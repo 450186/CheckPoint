@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheckPoint</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Share+Tech&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    referrerpolicy="no-referrer" 
+/>
+</head>
+<body>
+    
+<header class=" <%= (title == "Home" || title == "Login" || title == "Register") ? "centered" : "" %>">
+    <h1>CheckPoint</h1>
+    <% if (title !== "Home" && title !== "Login" && title !== "Register") { %>
+    <div id="search-container">
+        <input type="search" id="search" placeholder="Search games...">
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
+    <img src="/assets/<%= user?.profilePicture || 'account logo.png' %>" alt="Account Logo" class="account-logo"> 
+    <% } %>
+    <% if (title == "Home") { %>
+        <div class="home-links">
+            <a href="login">Login</a>
+            <a href="register">Register</a>
+        </div>
+    <% } %>
+</header>

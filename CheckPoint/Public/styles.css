@@ -1,18 +1,179 @@
 :root {
     /* ======== Base Colours ======== */
 
-    --primary : #0B1220;
-    --accent : #3B82F6;
-    --background : #0F172A;
-    --cards : #1E293B;
+    --primary : #22396b;
+    --accentHover : #192b50;
+    --accent : #4473d9;
+    --background : #3A65BB;
+    --cards : #2B4A8C;
     --text : #E5E7EB;
     --secondText : #94A3B8;
-    --border : #334155;
-
+    --border : #536D92;
+/*1E293B*/
     /* ======== Statuses ======== */
 
     --playing : #F59E0B;
     --completed : #22C55E;
     --wishlist : #6366F1;
     --dropped : #EF4444;
+
+    /* ======== Statuses ======== */
+
+    --shadow: 2px 10px 15px 5px #17274a;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: var(--primary);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.centered {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+a {
+    color: var(--text);
+    text-decoration: none;
+    margin: 0 15px;
+}
+a:hover {
+    color: var(--secondText);
+}
+.home-links {
+    right: 20px;
+    position: absolute;
+    font-weight: bold;
+}
+.card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px auto;
+    justify-content: center;
+    align-items: center;
+    max-width: 40%;
+    box-shadow: var(--shadow);
+}
+
+.account-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ======== Form styles ======== */
+
+#login-form, #register-form {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.form-row label {
+    text-align: left;
+}
+.form-row input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+    border-radius: 5px;
+}
+label {
+    display: inline-block;
+}
+#login-butt, #register-butt {
+  display: block;
+  width: fit-content;
+  margin: 20px auto 0;
+}
+
+/* ======== Buttons ======== */
+input[type="submit"] {
+    background-color: var(--accent);
+    color: var(--text);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border-color: var(--border);
+}
+input[type="submit"]:hover {
+    background-color: var(--accentHover);
+}
+#info-icon {
+    cursor: pointer;
+    color: var(--text);
+}
+#info-icon:hover {
+    color: var(--secondText);
+}
+
+/* ======== Divs ======== */
+
+#password-rules-div {
+    margin-bottom: 20px;
+    display: flex;
+    flex-flow: column;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+    left: 50%;
+    background-color: var(--cards);
+    box-shadow: var(--shadow);
+    color: var(--text);
+    text-align: left;
+    border-radius: 50px;
+    z-index: 1500;
+    padding: 20px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+#password-rules-div.show {
+    display: block;
+    opacity: 1;
+}
+.div-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.div-heading h2 {
+    margin-left: 20px;
+    margin: 0;
+    line-height: 1;
+
+}
+.div-heading .closebtn{
+  margin-right: 20px;
+  line-height: 1;
+  font-size: 40px;
+  cursor: pointer;
+  color: var(--text);
+  display: inline-flex; 
+  align-items: center;
+}
+.div-heading .closebtn:hover {
+    color: var(--secondText);
 }

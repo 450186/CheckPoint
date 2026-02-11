@@ -1,0 +1,66 @@
+<%- include('../Partials/header') %>
+<div class="card">
+    <form id="register-form" action="/register" method="POST">
+        <div class="form-row">
+            <label>Email</label>
+            <input 
+            type="email" 
+            id="email" 
+            name="email"
+            placeholder="E.g. Joebloggs@email.com"
+            required>
+        </div>
+        <div class="form-row">
+            <label>Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-row">
+            <label style="position: relative;">
+                Password
+                <i id="info-icon" class="fa-solid fa-circle-info"></i>
+            </label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-row">
+            <label>First Name</label>
+            <input type="text" id="Firstname" name="firstName" required>
+        </div>
+        <div class="form-row">
+            <label>Last Name</label>
+            <input type="text" id="Lastname" name="lastName" required>
+        </div>
+        <input id="register-butt" type="submit" value="Register">
+    </form>
+</div>    
+    <% if(typeof errorMessage !== 'undefined') { %>
+        <p id="errorMessage"> <%= errorMessage %> </p>
+    <% } %>
+    <p style="text-align: center;">Already have an account? <a href="/login">Login here</a></p>
+    <div id="password-rules-div">
+        <div class="div-heading">
+            <h2 style="line-height: 1; margin-top: 0;">Password Rules</h2>
+            <a aria-label="Close" id="closebtn" class="closebtn">&times;</a>
+        </div>
+        <ul id="password-list">
+            <li>Must be at least 8 characters</li>
+            <li>Must include 1 uppercase letter</li>
+            <li>Must include 1 number</li>
+            <li>Must include 1 special character</li>
+        </ul>
+    </div>
+<script>
+    let info = document.getElementById("info-icon")
+    let closebtn = document.getElementById("closebtn")
+    let passwordDiv = document.getElementById("password-rules-div")
+
+    function togglePassRules() {
+        if(passwordDiv.classList.contains("show")) {
+            passwordDiv.classList.remove("show")
+        } else {
+            passwordDiv.classList.add("show")
+        }
+    }
+    info.addEventListener("click", togglePassRules)
+    closebtn.addEventListener("click", togglePassRules)
+</script>
+<%- include('../Partials/footer') %>
