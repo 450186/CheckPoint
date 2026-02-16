@@ -14,29 +14,6 @@ const userSchema = new Schema({
 
 const userData = model('User', userSchema);
 
-// async function createUser(username, hashed, email, firstName, lastName) {
-//     if (!username || !hashed || !email || !firstName || !lastName) {
-//         throw new Error('All fields are required to create a user.');
-//     }
-//     const userExists = await userData.findOne({ $or: [{ username }, { email }] }).exec();
-//     if (userExists) {
-//         return false;
-//     }
-//     try {
-//         await userData.create({
-//             username,
-//             password,
-//             email,
-//             firstName,
-//             lastName,
-//         })
-//         return true;
-//     }
-//     catch (err) {
-//         console.error('Error creating user:', err);
-//         throw new Error('Failed to create user.');
-//     }
-// }
 async function createUser(username, password, email, firstName, lastName) {
   if (!username || !password || !email || !firstName || !lastName) {
     throw new Error("All fields are required to create a user.");

@@ -1,0 +1,190 @@
+<%- include('../Partials/header') %>
+<div class="sidebar">
+  <ul class="nav-list">
+    <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+    <li class="nav-item active-link"><a href="/discover"><%= title %></a></li>
+    <li class="nav-item"><a href="/library">My Library</a></li>
+    <li class="nav-item logout"><a href="/logout">Logout</a></li>
+  </ul>
+</div>
+
+<!-- Game Modal -->
+<div id="game-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-body">
+            <img id="modal-cover" class="modal-cover" src="" alt="">
+            <div class="modal-info">
+                <div class="modal-header">
+                    <h2 id="modal-title"></h2>
+                    <button class="modal-close" type="button" aria-label="close-modal">&CircleTimes;</button>
+                </div>
+                <p id="modal-info" class="muted-text"></p>
+                <p id="modal-genres"></p>
+                <p id="modal-rating"></p>
+                <div class="card-spacer"></div>
+                <div class="modal-actions">
+                <form action="/library/add" class="library-form" method="POST" onclick="event.stopPropagation()">
+                    <input type="hidden" name="gameId" value="">
+                    <input type="hidden" name="name" value="">
+                    <input type="hidden" name="coverUrl" value="">
+                    <input type="hidden" name="status" value="wishlist">
+                    <button type="submit" class="add-btn">+ Add to Library</button>
+                </form>
+                <form action="" method="GET" id="go-to-game" class="view-game-form">
+                    <input type="hidden" name="gameId" value="">
+                    <button type="submit" id="game-btn" class="go-to-game">Go to Game</button>
+                </form>
+            </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="main-content">
+    <h2 class="title"><%= title %></h2>
+    <p>Discover new games and expand your library with our curated selection of titles.</p>
+    <% if (errorMessage) { %>
+        <p class="error-message"><%= errorMessage %></p> 
+    <% } %>
+    <div class="card-rows">
+        <% games.forEach(game => { %>
+            <div
+                class="dash-card game-card"
+                data-game-id="<%= game.id %>"
+                data-name="<%= game.name %>"
+                data-cover="http:<%= game.cover.url.replace('t_thumb','t_cover_big') %>"
+                data-genres="<%= game.genres ? game.genres.map(g => g.name).join(', ') : 'Unknown' %>"
+                data-rating="<%= game.aggregated_rating ? Math.round(game.aggregated_rating) : '' %>"
+                data-release="<%= game.first_release_date ? new Date(game.first_release_date * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown' %>"
+            >
+            <div class="game-card-header">
+                <img 
+                src="http:<%= game.cover.url.replace("t_thumb", "t_cover_big") %>"
+                alt="<%= game.name %>"
+                class="game-cover"
+                >
+                <h3><%= game.name %></h3>
+            </div>
+            <p><strong>Genre:</strong> <%= game.genres ? game.genres.map(g => g.name).join(', ') : 'Unknown' %></p>
+            <% const releaseDate = game.first_release_date
+            ? new Date(game.first_release_date * 1000).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }) : "Unknown" %>
+            <p><strong>Release Date:</strong> <%= releaseDate %></p>
+            <p class="mutedText"><strong>Rating:</strong>
+                <%= game.aggregated_rating ? Math.round(game.aggregated_rating) : "N/A" %>
+            </p>
+            <div class="card-spacer"></div>
+            <form action="/library/add" class="library-form" method="POST" onclick="event.stopPropagation()">
+                <input type="hidden" name="gameId" value="<%= game.id %>">
+                <input type="hidden" name="name" value="<%= game.name %>">
+                <input type="hidden" name="coverUrl" value="<%= game.cover.url.replace("t_thumb", "t_cover_big") %>">
+                <input type="hidden" name="status" value="wishlist">
+                <% if (ownedGames.has(game.id)) { %>
+                    <button type="submit" class="add-btn disabled" disabled>Added</button>
+                <% } else { %>
+                    <button type="submit" class="add-btn">+ Add to Library</button>
+                <% } %>
+            </form>
+        </div>
+        <% }) %>
+    </div>
+    <%
+        const currentPage = Number(pageNum || 1);
+        const queryParam = (query && query.trim())
+            ? `&query=${encodeURIComponent(query.trim())}`
+            : "";
+    %>
+
+    <div class="pagination">
+        <% if (currentPage > 1) { %>
+            <a href="/discover?page=<%= currentPage - 1 %><%= queryParam %>">
+            <i class="chevron fa-solid fa-circle-chevron-left"></i>
+            </a>
+        <% } else { %>
+            <span>
+            <i class="chevron fa-solid fa-circle-chevron-left disabled"></i>
+            </span>
+        <% } %>
+
+        <span class="number">Page <%= currentPage %></span>
+
+        <a href="/discover?page=<%= currentPage + 1 %><%= queryParam %>">
+            <i class="chevron fa-solid fa-circle-chevron-right"></i>
+        </a>
+    </div>
+
+</div>
+    <script>
+        const addButton = document.getElementById('add-library'); 
+        if(addButton) {
+            addButton.addEventListener('mouseover', () => {
+                addButton.style.cursor = 'default'
+            })
+            addButton.addEventListener('mouseout', () => { 
+                addButton.style.cursor = 'pointer' 
+            })
+        }
+    </script>
+    <script>
+        const overlay = document.getElementById("game-modal")
+        const modal = overlay.querySelector(".modal")
+        const closebtn = overlay.querySelector(".modal-close")
+
+        const titleEl = document.getElementById("modal-title")
+        const coverEl = document.getElementById("modal-cover")
+        const infoEl = document.getElementById("modal-info")
+        const genresEl = document.getElementById("modal-genres")
+        const ratingEl = document.getElementById("modal-rating")
+
+        const gameForm = document.getElementById("go-to-game")
+
+        const cards = document.querySelectorAll(".game-card")
+
+
+        function openModalfromCard(card) {
+            const name = card.dataset.name || "Unknown"
+            const coverUrl = card.dataset.cover || ""
+            const genres = card.dataset.genres || "Unknown"
+            const rating = card.dataset.rating || ""
+            const release = card.dataset.release || ""
+            
+            titleEl.textContent = name
+            coverEl.src = coverUrl
+            infoEl.innerHTML = `<strong>Release Date: </strong> ${release}`
+            genresEl.innerHTML = `<strong>Genres: </strong> ${genres}`
+            ratingEl.innerHTML = `<strong>Rating: </strong> ${rating ? rating : "N/A"}`
+
+            gameForm.action = `/game/${card.dataset.gameId}`
+
+            overlay.classList.add("show")
+            overlay.setAttribute("aria-hidden", "false")
+            document.body.style.overflow = "hidden"
+        }
+        function closeModal() {
+            overlay.classList.remove("show")
+            overlay.setAttribute("aria-hidden", "true")
+            document.body.style.overflow = ""
+        }
+        cards.forEach(card => {
+            card.addEventListener("click", () => openModalfromCard(card))
+        });
+        closebtn.addEventListener("click", closeModal)
+
+        overlay.addEventListener("click", (event) => {
+            if (event.target === overlay) {
+                closeModal()
+            }
+        })
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && overlay.classList.contains("show")) {
+                closeModal()
+            }
+        })
+        
+    </script>
+<%- include('../Partials/footer') %>

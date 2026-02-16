@@ -1,5 +1,110 @@
 <%- include('../Partials/header') %>
-<h2><%= title %></h2>
 
+<div class="sidebar">
+  <ul class="nav-list">
+    <li class="nav-item active-link"><a href="/dashboard"><%= title %></a></li>
+    <li class="nav-item"><a href="/discover">Discover</a></li>
+    <li class="nav-item"><a href="/library">My Library</a></li>
+    <li class="nav-item logout"><a href="/logout">Logout</a></li>
+  </ul>
+</div>
+
+<div class="main-content">
+  <h2 class="title"><%= title %></h2>
+
+  <div class="welcome-message">
+    <h3>Welcome back, <%= user.firstName %>!</h3>
+  </div>
+
+    <div class="card-rows">
+      <div class="dash-card">
+          <h3>Your Stats</h3>
+          <p>Your key stats below:</p>
+          <p class="stats-list">
+              <i class="fa-solid fa-gamepad"></i>
+              <i class="fa-solid fa-gamepad"></i>
+              <i class="fa-solid fa-gamepad"></i>            
+          </p>
+          <div class="card-spacer"></div>
+      </div>
+      <div class="dash-card">
+          <h3>Wishlist Spotlight</h3>
+          <p>You have this game on your wishlist!</p>
+          <p class="wishlist">
+              <i class="fa-solid fa-gamepad"></i>
+          </p>
+          <div class="card-spacer"></div>
+          <button class="view-wishlist">View Wishlist</button>
+      </div>
+      <div class="dash-card">
+        <h3>Highest Rated</h3>
+        <p>Your highest rated games</p>
+        <p class="highest-rated">
+              <i class="fa-solid fa-gamepad"></i>
+              <i class="fa-solid fa-gamepad"></i>
+              <i class="fa-solid fa-gamepad"></i>
+        </p>
+        <div class="card-spacer"></div>
+      </div>
+    </div>
+    <div class="card-rows">
+          <div class="dash-card" id="continue-card">
+            <h3>Continue Playing</h3>
+            <p>Pick up where you left off in your current games.</p>
+            <p class="continue">
+            <% if (playing.length > 0) { %>
+              <div class="library-row">
+                <% playing.forEach(game => { %>
+                  <div class="library-card">
+                    <div class="game-card-header">
+                      <img src="<%= game.cachedCoverUrl %>" alt="<%= game.cachedName %>" class="game-cover">
+                      <p><strong><%= game.cachedName %></strong></p>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <p class="no-items">No games currently playing.</p>
+            <% } %>
+            </p>
+            <div class="card-spacer"></div>
+            <button onclick="window.location.href='/library'" class="view-library">View Library</button>
+        </div>
+    </div>
+  <div class="card-rows">
+    <div class="dash-card">
+      <h3>Recently Played</h3>
+      <p>View your recently played games and jump back in with one click.</p>
+      <p class="recent">
+        <i class="fa-solid fa-gamepad"></i>
+        <i class="fa-solid fa-gamepad"></i>
+        <i class="fa-solid fa-gamepad"></i>
+      </p>
+        <div class="card-spacer"></div>
+    </div>
+
+    <div class="dash-card">
+      <h3>Recommended for You</h3>
+      <p>Based on your gaming history, we think you'll love these titles.</p>
+      <p class="recommended">
+        <i class="fa-solid fa-gamepad"></i>
+        <i class="fa-solid fa-gamepad"></i>
+        <i class="fa-solid fa-gamepad"></i>
+      </p>
+        <div class="card-spacer"></div>
+    </div>
+
+    <div class="dash-card">
+      <h3>New Releases</h3>
+      <p>Check out the latest games added to our library.</p>
+      <p class="releases">
+        <i class="fa-solid fa-gamepad"></i>
+        <i class="fa-solid fa-gamepad"></i>
+        <i class="fa-solid fa-gamepad"></i>
+      </p>
+        <div class="card-spacer"></div>
+    </div>
+  </div>
+</div>
 
 <%- include('../Partials/footer') %>

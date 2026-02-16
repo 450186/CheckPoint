@@ -1,0 +1,93 @@
+<%- include('../Partials/header') %>
+<div class="sidebar">
+    <ul class="nav-list">
+        <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a href="/discover">Discover</a></li>
+        <li class="nav-item"><a href="/library">My Library</a></li>
+        <li class="nav-item logout"><a href="/logout">Logout</a></li>
+    </ul>
+</div>
+<div class="main-content">
+    <div class="game-header"> <button class="back-button">
+            <!-- <span class="chevron">&#8249;</span> --> 
+             <i class="fa-solid fa-circle-chevron-left"></i> <span>Back</span>
+        </button>
+        <h2 class="title">
+            <%= title %>
+        </h2>
+    </div>
+    <div class="game-info-container">
+        <div> <img src="<%= game.coverUrl %>"
+                alt="<%= game.name %>" class="game-cover">
+        </div>
+        <div class="game-details">
+            <p class="game-info"><strong>Developer:</strong>
+                <%= game.developer %>
+            </p>
+            <p class="game-info"><strong>Description:</strong>
+                <%= game.description %>
+            </p>
+            <p class="game-info"><strong>Genre:</strong>
+                <%= (game.genres && game.genres.length) ? game.genres.join(', '): 'Unknown' %>
+            </p>
+            <p class="game-info"><strong>Platform:</strong>
+                <%= (game.platforms && game.platforms.length) ? game.platforms.join(', '): 'Unknown' %>
+            </p>
+            <p class="game-info"><strong>Release Date:</strong>
+                <%= game.releaseDate ? new Date(game.releaseDate * 1000).toLocaleDateString("en-GB", {day: "2-digit",month: "short",year: "numeric"}) : "Unknown" %>
+            </p>
+            <p class="game-info"><strong>Rating:</strong>
+                <%= game.rating ? Math.round(game.rating) : "N/A" %>
+            </p>
+        </div>
+    </div>
+    <% if (moreFromDev && moreFromDev.length) { %>
+        <h3>More From <strong>
+                <%= game.developer %>
+            </strong></h3>
+        <div class="library-row">
+            <% moreFromDev.forEach(g => { %>
+            <div class="library-card">
+                <div class="game-card-header">
+                    <% if (g.cover && g.cover.url) { %>
+                     <img
+                            src="http:<%= g.cover.url.replace('t_thumb', 't_cover_big') %>"
+                            alt="<%= g.name %>"
+                            class="game-cover"> 
+                    <% } %>
+                    <p><strong>
+                            <%= g.name %>
+                        </strong></p>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    <% } %>
+    <% if (similarGenres && similarGenres.length) { %>
+        <h3>Same Genre</h3>
+        <div class="library-row">
+            <% similarGenres.forEach(g => { %>
+            <div class="library-card">
+                <div class="game-card-header">
+                    <% if (g.cover && g.cover.url) { %>
+                     <img
+                            src="http:<%= g.cover.url.replace('t_thumb', 't_cover_big') %>"
+                            alt="<%= g.name %>"
+                            class="game-cover"> 
+                    <% } %>
+                    <p><strong>
+                            <%= g.name %>
+                        </strong></p>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+<script>
+    const back = document.querySelector('.back-button');
+    back.addEventListener('click', () => {
+        window.history.go(-2);
+    });
+</script>
+<%- include('../Partials/footer') %>

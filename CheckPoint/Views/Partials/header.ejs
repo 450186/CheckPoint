@@ -16,13 +16,37 @@
 <body>
     
 <header class=" <%= (title == "Home" || title == "Login" || title == "Register") ? "centered" : "" %>">
-    <h1>CheckPoint</h1>
+    <h1 href="/">CheckPoint</h1>
     <% if (title !== "Home" && title !== "Login" && title !== "Register") { %>
-    <div id="search-container">
-        <input type="search" id="search" placeholder="Search games...">
-        <i class="fa-solid fa-magnifying-glass"></i>
+    <form action="/search" method="GET">
+        <div id="search-container">
+        <input
+        name="query"
+        type="search"
+        id="search"
+        placeholder="Search games..."
+        autocomplete="off"
+        value="<%= typeof query !== 'undefined' ? query : '' %>"
+        onfocus="this.value=''"
+        >
+            <button id="search-btn" type="submit" >
+                <i class="fa-solid fa-magnifying-glass fa-rotate-90 search-btn"></i>
+            </button>
+        </div>
+    </form>
+    <div class="account-container">
+        <p class="account-name"><%= user?.username || 'Account' %></p>
+        <img src="/assets/<%= user?.profilePicture || 'account logo.png' %>" alt="Account Logo" class="account-logo"> 
     </div>
-    <img src="/assets/<%= user?.profilePicture || 'account logo.png' %>" alt="Account Logo" class="account-logo"> 
+     <div class="account-dropdown">
+        <ul>
+            <li><a href="/profile" role="menuitem">Profile</a></li>
+            <li><a href="/wishlist" role="menuitem">Wishlist</a></li>
+            <li><a href="/settings" role="menuitem">Settings</a></li>
+            <li><a href="/logout" role="menuitem">Logout</a></li>
+        </ul>
+    </div>
+
     <% } %>
     <% if (title == "Home") { %>
         <div class="home-links">
@@ -30,4 +54,25 @@
             <a href="register">Register</a>
         </div>
     <% } %>
+
+    <script>
+    // Dropdown menu functionality
+    const accountContainer = document.querySelector('.account-container');
+    const dropdown = document.querySelector('.account-dropdown');
+    accountContainer.addEventListener('click', function() {
+        dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1';
+    });
+        // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!accountContainer.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.style.opacity = '0';
+        }
+    });
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            dropdown.style.opacity = '0';
+        }
+    });
+    </script>
+
 </header>
