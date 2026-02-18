@@ -8,7 +8,8 @@
     </ul>
 </div>
 <div class="main-content">
-    <div class="game-header"> <button class="back-button">
+    <div class="game-header"> 
+        <button onclick="window.location.href='/back'" class="back-button">
             <!-- <span class="chevron">&#8249;</span> --> 
              <i class="fa-solid fa-circle-chevron-left"></i> <span>Back</span>
         </button>
@@ -84,10 +85,4 @@
         </div>
     <% } %>
 </div>
-<script>
-    const back = document.querySelector('.back-button');
-    back.addEventListener('click', () => {
-        window.history.go(-2);
-    });
-</script>
 <%- include('../Partials/footer') %>

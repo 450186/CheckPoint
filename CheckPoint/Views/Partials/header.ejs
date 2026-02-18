@@ -12,11 +12,14 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     referrerpolicy="no-referrer" 
 />
+<script src="Modalfunction.js" defer></script>
 </head>
 <body>
     
 <header class=" <%= (title == "Home" || title == "Login" || title == "Register") ? "centered" : "" %>">
-    <h1 href="/">CheckPoint</h1>
+    <a href="/dashboard">
+        <h1>CheckPoint</h1>
+    </a>
     <% if (title !== "Home" && title !== "Login" && title !== "Register") { %>
     <form action="/search" method="GET">
         <div id="search-container">
@@ -53,6 +56,10 @@
             <a href="login">Login</a>
             <a href="register">Register</a>
         </div>
+    <% } %>
+
+    <% if (title == "Home" && title == "Register" && title == "Login") { %>
+        <%- include('../Partials/Modal') %>
     <% } %>
 
     <script>

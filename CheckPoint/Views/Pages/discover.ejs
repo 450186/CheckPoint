@@ -8,39 +8,6 @@
   </ul>
 </div>
 
-<!-- Game Modal -->
-<div id="game-modal" class="modal-overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal-body">
-            <img id="modal-cover" class="modal-cover" src="" alt="">
-            <div class="modal-info">
-                <div class="modal-header">
-                    <h2 id="modal-title"></h2>
-                    <button class="modal-close" type="button" aria-label="close-modal">&CircleTimes;</button>
-                </div>
-                <p id="modal-info" class="muted-text"></p>
-                <p id="modal-genres"></p>
-                <p id="modal-rating"></p>
-                <div class="card-spacer"></div>
-                <div class="modal-actions">
-                <form action="/library/add" class="library-form" method="POST" onclick="event.stopPropagation()">
-                    <input type="hidden" name="gameId" value="">
-                    <input type="hidden" name="name" value="">
-                    <input type="hidden" name="coverUrl" value="">
-                    <input type="hidden" name="status" value="wishlist">
-                    <button type="submit" class="add-btn">+ Add to Library</button>
-                </form>
-                <form action="" method="GET" id="go-to-game" class="view-game-form">
-                    <input type="hidden" name="gameId" value="">
-                    <button type="submit" id="game-btn" class="go-to-game">Go to Game</button>
-                </form>
-            </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
 <div class="main-content">
     <h2 class="title"><%= title %></h2>
     <p>Discover new games and expand your library with our curated selection of titles.</p>
@@ -129,62 +96,5 @@
             })
         }
     </script>
-    <script>
-        const overlay = document.getElementById("game-modal")
-        const modal = overlay.querySelector(".modal")
-        const closebtn = overlay.querySelector(".modal-close")
 
-        const titleEl = document.getElementById("modal-title")
-        const coverEl = document.getElementById("modal-cover")
-        const infoEl = document.getElementById("modal-info")
-        const genresEl = document.getElementById("modal-genres")
-        const ratingEl = document.getElementById("modal-rating")
-
-        const gameForm = document.getElementById("go-to-game")
-
-        const cards = document.querySelectorAll(".game-card")
-
-
-        function openModalfromCard(card) {
-            const name = card.dataset.name || "Unknown"
-            const coverUrl = card.dataset.cover || ""
-            const genres = card.dataset.genres || "Unknown"
-            const rating = card.dataset.rating || ""
-            const release = card.dataset.release || ""
-            
-            titleEl.textContent = name
-            coverEl.src = coverUrl
-            infoEl.innerHTML = `<strong>Release Date: </strong> ${release}`
-            genresEl.innerHTML = `<strong>Genres: </strong> ${genres}`
-            ratingEl.innerHTML = `<strong>Rating: </strong> ${rating ? rating : "N/A"}`
-
-            gameForm.action = `/game/${card.dataset.gameId}`
-
-            overlay.classList.add("show")
-            overlay.setAttribute("aria-hidden", "false")
-            document.body.style.overflow = "hidden"
-        }
-        function closeModal() {
-            overlay.classList.remove("show")
-            overlay.setAttribute("aria-hidden", "true")
-            document.body.style.overflow = ""
-        }
-        cards.forEach(card => {
-            card.addEventListener("click", () => openModalfromCard(card))
-        });
-        closebtn.addEventListener("click", closeModal)
-
-        overlay.addEventListener("click", (event) => {
-            if (event.target === overlay) {
-                closeModal()
-            }
-        })
-
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape" && overlay.classList.contains("show")) {
-                closeModal()
-            }
-        })
-        
-    </script>
 <%- include('../Partials/footer') %>

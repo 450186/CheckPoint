@@ -109,6 +109,27 @@ async function IGDBrequest(endpoint, body) {
     return response.json()
 }
 
+app.use((req, res, next) => {
+  const ignore =
+    req.method !== "GET" ||
+    req.path.startsWith("/css") ||
+    req.path.startsWith("/js") ||
+    req.path.startsWith("/Public") ||
+    req.path === "/login" ||
+    req.path === "/register" ||
+    req.path === "/logout" ||
+    req.path === "/back";
+
+  if (!ignore) {
+    // shift current -> previous, then store new current
+    req.session.prevPage = req.session.currPage;
+    req.session.currPage = req.originalUrl;
+  }
+
+  next();
+});
+
+
 
 app.get('/', (req, res) => {
     res.render('pages/home', {
@@ -128,6 +149,13 @@ app.get("/login", async (req, res) => {
         loggedIn: isLoggedIn(req),
     })
 })
+app.get("/back", (req, res) => {
+  const fallback = "/dashboard";
+  const prev = req.session.prevPage;
+  if (typeof prev === "string" && prev.startsWith("/")) return res.redirect(prev);
+  return res.redirect(fallback);
+});
+
 
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -257,6 +285,13 @@ app.get("/discover", checkLogin, async (req, res) => {
 });
 app.get("/game/:id", checkLogin, async (req, res) => {
     const id = Number(req.params.id);
+      if (!Number.isFinite(id)) {
+        return res.redirect("/discover"); 
+  }
+  const from = req.query.from;
+  if(typeof from === 'string' && from.startsWith('/' ) && !from.startsWith('/game/')) {
+    req.session.prevPage = from      
+  }
 
     const [g] = await IGDBrequest("games", `
         fields

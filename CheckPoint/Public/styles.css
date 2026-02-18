@@ -738,6 +738,26 @@ button:hover {
 .modal-actions form {
     flex: 1;
 }
+.modal-actions button {
+    flex: 1;
+    font-size: 14px;
+}
+#modal-go-to-game {
+    font-size: 14px;
+    flex: 1;
+    text-align: center;
+    background-color: var(--accent);
+    color: var(--text);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border-color: var(--border);
+}
+
+#modal-go-to-game:hover {
+    background-color: var(--accentHover);
+}
 
 @media (max-width: 650px) {
     .modal-body {
