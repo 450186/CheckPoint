@@ -231,6 +231,26 @@ app.get("/discover", checkLogin, async (req, res) => {
     const q = (req.query.query || "").trim();
     const pageNum = Math.max(parseInt(req.query.page || "1", 10), 1);
 
+    const genres = (req.query.genres || "").toString().trim();
+    const platforms = (req.query.platforms || "").toString().trim();
+    const minRating = Number(req.query.minRating || 0)
+    const yearFrom = Number(req.query.yearFrom || 0)
+    const yearTo = Number(req.query.yearTo || 0)
+    const sort = (req.query.sort || "newest").toString().toLowerCase()
+
+    function IDlist(str) {
+        return str
+            .split(",")
+            .map((s) => s.trim())
+            .filter(n => Number.isFinite(n) && n > 0);
+    }
+
+    const genreIds = IDlist(genres);
+    const platformIds = IDlist(platforms);
+
+    const fromDate = yearFrom ? Math.floor(new Date(`${yearFrom}-01-01`).getTime() / 1000) : null
+    const toDate = yearTo ? Math.floor(new Date(`${yearTo}-12-31`).getTime() / 1000) : null;
+
     try {
         const libraryItems = await libraryModel
             .find({ userId: req.session.user.id })
@@ -240,25 +260,51 @@ app.get("/discover", checkLogin, async (req, res) => {
         const limit = 12;
         const offset = (pageNum - 1) * limit;
 
+        const whereParts = ["cover != null & aggregated_rating != null"];
+
         const safeQ = q.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
-        const igdbBody = q
-            ? `
-    search "${safeQ}";
+        if(genreIds.length) {
+            whereParts.push(`genres = (${genreIds.join(",")})`)
+        }
+        if(platformIds.length) {
+            whereParts.push(`platforms = (${platformIds.join(",")})`)
+        }
+        if(Number.isFinite(minRating) && minRating > 0) {
+            whereParts.push(`aggregated_rating != null`)
+            whereParts.push(`aggregated_rating >= ${Math.min(minRating, 100)}`)
+        }
+
+        if(fromDate) {
+            whereParts.push(`first_release_date != null`)
+            whereParts.push(`first_release_date >= ${fromDate}`)
+        }
+        if(toDate) {
+            whereParts.push(`first_release_date != null`)
+            whereParts.push(`first_release_date <= ${toDate}`)
+        }
+
+        whereParts.push(`version_parent = null`)
+        whereParts.push(`parent_game = null`)
+
+        let sortLine = `sort first_release_date desc`
+        if(sort === "rating"){
+            sortLine = `sort aggregated_rating desc`
+        }
+        if(sort === "name"){
+            sortLine = `sort name asc`
+        }
+
+        const igdbBody =  `
+    ${q ? `search "${safeQ}";` : ""}
     fields name, cover.url, first_release_date, aggregated_rating, platforms.name, genres.name;
-    where cover != null;
+    where ${whereParts.join(" & ")};
+    ${sortLine};
     limit ${limit};
     offset ${offset};
     `
-            : `
-    fields name, cover.url, first_release_date, aggregated_rating, platforms.name, genres.name;
-    where cover != null & aggregated_rating != null;
-    sort first_release_date desc;
-    limit ${limit};
-    offset ${offset};`;
 
         const games = await IGDBrequest("games", igdbBody);
-        console.log("q =", q, "| games =", games.length);
 
         res.render("pages/discover", {
             title: "Discover",
@@ -268,6 +314,15 @@ app.get("/discover", checkLogin, async (req, res) => {
             pageNum,
             ownedGames,
             query: q,
+
+            filters: {
+                genres: genreIds,
+                platforms: platformIds,
+                minRating: Number.isFinite(minRating) ? minRating : 0,
+                yearFrom: yearFrom || "",
+                yearTo: yearTo || "",
+                sort,
+            }
         });
     } catch (error) {
         console.error(error);
@@ -280,6 +335,15 @@ app.get("/discover", checkLogin, async (req, res) => {
             pageNum,
             ownedGames: new Set(),
             query: q,
+
+            filters: {
+                genres: [],
+                platforms: [],
+                minRating: 0,
+                yearFrom: "",
+                yearTo: "",
+                sort: "newest"
+            }
         });
     }
 });

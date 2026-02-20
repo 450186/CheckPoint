@@ -67,17 +67,17 @@
     const accountContainer = document.querySelector('.account-container');
     const dropdown = document.querySelector('.account-dropdown');
     accountContainer.addEventListener('click', function() {
-        dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1';
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     });
         // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
         if (!accountContainer.contains(event.target) && !dropdown.contains(event.target)) {
-            dropdown.style.opacity = '0';
+            dropdown.style.display = 'none';
         }
     });
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape") {
-            dropdown.style.opacity = '0';
+            dropdown.style.display = 'none';
         }
     });
     </script>

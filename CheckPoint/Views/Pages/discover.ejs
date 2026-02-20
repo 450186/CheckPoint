@@ -14,6 +14,27 @@
     <% if (errorMessage) { %>
         <p class="error-message"><%= errorMessage %></p> 
     <% } %>
+    
+    <div class="filter-container" id="filters">
+        <div class="filter-item">
+            <button data-filter="genres">Genres</button>
+        </div>
+        <div class="filter-item">
+            <button data-filter="platforms">Platforms</button>
+        </div>
+        <div class="filter-item">
+            <button data-filter="minRating">Rating</button>
+        </div>
+        <div class="filter-item">
+            <button data-filter="release">Release Date</button>
+        </div>
+        <div class="filter-item">
+            <button data-filter="sort">Sort</button>
+        </div>
+    </div>
+
+    <div class="filter-select-div" hidden id="filter-dropdown"></div>
+
     <div class="card-rows">
         <% games.forEach(game => { %>
             <div
@@ -60,41 +81,115 @@
         <% }) %>
     </div>
     <%
-        const currentPage = Number(pageNum || 1);
-        const queryParam = (query && query.trim())
-            ? `&query=${encodeURIComponent(query.trim())}`
-            : "";
+        const currentPage = Number(pageNum || 1)
+        const params = new URLSearchParams()
+
+        if(query && query.trim()) {
+            params.set('query', query.trim())
+        }
+
+        if(filters?.genres?.length) params.set('genres', filters.genres.join(','))
+        if(filters?.platforms?.length) params.set('platforms', filters.platforms.join(','))
+        if(filters?.minRating) params.set('minRating', String(filters.minRating))
+        if(filters?.yearFrom) params.set('yearFrom', String(filters.yearFrom))
+        if(filters?.yearTo) params.set('yearTo', String(filters.yearTo))
+        if(filters?.sort) params.set('sort', filters.sort)
+
+        const qs = params.toString()
     %>
 
     <div class="pagination">
-        <% if (currentPage > 1) { %>
-            <a href="/discover?page=<%= currentPage - 1 %><%= queryParam %>">
-            <i class="chevron fa-solid fa-circle-chevron-left"></i>
-            </a>
-        <% } else { %>
-            <span>
-            <i class="chevron fa-solid fa-circle-chevron-left disabled"></i>
-            </span>
-        <% } %>
-
-        <span class="number">Page <%= currentPage %></span>
-
-        <a href="/discover?page=<%= currentPage + 1 %><%= queryParam %>">
-            <i class="chevron fa-solid fa-circle-chevron-right"></i>
+    <% if (currentPage > 1) { %>
+        <a href="/discover?page=<%= currentPage - 1 %><%= qs ? '&' + qs : '' %>">
+        <i class="chevron fa-solid fa-circle-chevron-left"></i>
         </a>
+    <% } else { %>
+        <span>
+        <i class="chevron fa-solid fa-circle-chevron-left disabled"></i>
+        </span>
+    <% } %>
+
+    <span class="number">Page <%= currentPage %></span>
+
+    <a href="/discover?page=<%= currentPage + 1 %><%= qs ? '&' + qs : '' %>">
+        <i class="chevron fa-solid fa-circle-chevron-right"></i>
+    </a>
     </div>
 
+
 </div>
-    <script>
-        const addButton = document.getElementById('add-library'); 
-        if(addButton) {
-            addButton.addEventListener('mouseover', () => {
-                addButton.style.cursor = 'default'
-            })
-            addButton.addEventListener('mouseout', () => { 
-                addButton.style.cursor = 'pointer' 
-            })
-        }
-    </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const dropdown = document.getElementById("filter-dropdown");
+  const filtersBar = document.getElementById("filters");
+
+  if (!dropdown || !filtersBar) {
+    console.log("Missing dropdown or filtersBar", { dropdown, filtersBar });
+    return;
+  }
+
+  const currentSort = "<%= (filters && filters.sort) ? filters.sort : 'release' %>";
+
+  filtersBar.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const type = btn.dataset.filter;
+    console.log("Clicked filter:", type);
+
+    if (type !== "sort") {
+      dropdown.hidden = true;
+      return;
+    }
+
+    dropdown.innerHTML = `
+      <div>
+        <p>Sort By:</p>
+
+        <select id="sort-select">
+          <option value="release" ${currentSort === "release" ? "selected" : ""}>Newest</option>
+          <option value="rating" ${currentSort === "rating" ? "selected" : ""}>Highest Rating</option>
+          <option value="name" ${currentSort === "name" ? "selected" : ""}>Name (A–Z)</option>
+        </select>
+
+        <div style="display:flex; margin-top:10px; gap:10px">
+          <button type="button" id="apply-sort" class="add-btn">Apply</button>
+          <button type="button" id="close-dropdown">Close</button>
+        </div>
+      </div>
+    `;
+
+    const rect = btn.getBoundingClientRect();
+    dropdown.style.left = `${rect.left + rect.width / 2}px`;
+    dropdown.style.top = `${rect.bottom + 10 + window.scrollY}px`;
+    dropdown.style.transform = "translateX(-50%)";
+    dropdown.hidden = false;
+  });
+
+  dropdown.addEventListener("click", (e) => {
+    if (e.target.id === "close-dropdown") {
+      dropdown.hidden = true;
+    }
+
+    if (e.target.id === "apply-sort") {
+      const sortVal = document.getElementById("sort-select").value;
+
+      const params = new URLSearchParams(window.location.search);
+      params.set("sort", sortVal);
+      params.set("page", "1");
+
+      window.location.href = `/discover?${params.toString()}`;
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (dropdown.hidden) return;
+    if (e.target.closest("#filters")) return;
+    if (e.target.closest("#filter-dropdown")) return;
+    dropdown.hidden = true;
+  });
+});
+</script>
+
 
 <%- include('../Partials/footer') %>
