@@ -51,9 +51,13 @@
                 <div class="library-row">
                     <% playing.forEach(game => { %>
                     <div class="library-card game-card"
-                        data-game-id="<%= game.gameId %>"
-                        data-name="<%= game.cachedName %>"
-                        data-cover="<%= game.cachedCoverUrl %>">
+                      data-game-id="<%= game.gameId %>"
+                      data-name="<%= game.cachedName %>"
+                      data-cover="<%= game.cachedCoverUrl %>"
+                      data-genres="<%= game.cachedGenres || '' %>"
+                      data-rating="<%= game.cachedRating || '' %>"
+                      data-release="<%= game.cachedRelease || '' %>"
+                    >
                         <div class="game-card-header"> <img
                                 src="<%= game.cachedCoverUrl %>"
                                 alt="<%= game.cachedName %>"

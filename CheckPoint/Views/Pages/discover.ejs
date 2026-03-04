@@ -22,14 +22,17 @@
         <div class="filter-item">
             <button data-filter="platforms">Platforms</button>
         </div>
+        <div class="filter-item release-div">
+            <button data-filter="release">Release Date</button>
+        </div>
         <div class="filter-item">
             <button data-filter="minRating">Rating</button>
         </div>
         <div class="filter-item">
-            <button data-filter="release">Release Date</button>
+            <button data-filter="sort">Sort</button>
         </div>
         <div class="filter-item">
-            <button data-filter="sort">Sort</button>
+          <button data-filter="reset">Reset</button>
         </div>
     </div>
 
@@ -71,6 +74,9 @@
                 <input type="hidden" name="name" value="<%= game.name %>">
                 <input type="hidden" name="coverUrl" value="<%= game.cover.url.replace("t_thumb", "t_cover_big") %>">
                 <input type="hidden" name="status" value="wishlist">
+                <input type="hidden" name="genres" value="<%= game.genres ? game.genres.map(g => g.name).join(', ') : '' %>">
+                <input type="hidden" name="rating" value="<%= game.aggregated_rating ? Math.round(game.aggregated_rating) : '' %>">
+                <input type="hidden" name="release" value="<%= releaseDate %>">
                 <% if (ownedGames.has(game.id)) { %>
                     <button type="submit" class="add-btn disabled" disabled>Added</button>
                 <% } else { %>
@@ -122,13 +128,19 @@
 document.addEventListener("DOMContentLoaded", () => {
   const dropdown = document.getElementById("filter-dropdown");
   const filtersBar = document.getElementById("filters");
+  const releaseDiv = document.getElementById("release-div")
 
   if (!dropdown || !filtersBar) {
     console.log("Missing dropdown or filtersBar", { dropdown, filtersBar });
     return;
   }
 
-  const currentSort = "<%= (filters && filters.sort) ? filters.sort : 'release' %>";
+const currentSort = "<%= (filters && filters.sort) ? filters.sort : 'release' %>";
+const CurrentMinRating = Number("<%= (filters && filters.minRating) ? filters.minRating : 80 %>");
+const CurrentYearFrom = "<%= (filters && filters.yearFrom) ? filters.yearFrom : '' %>";
+const CurrentYearTo = "<%= (filters && filters.yearTo) ? filters.yearTo : '' %>";
+const CurrentGenres = "<%= (filters && filters.genres) ? filters.genres.join(',') : '' %>";
+const CurrentPlatforms = "<%= (filters && filters.platforms) ? filters.platforms.join(',') : '' %>";
 
   filtersBar.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
@@ -137,12 +149,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const type = btn.dataset.filter;
     console.log("Clicked filter:", type);
 
-    if (type !== "sort") {
+    if (type !== "sort" && type !== "minRating" && type !== "yearFrom" && type !== "yearTo" && type !== "genres" && type !== "platforms" && type !== "release" && type !== "reset") {
       dropdown.hidden = true;
       return;
     }
-
-    dropdown.innerHTML = `
+    if(type === 'sort') {
+         dropdown.innerHTML = `
       <div>
         <p>Sort By:</p>
 
@@ -158,6 +170,52 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
     `;
+    }
+    if(type === 'minRating') {
+        dropdown.innerHTML = `
+        <div>
+          <p>Minimum Rating:</p>
+          <select id="min-rating-select">
+            <option value="0" ${CurrentMinRating === 0 ? "selected" : ""}>Any</option>
+            <option value="60" ${CurrentMinRating === 60 ? "selected" : ""}>60+</option>
+            <option value="70" ${CurrentMinRating === 70 ? "selected" : ""}>70+</option>
+            <option value="80" ${CurrentMinRating === 80 ? "selected" : ""}>80+</option>
+        </select>
+        <div class="filter-actions">
+          <button type="button" id="apply-rating" class="add-btn">Apply</button>
+          <button type="button" id="close-dropdown">Close</button>
+        </div>
+      </div>
+      `;
+    }
+    if(type === "release") {
+      dropdown.innerHTML = `
+      <div>
+        <p>Release Date From:</p>
+        <input type="month" id="year-from-input" value="${CurrentYearFrom}">
+      </div>
+      <div>
+        <p>Release Date To:</p>
+        <input type="month" id="year-to-input" value="${CurrentYearTo}">
+      </div>
+        <div class="filter-actions">
+          <button type="button" id="apply-year-from" class="add-btn">Apply</button>
+          <button type="button" id="close-dropdown">Close</button>
+        </div>
+      `;
+    }
+    if(type === 'reset') {
+      dropdown.innerHTML = `
+        <div>
+          <p>Are you sure you want to reset all filters?</p>
+        </div>
+        <div class="filter-actions">
+          <button type="button" id="reset-filters" class="add-btn">Reset</button>
+          <button type="button" id="close-dropdown">Close</button>
+        </div>
+      `;
+    }
+
 
     const rect = btn.getBoundingClientRect();
     dropdown.style.left = `${rect.left + rect.width / 2}px`;
@@ -180,6 +238,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
       window.location.href = `/discover?${params.toString()}`;
     }
+    if(e.target.id === "apply-rating") {
+      const ratingVal = document.getElementById("min-rating-select").value;
+      const params = new URLSearchParams(window.location.search);
+      params.set("minRating", ratingVal);
+      params.set("page", "1");
+      window.location.href = `/discover?${params.toString()}`;
+    }
+    if(e.target.id == "apply-year-from") {
+      const yearFromVal = document.getElementById("year-from-input").value;
+      const yearToVal = document.getElementById("year-to-input").value;
+      const params = new URLSearchParams(window.location.search);
+      params.set("yearFrom", yearFromVal);
+      params.set("yearTo", yearToVal);
+      params.set("page", "1");
+      window.location.href = `/discover?${params.toString()}`;
+    }
+    if(e.target.id == "reset-filters") {
+      const params = new URLSearchParams(window.location.search);
+      params.delete("genres");
+      params.delete("platforms");
+      params.delete("minRating");
+      params.delete("yearFrom");
+      params.delete("yearTo");
+      params.delete("sort");
+      params.set("page", "1");
+      window.location.href = `/discover?${params.toString()}`;
+    }
   });
 
   document.addEventListener("click", (e) => {
@@ -188,8 +273,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.closest("#filter-dropdown")) return;
     dropdown.hidden = true;
   });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !dropdown.hidden) {
+      dropdown.hidden = true;
+
+    }
+  });
 });
 </script>
-
-
 <%- include('../Partials/footer') %>

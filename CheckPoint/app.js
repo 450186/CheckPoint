@@ -234,22 +234,40 @@ app.get("/discover", checkLogin, async (req, res) => {
     const genres = (req.query.genres || "").toString().trim();
     const platforms = (req.query.platforms || "").toString().trim();
     const minRating = Number(req.query.minRating || 0)
-    const yearFrom = Number(req.query.yearFrom || 0)
-    const yearTo = Number(req.query.yearTo || 0)
+    const yearFrom = (req.query.yearFrom || "").toString().trim()
+    const yearTo = (req.query.yearTo || "").toString().trim()
     const sort = (req.query.sort || "newest").toString().toLowerCase()
 
     function IDlist(str) {
         return str
             .split(",")
-            .map((s) => s.trim())
+            .map((s) => Number(s.trim()))
             .filter(n => Number.isFinite(n) && n > 0);
     }
 
     const genreIds = IDlist(genres);
     const platformIds = IDlist(platforms);
 
-    const fromDate = yearFrom ? Math.floor(new Date(`${yearFrom}-01-01`).getTime() / 1000) : null
-    const toDate = yearTo ? Math.floor(new Date(`${yearTo}-12-31`).getTime() / 1000) : null;
+    function monthStartToUnix(yyyyMm) {
+        // yyyyMm = "YYYY-MM"
+        const ms = Date.parse(`${yyyyMm}-01T00:00:00.000Z`);
+        return Number.isFinite(ms) ? Math.floor(ms / 1000) : null;
+        }
+
+        function monthEndToUnix(yyyyMm) {
+        // end of month: first day of next month - 1 second
+        const [y, m] = yyyyMm.split("-").map(Number);
+        if (!Number.isFinite(y) || !Number.isFinite(m)) return null;
+
+        const nextMonth = m === 12 ? 1 : m + 1;
+        const nextYear = m === 12 ? y + 1 : y;
+
+        const ms = Date.parse(`${String(nextYear).padStart(4,"0")}-${String(nextMonth).padStart(2,"0")}-01T00:00:00.000Z`);
+        return Number.isFinite(ms) ? Math.floor(ms / 1000) - 1 : null;
+    }
+
+        const fromDate = yearFrom ? monthStartToUnix(yearFrom) : null;
+        const toDate = yearTo ? monthEndToUnix(yearTo) : null;
 
     try {
         const libraryItems = await libraryModel
@@ -287,24 +305,24 @@ app.get("/discover", checkLogin, async (req, res) => {
         whereParts.push(`version_parent = null`)
         whereParts.push(`parent_game = null`)
 
-        let sortLine = `sort first_release_date desc`
-        if(sort === "rating"){
-            sortLine = `sort aggregated_rating desc`
-        }
-        if(sort === "name"){
-            sortLine = `sort name asc`
+        let sortLine = "";
+        if (!q) {
+        sortLine = `sort first_release_date desc`;
+        if (sort === "rating") sortLine = `sort aggregated_rating desc`;
+        if (sort === "name") sortLine = `sort name asc`;
         }
 
-        const igdbBody =  `
-    ${q ? `search "${safeQ}";` : ""}
-    fields name, cover.url, first_release_date, aggregated_rating, platforms.name, genres.name;
-    where ${whereParts.join(" & ")};
-    ${sortLine};
-    limit ${limit};
-    offset ${offset};
-    `
+        const igdbBody = `
+        ${q ? `search "${safeQ}";` : ""}
+        fields name, cover.url, first_release_date, aggregated_rating, platforms.name, genres.name;
+        where ${whereParts.join(" & ")};
+        ${sortLine ? `${sortLine};` : ""}
+        limit ${limit};
+        offset ${offset};
+        `;
 
         const games = await IGDBrequest("games", igdbBody);
+
 
         res.render("pages/discover", {
             title: "Discover",
@@ -380,22 +398,53 @@ app.get("/game/:id", checkLogin, async (req, res) => {
 
     if (!g) return res.redirect('/discover')
 
-    const genresId = g.genres?.map(x => x.id) ?? [];
+const genreIds = g.genres?.map(x => x.id) ?? [];
+const similarIds = (g.similar_games || []).slice(0, 30);
 
-    const similarGenres = genresId.length
-        ? await IGDBrequest("games", `
-      fields id, name, cover.url, first_release_date, aggregated_rating;
-      where genres = (${genresId.join(",")})
-        & cover != null
-        & id != ${id}
-        & version_parent = null
-        & parent_game = null
-        & aggregated_rating != null
-        & aggregated_rating > 80;
-      sort aggregated_rating desc;
-      limit 6;
-    `)
-        : [];
+let similarGenres = [];
+
+if (similarIds.length) {
+  similarGenres = await IGDBrequest("games", `
+    fields id, name, cover.url, first_release_date, aggregated_rating, genres.id;
+    where id = (${similarIds.join(",")})
+      & cover != null
+      & id != ${id}
+      & version_parent = null
+      & parent_game = null;
+    limit 12;
+  `);
+}
+
+if (!similarGenres.length && genreIds.length >= 2) {
+  const candidates = await IGDBrequest("games", `
+    fields id, name, cover.url, first_release_date, aggregated_rating, genres.id;
+    where genres = (${genreIds.join(",")})
+      & cover != null
+      & id != ${id}
+      & version_parent = null
+      & parent_game = null;
+    limit 60;
+  `);
+
+  const base = new Set(genreIds);
+
+  similarGenres = candidates
+    .map(c => {
+      const cGenres = c.genres?.map(gx => gx.id) ?? [];
+      const overlap = cGenres.reduce((acc, gid) => acc + (base.has(gid) ? 1 : 0), 0);
+      return { game: c, overlap };
+    })
+    .filter(x => x.overlap >= 2)
+    .sort((a, b) => {
+      if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+      const br = Number.isFinite(b.game.aggregated_rating) ? b.game.aggregated_rating : -1;
+      const ar = Number.isFinite(a.game.aggregated_rating) ? a.game.aggregated_rating : -1;
+      return br - ar;
+    })
+    .slice(0, 6)
+    .map(x => x.game);
+}
+similarGenres = similarGenres.slice(0, 6);
 
 
     const devCompany = g.involved_companies?.find(c => c.developer)?.company || null;
@@ -468,14 +517,17 @@ app.get("/library", checkLogin, async (req, res) => {
 })
 app.post('/library/add', checkLogin, async (req, res) => {
     try {
-        const { gameId, status, name, coverUrl } = req.body;
+        const { gameId, status, name, coverUrl, genres, rating, release } = req.body;
 
         await libraryModel.create({
-            userId: req.session.user.id,
-            gameId: Number(gameId),
-            status: status || 'wishlist',
-            cachedName: name || 'Unknown Title',
-            cachedCoverUrl: coverUrl,
+        userId: req.session.user.id,
+        gameId: Number(gameId),
+        status: status || "wishlist",
+        cachedName: name || "Unknown Title",
+        cachedCoverUrl: coverUrl,
+        cachedGenres: genres || "",
+        cachedRating: rating ? Number(rating) : null,
+        cachedRelease: release || ""
         });
         res.redirect('/library');
     } catch (error) {

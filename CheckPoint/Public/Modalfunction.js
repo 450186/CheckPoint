@@ -17,46 +17,77 @@
   let lastFocused = null;
   let goToUrl = null;
 
-  function openFromCard(card) {
-    console.log("Go to game URL:", goToGameLink.href);
-    const id = card.dataset.gameId || "";
-    if (!id) {
-      console.warn("Card missing data-game-id:", card);
-      return;
-    }
+function openFromCard(card) {
+  const id = card.dataset.gameId;
+  const name = card.dataset.name || "";
+  const cover = card.dataset.cover || "";
 
-    lastFocused = document.activeElement;
+  if (!id) {
+    console.warn("Card missing data-game-id:", card);
+    return;
+  }
 
-    const name = card.dataset.name || "Unknown";
-    const cover = card.dataset.cover || "";
-    const genres = card.dataset.genres || "Unknown";
-    const rating = card.dataset.rating || "";
-    const release = card.dataset.release || "Unknown";
+  lastFocused = document.activeElement;
 
-    titleEl.textContent = name;
-
+  // Title + cover
+  if (titleEl) titleEl.textContent = name;
+  if (coverEl) {
     coverEl.src = cover;
-    coverEl.alt = name;
+    coverEl.alt = name ? `${name} cover` : "Game cover";
+  }
 
+  const genres = card.dataset.genres || "";
+  const rating = card.dataset.rating || "";
+  const release = card.dataset.release || "";
+
+  // Release
+  if (release) {
     infoEl.innerHTML = `<strong>Release Date:</strong> ${release}`;
+    infoEl.style.display = "";
+  } else {
+    infoEl.innerHTML = "";
+    infoEl.style.display = "none";
+  }
+
+  // Genres
+  if (genres) {
     genresEl.innerHTML = `<strong>Genres:</strong> ${genres}`;
-    ratingEl.innerHTML = `<strong>Rating:</strong> ${rating ? rating : "N/A"}`;
+    genresEl.style.display = "";
+  } else {
+    genresEl.innerHTML = "";
+    genresEl.style.display = "none";
+  }
 
-    if (addForm) {
-      addForm.querySelector('input[name="gameId"]').value = id;
-      addForm.querySelector('input[name="name"]').value = name;
-      addForm.querySelector('input[name="coverUrl"]').value = cover;
-    }
+  // Rating
+  if (rating) {
+    ratingEl.innerHTML = `<strong>Rating:</strong> ${rating}`;
+    ratingEl.style.display = "";
+  } else {
+    ratingEl.innerHTML = "";
+    ratingEl.style.display = "none";
+  }
 
+  // Hidden form fields
+  if (addForm) {
+    addForm.querySelector('input[name="gameId"]').value = id;
+    addForm.querySelector('input[name="name"]').value = name;
+    addForm.querySelector('input[name="coverUrl"]').value = cover;
+    addForm.querySelector('input[name="genres"]').value = genres;
+    addForm.querySelector('input[name="rating"]').value = rating;
+    addForm.querySelector('input[name="release"]').value = release;
+  }
+
+  // Go-to link (guard in case element is missing)
+  if (goToGameLink) {
     const from = window.location.pathname + window.location.search;
     goToGameLink.href = `/game/${id}?from=${encodeURIComponent(from)}`;
-
-
-    overlay.classList.add("show");
-    overlay.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    closeBtn.focus();
   }
+
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  closeBtn.focus();
+}
 
   function closeModal() {
     overlay.classList.remove("show");

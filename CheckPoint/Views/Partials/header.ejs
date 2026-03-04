@@ -17,9 +17,13 @@
 <body>
     
 <header class=" <%= (title == "Home" || title == "Login" || title == "Register") ? "centered" : "" %>">
+    <% if (title == "Home" || title == "Login" || title == "Register") { %>
+     <h1>CheckPoint</h1>
+    <% } else { %>
     <a href="/dashboard">
         <h1>CheckPoint</h1>
     </a>
+    <% } %>
     <% if (title !== "Home" && title !== "Login" && title !== "Register") { %>
     <form action="/search" method="GET">
         <div id="search-container">
