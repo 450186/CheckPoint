@@ -821,7 +821,9 @@ button:hover {
     padding: 15px;
     box-shadow: var(--shadow);
     z-index: 2500;
-    min-width: 220px;
+    width: 320px;
+    max-width: min(90vw, 320px);
+    box-sizing: border-box;
 }
 
 .filter-select-div p {
@@ -852,6 +854,46 @@ button:hover {
     display: flex;
     margin-top: 10px;
     gap: 10px;
+}
+.filter-checkbox-container {
+    display: grid;
+    max-height: 240px;
+    overflow-y: auto;
+    gap: 8px;
+    margin: 10px 0;
+}
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;;
+}
+.toggle-more-btn {
+  margin: 10px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.filter-checkbox-container {
+    max-height: 220px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: grid;
+    gap: 8px;
+    margin: 10px 0;
+}
+[hidden] {
+    display: none !important;
 }
 
 /* ======== ======== */

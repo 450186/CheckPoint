@@ -323,6 +323,37 @@ app.get("/discover", checkLogin, async (req, res) => {
 
         const games = await IGDBrequest("games", igdbBody);
 
+        const availableGenres = await IGDBrequest("genres", `
+            fields id, name;
+            sort name asc;
+            limit 100;
+        `);
+
+        const allowedPlatforms = [
+            "PC (Microsoft Windows)",
+            "PlayStation 5",
+            "PlayStation 4",
+            "Xbox Series X|S",
+            "Xbox One",
+            "Nintendo Switch",
+            "iOS",
+            "Android",
+        ]
+        const allowedPlatformsSet = new Set(allowedPlatforms);
+
+        const allPlatforms = await IGDBrequest("platforms", `
+            fields id, name;
+            sort name asc;
+            limit 200;
+        `);
+        const popularPlatforms = allPlatforms
+        .filter(p => allowedPlatformsSet.has(p.name))
+        .sort((a, b) =>
+            allowedPlatforms.indexOf(a.name) - allowedPlatforms.indexOf(b.name)
+        )
+        const otherPlatforms = allPlatforms
+        .filter(p => !allowedPlatformsSet.has(p.name))
+
 
         res.render("pages/discover", {
             title: "Discover",
@@ -332,6 +363,9 @@ app.get("/discover", checkLogin, async (req, res) => {
             pageNum,
             ownedGames,
             query: q,
+            availableGenres,
+            popularPlatforms,
+            otherPlatforms,
 
             filters: {
                 genres: genreIds,
@@ -353,6 +387,9 @@ app.get("/discover", checkLogin, async (req, res) => {
             pageNum,
             ownedGames: new Set(),
             query: q,
+            availableGenres: [],
+            popularPlatforms: [],
+            otherPlatforms: [],
 
             filters: {
                 genres: [],

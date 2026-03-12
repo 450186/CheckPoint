@@ -142,6 +142,11 @@ const CurrentYearTo = "<%= (filters && filters.yearTo) ? filters.yearTo : '' %>"
 const CurrentGenres = "<%= (filters && filters.genres) ? filters.genres.join(',') : '' %>";
 const CurrentPlatforms = "<%= (filters && filters.platforms) ? filters.platforms.join(',') : '' %>";
 
+const availableGenres = <%- JSON.stringify(availableGenres || []) %>;
+
+const popularPlatforms = <%- JSON.stringify(popularPlatforms || []) %>;
+const otherPlatforms = <%- JSON.stringify(otherPlatforms || []) %>;
+
   filtersBar.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
@@ -215,6 +220,93 @@ const CurrentPlatforms = "<%= (filters && filters.platforms) ? filters.platforms
         </div>
       `;
     }
+    if(type === 'genres') {
+      const selectedGenres = new Set(
+        CurrentGenres
+          .split(",")
+          .map(v => v.trim())
+          .filter(Boolean)
+      )
+      const options = availableGenres.map(genre => `
+        <label class="filter-checkbox">
+          <input
+          type="checkbox"
+          class="genre-checkbox"
+          value="${genre.id}"
+          ${selectedGenres.has(String(genre.id)) ? "checked" : ""}
+          />
+          ${genre.name}
+        </label>
+      `).join("");
+      dropdown.innerHTML = `
+        <div>
+          <p>Selected Genres:</p>
+          <div class="filter-checkbox-container">
+            ${options || "No genres found"}
+          </div>
+          <div class="filter-actions">
+            <button type="button" id="apply-genres" class="add-btn">Apply</button>
+            <button type="button" id="clear-genres" class="add-btn">Clear</button>
+            <button type="button" id="close-dropdown">Close</button>
+          </div>
+        </div>
+      `;
+    }
+if(type === 'platforms') {
+  const selectedPlatforms = new Set(
+    CurrentPlatforms
+      .split(",")
+      .map(v => v.trim())
+      .filter(Boolean)
+  );
+
+  const popularOptions = popularPlatforms.map(platform => `
+    <label class="filter-checkbox">
+      <input
+        type="checkbox"
+        class="platform-checkbox"
+        value="${platform.id}"
+        ${selectedPlatforms.has(String(platform.id)) ? "checked" : ""}
+      />
+      ${platform.name}
+    </label>
+  `).join("");
+
+  const otherOptions = otherPlatforms.map(platform => `
+    <label class="filter-checkbox">
+      <input
+        type="checkbox"
+        class="platform-checkbox"
+        value="${platform.id}"
+        ${selectedPlatforms.has(String(platform.id)) ? "checked" : ""}
+      />
+      ${platform.name}
+    </label>
+  `).join("");
+
+  dropdown.innerHTML = `
+    <div>
+      <p>Popular Platforms:</p>
+      <div class="filter-checkbox-container">
+        ${popularOptions || "No platforms found"}
+      </div>
+
+      <button type="button" id="toggle-other-platforms" class="toggle-more-btn">
+        Show other platforms
+      </button>
+
+      <div id="other-platforms-section" class="filter-checkbox-container" hidden>
+        ${otherOptions || "No other platforms found"}
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" id="apply-platforms" class="add-btn">Apply</button>
+        <button type="button" id="clear-platforms" class="add-btn">Clear</button>
+        <button type="button" id="close-dropdown">Close</button>
+      </div>
+    </div>
+  `;
+}
 
 
     const rect = btn.getBoundingClientRect();
@@ -264,6 +356,51 @@ const CurrentPlatforms = "<%= (filters && filters.platforms) ? filters.platforms
       params.delete("sort");
       params.set("page", "1");
       window.location.href = `/discover?${params.toString()}`;
+    }
+    if(e.target.id == "apply-genres") {
+      const selected = Array.from(document.querySelectorAll(".genre-checkbox:checked"))
+      .map(cb => cb.value)
+
+      const params = new URLSearchParams(window.location.search)
+      if(selected.length) params.set("genres", selected.join(","))
+      else params.delete("genres")
+      params.set("page", "1")
+      window.location.href = `/discover?${params.toString()}`
+    }
+    if(e.target.id == "clear-genres") {
+      const params = new URLSearchParams(window.location.search)
+      params.delete("genres")
+      params.set("page", "1")
+      window.location.href = `/discover?${params.toString()}`
+    }
+    if(e.target.id == "apply-platforms") {
+      const selected = Array.from(document.querySelectorAll(".platform-checkbox:checked"))
+      .map(cb => cb.value)
+
+      const params = new URLSearchParams(window.location.search)
+      if(selected.length) params.set("platforms", selected.join(","))
+      else params.delete("platforms")
+      params.set("page", "1")
+      window.location.href = `/discover?${params.toString()}`
+    }
+    if(e.target.id == "clear-platforms") {
+      const params = new URLSearchParams(window.location.search)
+      params.delete("platforms")
+      params.set("page", "1")
+      window.location.href = `/discover?${params.toString()}`
+    }
+    if (e.target.id === "toggle-other-platforms") {
+      const section = document.getElementById("other-platforms-section");
+      if (!section) return;
+
+      const isHidden = section.hasAttribute("hidden");
+      if (isHidden) {
+        section.removeAttribute("hidden");
+        e.target.textContent = "Show fewer platforms";
+      } else {
+        section.setAttribute("hidden", "");
+        e.target.textContent = "Show other platforms";
+      }
     }
   });
 
