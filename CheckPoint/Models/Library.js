@@ -7,7 +7,7 @@ const librarySchema = new Schema({
   gameId: { type: Number, required: true, index: true },
 
   status: { type: String, enum: ['playing','completed','wishlist','dropped'], default: 'wishlist' },
-  userRating: { type: Number, min: 0, max: 10 },
+  userRating: { type: Number, min: 0.5, max: 5, default: null },
   review: { type: String, trim: true, maxlength: 2000 },
   startedAt: { type: Date },
   completedAt: { type: Date },

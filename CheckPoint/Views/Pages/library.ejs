@@ -1,59 +1,251 @@
 <%- include('../Partials/header') %>
 
 <div class="sidebar">
-  <ul class="nav-list">
-    <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
-    <li class="nav-item"><a href="/discover">Discover</a></li>
-    <li class="nav-item active-link"><a href="/library"><%= title %></a></li>
-    <li class="nav-item logout"><a href="/logout">Logout</a></li>
-  </ul>
+    <ul class="nav-list">
+        <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a href="/discover">Discover</a></li>
+        <li class="nav-item active-link"><a href="/library"><%= title %></a></li>
+        <li class="nav-item logout"><a href="/logout">Logout</a></li>
+    </ul>
 </div>
-
-<div class="main-content">
-    <h2 class="title"><%= title %></h2>
-
     <% const sections = [
         {key: "playing", label: "Playing 🟠"},
         {key: "completed", label: "Completed 🟢"},
         {key: "wishlist", label: "Wishlist 🟡"},
         {key: "dropped", label: "Dropped 🔴"}
     ]; %>
-<% sections.forEach(section => { %>
-    <h3><%= section.label %> (<%= grouped[section.key].length %>)</h3>
-    <% if(grouped[section.key].length === 0) { %> 
-    <p class="no-items">No items in this section.</p> <% 
-    } else { %> 
-        <div class="library-row">
-    <% grouped[section.key].forEach(item => { %>
-        <div class="library-card">
-            <div class="game-card-header">
-                <img src="<%= item.cachedCoverUrl %>" alt="<%= item.cachedName %>" class="game-cover">
-                <h3><%= item.cachedName %></h3>
+<div class="main-content">
+    <h2 class="title"><%= title %></h2>
+    <div class="library-accordion">
+        <% sections.forEach(section => { %>
+            <section class="accordion-item <%= grouped[section.key].length ? '' : 'empty' %>">
+                <button class="accordion-trigger" type="button" aria-expanded="<%= section.key === 'playing' ? 'true' : 'false' %>">
+                    <span><%= section.label %></span>
+                    <span class="accordion-right">
+                        <span class="accordion-count"><%= grouped[section.key].length %></span>
+                        <span class="accordion-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+                    </span>
+                </button>
+                <div class="accordion-panel <%= section.key === 'playing' ? 'open' : '' %>">
+                    <% if (grouped[section.key].length === 0) { %>
+                        <p class="no-items">No items in this section.</p>
+                    <% } else { %>
+                        <div class="library-grid">
+                            <% grouped[section.key].forEach(item => { %>
+                                <div class="library-card library-img-card"
+                                    data-game-id="<%= item.gameId %>"
+                                    data-name="<%= item.cachedName %>"
+                                    data-cover="<%= item.cachedCoverUrl %>"
+                                    data-genres="<%= item.cachedGenres %>"
+                                    data-release="<%= item.cachedRelease %>"
+                                    data-rating="<%= item.userRating ?? '' %>"
+                                    data-status="<%= item.status %>"
+                                >
+                                    <form 
+                                    action="/library/remove" 
+                                    method="POST" 
+                                    class="remove-form" 
+                                    onclick="event.stopPropagation()"
+                                    >
+                                        <input type="hidden" name="gameId" value="<%= item.gameId %>">
+                                        <button type="submit" class="remove-button" onclick="event.stopPropagation()"><i class="fa-solid fa-circle-xmark fa-xl" ></i></button>
+                                    </form>
+                                    <img src="<%= item.cachedCoverUrl %>" alt="<%= item.cachedName %>" class="game-cover library-img">
+                                    <div class="library-img-overlay">
+                                        <h3 style="justify-content: center; text-align: center;"><%= item.cachedName %></h3>
+                                        <p style="justify-content: center; text-align: center;"><%= item.cachedGenres %></p>
+                                        <p><%= item.cachedRelease %></p>
+                                        <div class="card-user-rating" data-rating="<%= item.userRating ?? '' %>">
+                                        <% if (item.userRating !== null && item.userRating !== undefined) { %>
+                                            <span class="rating-label">Your Rating:</span>
+                                            <div class="card-star-rating">
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
+                                            </div>
+                                        <% } else { %>
+                                            <p class="mutedText"><strong>Not rated Yet!</strong></p>
+                                        <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
+            </section>
+        <% }) %>
+    </div>
+    <div id="confirm-overlay" class="confirm-overlay" hidden>
+        <div class="confirm-box">
+            <h3>Are you sure you want to remove
+                <span class="confirm-game-name"></span>
+                from your library?</h3>
+            <div class="confirm-buttons">
+                <button id="cancel-remove" type="button">Cancel</button>
+                <button id="confirm-remove" type="button">Remove</button>
             </div>
-            <% if (item.userRating !== null && item.userRating !== undefined) { %>
-                <p class="mutedText"><strong>Your Rating: </strong><%= item.userRating %></p>             
-            <% } else { %>
-                <p class="mutedText"><strong>Not rated Yet!</strong></p>
-            <% } %>
-            <div class="card-spacer"></div>
-            <form action="/library/status" method="POST" class="status-form"> 
-                <input type="hidden" name="gameId" value="<%= item.gameId %>"> 
-                <select name="status" onchange="this.form.submit()"> 
-                    <option value="playing" <%= item.status === 'playing' ? 'selected' : '' %>>Playing</option> 
-                    <option value="completed" <%= item.status === 'completed' ? 'selected' : '' %>>Completed</option> 
-                    <option value="wishlist" <%= item.status === 'wishlist' ? 'selected' : '' %>>Wishlist</option> 
-                    <option value="dropped" <%= item.status === 'dropped' ? 'selected' : '' %>>Dropped</option> 
-                </select> 
-            </form>
-            <form action="/library/remove" method="POST" class="delete-form">
-                <input type="hidden" name="gameId" value="<%= item.gameId %>">
-                <button type="submit" class="remove-button">Remove</button>
-            </form>
         </div>
-    <% }) %>
-</div>
-<% } %>
+    </div>
+        <div class="stats-sidebar">
+            <h3 style="text-align: center; margin-top: 0;">Library Stats</h3>
+        <div class="total-games">
+            <p>Total Games:</p>
+            <p style="font-weight: bold;"><%= totalGames %></p>
+        </div>
+        <div class="completion-rate">
+            <label for="progress-bar">Completion Rate:</label>
 
-<% }) %>
+            <div class="progress-wrap">
+                <progress id="progress-bar" class="progress-bar" value="<%= completionRate %>" max="100"></progress>
+                <span class="progress-text"><%= completionRate %>%</span>
+            </div>
+        </div>
+        <div class="genre-chart-cont">
+            <h3 style="text-align: center;">Genre Breakdown</h3>
+            <canvas id="genre-chart"></canvas>
+        </div>
+    </div>
 </div>
+<script>
+  function drawCardStars(container, value) {
+    if (!container) return;
+
+    const numericValue = Number(value) || 0;
+    const icons = container.querySelectorAll(".card-star-rating i");
+
+    icons.forEach((icon, index) => {
+      const starNumber = index + 1;
+
+      if (numericValue >= starNumber) {
+        icon.className = "fa-solid fa-star";
+      } else if (numericValue >= starNumber - 0.5) {
+        icon.className = "fa-solid fa-star-half-stroke";
+      } else {
+        icon.className = "fa-regular fa-star";
+      }
+    });
+  }
+
+  document.querySelectorAll(".card-user-rating").forEach((wrapper) => {
+    const value = wrapper.dataset.rating;
+    const starRow = wrapper.querySelector(".card-star-rating");
+
+    if (starRow && value !== "") {
+      drawCardStars(wrapper, value);
+    }
+  });
+</script>
+<script>
+    const overlay = document.getElementById('confirm-overlay');
+    const confirmBtn = document.getElementById('confirm-remove');
+    const cancelBtn = document.getElementById('cancel-remove');
+    const nameSpace = document.querySelector('.confirm-game-name');
+
+    let pendingForm = null;
+
+    document.querySelectorAll('.remove-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const card = form.closest('.library-card');
+            const gamename = card.dataset.name
+
+            nameSpace.textContent = `"${gamename}"`;
+            pendingForm = form;
+            overlay.hidden = false;
+        });
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        if (pendingForm) {
+            pendingForm.submit();
+            pendingForm = null;
+        }
+        overlay.hidden = true;
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        pendingForm = null;
+        overlay.hidden = true;
+    });
+
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            pendingForm = null;
+            overlay.hidden = true;
+        }
+    });
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const genreData = <%- JSON.stringify(genreData || {labels: [], values: []}) %>;
+
+        const canvas = document.getElementById('genre-chart');
+
+        if(canvas && genreData.labels.length) {
+            new Chart(canvas, {
+                type: 'pie',
+                data: {
+                    labels: genreData.labels,
+                    datasets: [{
+                        data: genreData.values
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: true,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                color: '#E5E7EB',
+                                padding: 10
+                            }
+                        },
+                        tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label;
+                                const value = context.raw;
+
+                                if(label === "Other" && genreData.otherGenres?.length) {
+                                    return [
+                                        `Other: ${value}`,
+                                        ...genreData.otherGenres.map(genre => `${genre.genre} (${genre.count})`)
+                                    ]
+                                }
+                                return `${label}: ${value}`
+                            }
+                        }
+                    }
+                    }
+                }
+            })
+        }
+    </script>
+
+    <script>
+        document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const item = trigger.closest('.accordion-item')
+                const panel = item.querySelector('.accordion-panel')
+                const isOpen = trigger.getAttribute('aria-expanded') === 'true'
+
+                document.querySelectorAll('.accordion-trigger').forEach(btn => {
+                    btn.setAttribute('aria-expanded', 'false')
+                })
+                document.querySelectorAll('.accordion-panel').forEach(panel => {
+                    panel.classList.remove('open')
+                })
+                if (!isOpen) {
+                    trigger.setAttribute('aria-expanded', 'true')
+                    panel.classList.add('open')
+                }
+            })
+        })
+    </script>
+<%- include('../Partials/Modal') %>
 <%- include('../Partials/footer') %>

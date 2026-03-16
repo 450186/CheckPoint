@@ -31,9 +31,11 @@
         <div class="filter-item">
             <button data-filter="sort">Sort</button>
         </div>
-        <div class="filter-item">
-          <button data-filter="reset">Reset</button>
-        </div>
+        <% if (URLSearchParams !== "/discover") { %>
+          <div class="filter-item">
+            <button data-filter="reset">Reset</button>
+          </div>
+        <% } %>
     </div>
 
     <div class="filter-select-div" hidden id="filter-dropdown"></div>
@@ -70,22 +72,57 @@
             </p>
             <div class="card-spacer"></div>
             <form action="/library/add" class="library-form" method="POST" onclick="event.stopPropagation()">
-                <input type="hidden" name="gameId" value="<%= game.id %>">
-                <input type="hidden" name="name" value="<%= game.name %>">
-                <input type="hidden" name="coverUrl" value="<%= game.cover.url.replace("t_thumb", "t_cover_big") %>">
-                <input type="hidden" name="status" value="wishlist">
-                <input type="hidden" name="genres" value="<%= game.genres ? game.genres.map(g => g.name).join(', ') : '' %>">
-                <input type="hidden" name="rating" value="<%= game.aggregated_rating ? Math.round(game.aggregated_rating) : '' %>">
-                <input type="hidden" name="release" value="<%= releaseDate %>">
-                <% if (ownedGames.has(game.id)) { %>
-                    <button type="submit" class="add-btn disabled" disabled>Added</button>
-                <% } else { %>
-                    <button type="submit" class="add-btn">+ Add to Library</button>
-                <% } %>
+              <input type="hidden" name="gameId" value="<%= game.id %>">
+              <input type="hidden" name="name" value="<%= game.name %>">
+              <input type="hidden" name="coverUrl" value="<%= game.cover.url.replace("t_thumb", "t_cover_big") %>">
+              <input type="hidden" name="genres" value="<%= game.genres ? game.genres.map(g => g.name).join(', ') : '' %>">
+              <input type="hidden" name="rating" value="<%= game.aggregated_rating ? Math.round(game.aggregated_rating) : '' %>">
+              <input type="hidden" name="release" value="<%= releaseDate %>">
+
+              <% if (ownedGames.has(game.id)) { %>
+                <button type="submit" class="add-btn disabled" disabled>Added</button>
+              <% } else { %>
+                <select name="status" class="status-select-card">
+                  <option value="wishlist">Wishlist</option>
+                  <option value="playing">Playing</option>
+                  <option value="completed">Completed</option>
+                  <option value="dropped">Dropped</option>
+                </select>
+                <button type="submit" class="add-btn card-add-btn">+ Add to Wishlist</button>
+              <% } %>
             </form>
         </div>
         <% }) %>
     </div>
+<script>
+  function setStatusLabel(value) {
+    switch (value) {
+      case "playing":
+        return "Playing";
+      case "completed":
+        return "Completed";
+      case "dropped":
+        return "Dropped";
+      case "wishlist":
+      default:
+        return "Wishlist";
+    }
+  }
+
+  document.querySelectorAll(".library-form").forEach((form) => {
+    const select = form.querySelector(".status-select-card");
+    const button = form.querySelector(".card-add-btn");
+
+    if (!select || !button) return;
+
+    function updateBtnLabel() {
+      button.textContent = `+ Add to ${setStatusLabel(select.value)}`;
+    }
+
+    select.addEventListener("change", updateBtnLabel);
+    updateBtnLabel();
+  });
+</script>
     <%
         const currentPage = Number(pageNum || 1)
         const params = new URLSearchParams()

@@ -546,10 +546,51 @@ app.get("/library", checkLogin, async (req, res) => {
         dropped: items.filter(i => i.status === 'dropped'),
     }
 
+    const genreCount = {};
+
+    items.forEach(item => {
+        const genres = (item.cachedGenres || "")
+        .split(',')
+        .map(x => x.trim())
+        .filter(Boolean)
+        
+        genres.forEach(genre => {
+            genreCount[genre] = (genreCount[genre] || 0) + 1
+        })
+    })
+    const sortedGenres = Object.entries(genreCount)
+    .sort((a, b) => b[1] - a[1])
+
+
+    const topGenres = sortedGenres.slice(0, 5)
+    const otherGenreEntries = sortedGenres.slice(5)
+
+    const otherGenreTotal = otherGenreEntries.reduce((sum, [, count]) => sum + count, 0);
+
+    const labels = topGenres.map(([genre]) => genre);
+    const values = topGenres.map(([, count]) => count);
+
+    if(otherGenreTotal > 0) {
+        labels.push("Other");
+        values.push(otherGenreTotal);
+    }
+    const genreData = {
+        labels,
+        values,
+        otherGenres: otherGenreEntries.map(([genre, count]) => ({ genre, count }))
+    }
+
+    const totalGames = grouped['playing'].length + grouped['completed'].length + grouped['wishlist'].length + grouped['dropped'].length;
+
+    const completionRate = totalGames > 0 ? Math.round((grouped['completed'].length / totalGames) * 100) : 0;
+
     res.render('pages/library', {
         title: 'Library',
         user: req.session.user,
         grouped,
+        totalGames,
+        completionRate,
+        genreData,
     })
 })
 app.post('/library/add', checkLogin, async (req, res) => {
@@ -561,6 +602,7 @@ app.post('/library/add', checkLogin, async (req, res) => {
         gameId: Number(gameId),
         status: status || "wishlist",
         cachedName: name || "Unknown Title",
+        userRating: null,
         cachedCoverUrl: coverUrl,
         cachedGenres: genres || "",
         cachedRating: rating ? Number(rating) : null,
@@ -576,13 +618,39 @@ app.post('/library/add', checkLogin, async (req, res) => {
 app.post("/library/status", checkLogin, async (req, res) => {
     const { gameId, status } = req.body;
 
+    const update = { status };
+
+    if(status === "wishlist") {
+        update.userRating = null
+    }
+
     await libraryModel.updateOne(
         { userId: req.session.user.id, gameId: Number(gameId) },
-        { $set: { status } }
+        { $set: update }
     );
 
     res.redirect("/library");
 });
+app.post("/library/rate", checkLogin, async (req, res) => {
+    const { gameId, rating } = req.body;
+
+    const ratingValue = 
+        rating === "" || rating === null || rating === undefined
+        ? null
+        : Number(rating);
+
+    await libraryModel.updateOne(
+        { 
+            userId: req.session.user.id, 
+            gameId: Number(gameId) 
+        },
+        { 
+            $set: { userRating: ratingValue } 
+        }
+    );
+
+    res.sendStatus(204);
+})
 
 app.post("/library/remove", checkLogin, async (req, res) => {
     const { gameId } = req.body;

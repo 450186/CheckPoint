@@ -608,17 +608,6 @@ button:hover {
     width: 100%;
     margin: 20px 0;
 }
-
-.status-form select:hover {
-    background-color: var(--accentHover);
-}
-
-.remove-form {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
 .status-form select:hover {
     background-color: var(--accentHover);
 }
@@ -639,6 +628,7 @@ button:hover {
     justify-content: center;
     padding: 20px;
 }
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -646,12 +636,14 @@ button:hover {
     gap: 12px;
     margin-bottom: 20px;
 }
+
 .modal-header #modal-title {
     margin: 0;
     min-width: 0;
     overflow-wrap: break-word;
     line-height: 1.2;
 }
+
 #game-modal.show {
     display: flex;
 }
@@ -698,7 +690,6 @@ button:hover {
     height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 .modal-info h2 {
@@ -706,23 +697,57 @@ button:hover {
 }
 
 .modal-actions {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
     width: 100%;
+    margin: 10px 0 0;
+    align-items: end;
 }
 
-.modal-actions form {
-    flex: 1;
+/* Discover modal form spans full width and becomes its own grid */
+.modal-actions .library-form {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    align-items: end;
 }
-.modal-actions button {
-    flex: 1;
-    font-size: 14px;
+
+/* Library modal form can stay simple */
+.modal-actions .status-form {
+    width: 100%;
+    margin: 0;
 }
+
+/* Status dropdown on discover modal spans both columns */
+.modal-actions .library-form #modal-add-status-select {
+    grid-column: 1 / -1;
+    width: 100%;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background-color: var(--background);
+    color: var(--text);
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Add button left column */
+.modal-actions .library-form .add-btn,
+.modal-actions .status-form {
+    grid-column: 1;
+    width: 100%;
+    margin: 0;
+}
+
+/* Go to game right column */
 #modal-go-to-game {
+    grid-column: 2;
+    width: 100%;
+    margin: 0;
     font-size: 14px;
-    flex: 1;
     text-align: center;
     background-color: var(--accent);
     color: var(--text);
@@ -737,10 +762,102 @@ button:hover {
     background-color: var(--accentHover);
 }
 
+/* Library page select */
+.status-form select, .library-form .status-select-card {
+    width: 100%;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background-color: var(--background);
+    color: var(--text);
+    cursor: pointer;
+    margin: 0;
+}
+
 @media (max-width: 650px) {
     .modal-body {
         grid-template-columns: 1fr;
     }
+
+    .modal {
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .modal-actions,
+    .modal-actions .library-form {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-actions .library-form #modal-add-status-select,
+    .modal-actions .library-form .add-btn,
+    .modal-actions .status-form,
+    #modal-go-to-game {
+        grid-column: 1;
+    }
+}
+
+.library-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.star-rating {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.star-btn {
+    background: transparent !important;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 32px;
+    color: #FBBF24;
+    line-height: 1;
+    box-shadow: none !important;
+}
+
+.star-btn:hover {
+    background: transparent !important;
+    transform: scale(1.08);
+}
+
+.star-btn i {
+    pointer-events: none;
+}
+
+.clear-rating-btn {
+    margin-top: 12px;
+    background: transparent !important;
+    border: 1px solid var(--border);
+    color: var(--secondText);
+    padding: 8px 12px;
+}
+
+.clear-rating-btn:hover {
+    background: rgba(255,255,255,0.05) !important;
+    color: var(--text);
+}
+.card-user-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.rating-label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.card-star-rating {
+    display: flex;
+    gap: 4px;
+    font-size: 18px;
+    color: #FBBF24;
 }
 
 /* ======== Game Page ======== */
@@ -895,10 +1012,290 @@ button:hover {
 [hidden] {
     display: none !important;
 }
+.rate-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.rate-form select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--background);
+    color: var(--text);
+}
 
-/* ======== ======== */
-/* ======== ======== */
-/* ======== ======== */
+/* ======== Accordion styles ======== */
+.accordion-panel {
+    display: none;
+}
+.accordion-panel.open {
+    display: block;
+}
+.library-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+    margin-right: calc(60px + var(--sidebar-width));
+}
+.accordion-item {
+    background: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.accordion-trigger {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    color: var(--text);
+    padding: 18px 20px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+}
+
+.accordion-trigger:hover {
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.accordion-panel {
+    display: none;
+    padding: 20px;
+}
+
+.accordion-panel.open {
+    display: block;
+}
+
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.library-card {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.library-card h3 {
+    margin: 0;
+    font-size: 16px;
+    text-align: center;
+}
+
+.library-card .game-cover {
+    width: 100%;
+    border-radius: 10px;
+}
+.library-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(0,0,0,.8);
+}
+.accordion-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accordion-arrow {
+  transition: transform 0.25s ease;
+}
+
+.accordion-trigger[aria-expanded="true"] .accordion-arrow {
+  transform: rotate(180deg);
+}
+.library-img-card {
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 14px;
+    aspect-ratio: 3/4;
+}
+.library-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+.library-img-card:hover .library-img {
+    transform: scale(1.05);
+}
+.library-img-overlay {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 1;
+}
+.library-img-overlay h3,
+.library-img-overlay p {
+    margin: 0;
+}
+.library-img-card:hover .library-img-overlay {
+    opacity: 1;
+}
+.remove-form {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0;
+    transform: translate(5px, -10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 3;
+}
+.library-img-card:hover .remove-form {
+    opacity: 1;
+    transform: translate(-5px, 5px);
+}
+.remove-button {
+    background: black !important;
+    border: none;
+    color: #EF4444 !important;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.remove-button:hover {
+    color: #DC2626 !important;
+    background: black !important;
+    transform: translateY(-4px);
+    scale: 1.05;
+    box-shadow: var(--shadow);
+}
+
+#confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .65);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+.confirm-box {
+    width: 40%;
+    height: fit-content;
+    background: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transform: translateY(0);
+    animation: confirmPop 0.18s ease;
+}
+.confirm-box h3 {
+    text-align: center;
+}
+.confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+@keyframes confirmPop {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+/* ======== Stats ======== */
+.stats-sidebar {
+    position: fixed;
+    top: calc(110px + var(--header-height));
+    right: 0;
+    width: calc(60px +(var(--sidebar-width)));
+    max-height: calc(100vh - (110px + var(--header-height)) - 40px);
+    height: fit-content;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    background: var(--cards);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow-y: auto;
+    overflow-x: hidden;
+
+}
+.total-games {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.completion-rate {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.progress-bar {
+    width: 100%;
+    height: 24px;
+    display: block;
+    background-color: var(--background);
+    border-radius: 10px;
+    overflow: hidden;
+}
+progress::-webkit-progress-bar {
+    background-color: var(--background);
+}
+progress::-webkit-progress-value {
+    background: linear-gradient(.25turn, green, lightgreen);
+}
+progress::-moz-progress-bar {
+    background: linear-gradient(.25turn, green, lightgreen);
+}
+.progress-wrap {
+    position: relative;
+    width: 100%;
+}
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text);
+    pointer-events: none;
+    font-weight: 600;
+}
+/* ======== Chart Information ======== */
+#genre-chart {
+    height: 200px !important;
+}
+
 /* ======== ======== */
 /* ======== ======== */
 /* ======== ======== */

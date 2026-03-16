@@ -11,23 +11,68 @@
 
         <p id="modal-info" class="muted-text"></p>
         <p id="modal-genres"></p>
-        <p id="modal-rating"></p>
+        <p id="modal-release"></p>
 
         <div class="card-spacer"></div>
+        <% if (title !== "Library") { %>
+          <div class="modal-actions">
+            <form action="/library/add" method="POST" class="library-form">
+              <input type="hidden" name="gameId" id="modal-game-id-add" value="">
+              <input type="hidden" name="name" id="modal-name" value="">
+              <input type="hidden" name="coverUrl" id="modal-cover-url" value="">
+              <input type="hidden" name="genres" id="modal-genres-input" value="">
+              <input type="hidden" name="rating" id="modal-rating-input" value="">
+              <input type="hidden" name="release" id="modal-release-input" value="">
+                <select name="status" id="modal-add-status-select">
+                  <option value="wishlist">Wishlist</option>
+                  <option value="playing">Playing</option>
+                  <option value="completed">Completed</option>
+                  <option value="dropped">Dropped</option>
+                </select>
+                <button type="submit" class="add-btn" id="modal-add-btn">+ Add to Wishlist</button>
+                <a href="#" id="modal-go-to-game" class="go-to-game">Go to Game</a>
+            </form>
+          </div>
+        <% } else { %>
+          <div class="modal-actions">
+              <div id="modal-rating-wrap">
+                <form action="/library/rate" method="POST" class="rate-form">
+                  <input type="hidden" name="gameId" id="modal-game-id-rate" value="">
+                  <input type="hidden" name="rating" id="modal-rate-input" value="">
+                  <label><strong>Your Rating</strong></label>
+                  <div class="star-rating" id="modal-star-rating">
+                    <button type="button" class="star-btn" data-value="1" aria-label="1">
+                      <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="2" aria-label="2">
+                      <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="3" aria-label="3">
+                      <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="4" aria-label="4">
+                      <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="5" aria-label="5">
+                      <i class="fa-regular fa-star"></i>
+                    </button>
+                  </div>
+                  <button type="button" id="clear-rating-btn" class="clear-rating-btn">Clear Rating</button>
+                </form>
+              </div>
+            <form action="/library/status" method="POST" class="status-form">
+              <input type="hidden" name="gameId" id="modal-game-id-status" value="">
+              <select name="status" id="modal-library-status-select" onchange="this.form.submit()">
+                <option value="playing">Playing</option>
+                <option value="completed">Completed</option>
+                <option value="wishlist">Wishlist</option>
+                <option value="dropped">Dropped</option>
+              </select>
+            </form>
 
-        <div class="modal-actions">
-          <form action="/library/add" method="POST" class="library-form">
-            <input type="hidden" name="gameId" value="">
-            <input type="hidden" name="name" value="">
-            <input type="hidden" name="coverUrl" value="">
-            <input type="hidden" name="genres" value="">
-            <input type="hidden" name="rating" value="">
-            <input type="hidden" name="release" value="">
-            <input type="hidden" name="status" value="wishlist">
-            <button type="submit" class="add-btn">+ Add to Library</button>
-            <a href="/game" id="modal-go-to-game" class="go-to-game">Go to Game</a>
-          </form>
-        </div>
+            <a href="#" id="modal-go-to-game" class="go-to-game">Go to Game</a>
+          </div>
+        <% } %>
       </div>
     </div>
   </div>
