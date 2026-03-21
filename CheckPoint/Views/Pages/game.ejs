@@ -28,6 +28,11 @@
             <p class="game-info"><strong>Description:</strong>
                 <%= game.description %>
             </p>
+            <% if (game.gameModes) { %>
+                <p class="game-info"><strong>Game Modes:</strong>
+                    <%= game.gameModes ? game.gameModes.join(', ') : 'Unknown' %>
+                </p>             
+            <% } %>
             <p class="game-info"><strong>Genre:</strong>
                 <%= (game.genres && game.genres.length) ? game.genres.join(', '): 'Unknown' %>
             </p>
@@ -41,6 +46,18 @@
                 <%= game.rating ? Math.round(game.rating) : "N/A" %>
             </p>
         </div>
+        <% if (game.completion) { %>
+            <div class="completion-grid">
+                <p class="grid-header"><strong>Time to Complete</strong></p>
+                <p class="header-cell">Hastily</p>
+                <p class="header-cell">Main Story</p>
+                <p class="header-cell">Completionist</p>
+
+                <p class="time-cell"><%= game.completion.rushed != null ? `${game.completion.rushed} hours` : "No Record" %></p>
+                <p class="time-cell"><%= game.completion.main != null ? `${game.completion.main} hours` : "No Record" %></p>
+                <p class="time-cell"><%= game.completion.completionist != null ? `${game.completion.completionist} hours` : "No Record" %></p>
+            </div>
+        <% } %>
     </div>
     <% if (moreFromDev && moreFromDev.length) { %>
         <h3>More From <strong>
@@ -84,5 +101,177 @@
             <% }) %>
         </div>
     <% } %>
+            <div class="media-section">
+             <% if (game.screenshots.length) { %>
+                <div class="screenshot-container">
+                    <h3 style="text-align: center;">Screenshots</h3>
+                    <div class="slideshow-container" id="screenshots-slideshow">
+                    <% game.screenshots.forEach((screenshot, index) => { %>
+                        <div class="ss-img-slide" style="<%= index === 0 ? 'display:block;' : 'display:none;' %>">
+                        <img src="<%= screenshot.url %>" alt="Screenshot <%= index + 1 %>" class="screenshot">
+                        </div>
+                    <% }) %>
+                    <% if (game.screenshots.length > 1) { %>
+                        <a class="SSprev" onclick="ssPlusSlides(-1)">&#10094;</a>
+                        <a class="SSnext" onclick="ssPlusSlides(1)">&#10095;</a>                     
+                    <% } %>
+                    </div>
+
+                    <div class="dot-div">
+                    <% game.screenshots.forEach((_, index) => { %>
+                        <span class="SSdot <%= index === 0 ? 'active' : '' %>" onclick="ssCurrentSlide(<%= index + 1 %>)"></span>
+                    <% }) %>
+                    </div>
+                </div>
+                <% } %>
+                <% if (game.artworks.length) { %>
+                <div class="artwork-container">
+                    <h3 style="text-align: center;">Artwork</h3>
+                    <div class="slideshow-container" id="artworks-slideshow">
+                    <% game.artworks.forEach((artwork, index) => { %>
+                        <div class="art-img-slide" style="<%= index === 0 ? 'display:block;' : 'display:none;' %>">
+                        <img src="<%= artwork.url %>" alt="Artwork <%= index + 1 %>" class="artwork">
+                        </div>
+                    <% }) %>
+                    <% if (game.artworks.length > 1) { %>
+                        <a class="Artprev" onclick="artPlusSlides(-1)">&#10094;</a>
+                        <a class="Artnext" onclick="artPlusSlides(1)">&#10095;</a>                     
+                    <% } %>
+
+                    </div>
+
+                    <div class="dot-div">
+                    <% game.artworks.forEach((_, index) => { %>
+                        <span class="Artdot <%= index === 0 ? 'active' : '' %>" onclick="artCurrentSlide(<%= index + 1 %>)"></span>
+                    <% }) %>
+                    </div>
+                </div>
+                <% } %>
+                <% if (game.videos.length) { %>
+                    <div class="video-container">
+                        <h3 style="text-align: center;">Videos</h3>
+                        <div class="slideshow-container" id="videos-container">
+                            <% game.videos.forEach((video, index) => { %>
+                                <div class="video-slide" style="<%= index === 0 ? 'display:block;' : 'display:none;' %>">
+                                    <iframe
+                                        src="<%= video.url %>"
+                                        class="video-frame"
+                                        title="Video <%= index + 1 %>"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                            <% }) %>
+                        <% if (game.videos.length > 1) { %>
+                            <a class="Videoprev" onclick="videoPlusSlides(-1)">&#10094;</a>
+                            <a class="Videonext" onclick="videoPlusSlides(1)">&#10095;</a>                         
+                        <% } %>
+                        </div>
+
+                        <div class="dot-div">
+                            <% game.videos.forEach((_, index) => { %>
+                                <span class="Videodot <%= index === 0 ? 'active' : '' %>" onclick="videoCurrentSlide(<%= index + 1 %>)"></span>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>  
+            </div>
+    <!-- Slideshow Javascript -->
+    <script>
+    let ssSlideIndex = 1;
+    let artSlideIndex = 1;
+    let videoSlideIndex = 1;
+
+    function showVideoSlides(n) {
+        const slides = document.getElementsByClassName("video-slide");
+        const dots = document.getElementsByClassName("Videodot");
+
+        if (!slides.length) return;
+
+        if (n > slides.length) videoSlideIndex = 1;
+        if (n < 1) videoSlideIndex = slides.length;
+
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].classList.remove("active");
+        }
+
+        slides[videoSlideIndex - 1].style.display = "block";
+        dots[videoSlideIndex - 1].classList.add("active");
+    }
+
+    function showSsSlides(n) {
+        const slides = document.getElementsByClassName("ss-img-slide");
+        const dots = document.getElementsByClassName("SSdot");
+
+        if (!slides.length) return;
+
+        if (n > slides.length) ssSlideIndex = 1;
+        if (n < 1) ssSlideIndex = slides.length;
+
+        for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+        }
+
+        for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.remove("active");
+        }
+
+        slides[ssSlideIndex - 1].style.display = "block";
+        dots[ssSlideIndex - 1].classList.add("active");
+    }
+
+    function ssPlusSlides(n) {
+        showSsSlides(ssSlideIndex += n);
+    }
+
+    function ssCurrentSlide(n) {
+        showSsSlides(ssSlideIndex = n);
+    }
+    function videoPlusSlides(n) {
+        showVideoSlides(videoSlideIndex += n);
+    }
+
+    function videoCurrentSlide(n) {
+        showVideoSlides(videoSlideIndex = n);
+    }
+
+    function showArtSlides(n) {
+        const slides = document.getElementsByClassName("art-img-slide");
+        const dots = document.getElementsByClassName("Artdot");
+
+        if (!slides.length) return;
+
+        if (n > slides.length) artSlideIndex = 1;
+        if (n < 1) artSlideIndex = slides.length;
+
+        for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+        }
+
+        for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.remove("active");
+        }
+
+        slides[artSlideIndex - 1].style.display = "block";
+        dots[artSlideIndex - 1].classList.add("active");
+    }
+
+    function artPlusSlides(n) {
+        showArtSlides(artSlideIndex += n);
+    }
+
+    function artCurrentSlide(n) {
+        showArtSlides(artSlideIndex = n);
+    }
+
+    showSsSlides(ssSlideIndex);
+    showArtSlides(artSlideIndex);
+    showVideoSlides(videoSlideIndex);
+    </script>
 </div>
 <%- include('../Partials/footer') %>

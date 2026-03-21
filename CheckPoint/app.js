@@ -420,6 +420,11 @@ app.get("/game/:id", checkLogin, async (req, res) => {
         summary,
         first_release_date,
         aggregated_rating,
+        screenshots.url,
+        videos.video_id,
+        artworks.url,
+        game_modes.name,
+        game_type.type,
         platforms.id, platforms.name,
         genres.id, genres.name,
         themes.id, themes.name,
@@ -503,6 +508,19 @@ similarGenres = similarGenres.slice(0, 6);
       limit 6;
     `)
         : [];
+    const TimeToBeat = await IGDBrequest("game_time_to_beats",
+        `
+        fields game_id, completely, hastily, normally;
+        where game_id = ${g.id};
+        limit 1;
+        `)
+
+    const ttb = TimeToBeat[0] || null
+    const completion = {
+        main: ttb?.normally ? Math.round(ttb.normally / 3600) : null,
+        completionist: ttb?.completely ? Math.round(ttb.completely / 3600) : null,
+        rushed: ttb?.hastily ? Math.round(ttb.hastily / 3600) : null,
+    };
 
     const game = {
         id: g.id,
@@ -515,7 +533,21 @@ similarGenres = similarGenres.slice(0, 6);
         platforms: g.platforms?.map(p => p.name) || [],
         genres: g.genres?.map(g => g.name) || [],
         releaseDate: g.first_release_date || null,
-        rating: g.aggregated_rating || null
+        rating: g.aggregated_rating || null,
+        gameModes: g.game_modes?.map(mode => mode.name) || [],
+        completion,
+
+        artworks: g.artworks?.map(a => ({
+            url: a.url ? `http:${a.url.replace("t_thumb", "t_1080p")}` : ""
+        })).filter(a => a.url) || [], //filter out empty urls
+
+        screenshots: g.screenshots?.map(s => ({
+            url: s.url ? `http:${s.url.replace("t_thumb", "t_1080p")}` : ""
+        })).filter(s => s.url) || [],//filter out empty urls
+
+        videos: g.videos?.map(v => ({
+            url: v.video_id ? `https://www.youtube.com/embed/${v.video_id}` : ""
+        })).filter(v => v.url) || [],
     }
 
     res.render('pages/game', {
@@ -525,6 +557,7 @@ similarGenres = similarGenres.slice(0, 6);
         similarGenres,
         moreFromDev,
         devCompanyName,
+        TimeToBeat,
     })
 })
 app.get("/profile", checkLogin, (req, res) => {
