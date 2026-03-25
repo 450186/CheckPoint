@@ -8,6 +8,7 @@ app.listen(port, () => {
 
 const userModel = require('./Models/users.js');
 const libraryModel = require('./Models/Library.js');
+const reviewModel = require('./Models/Review.js');
 
 const session = require('express-session');
 const bcrypt = require('bcrypt');
@@ -522,6 +523,11 @@ similarGenres = similarGenres.slice(0, 6);
         rushed: ttb?.hastily ? Math.round(ttb.hastily / 3600) : null,
     };
 
+    const userLibraryItem = await libraryModel.findOne({
+        userId: req.session.user.id,
+        gameId: id
+    }).lean();
+
     const game = {
         id: g.id,
         name: g.name,
@@ -554,6 +560,7 @@ similarGenres = similarGenres.slice(0, 6);
         title: game.name,
         user: req.session.user,
         game,
+        userLibraryItem,
         similarGenres,
         moreFromDev,
         devCompanyName,
@@ -695,7 +702,25 @@ app.post("/library/remove", checkLogin, async (req, res) => {
 
     res.redirect("/library");
 });
+app.post("/reviews/create", checkLogin, async (req, res) => {
+    const { gameId, cachedName, cachedCoverUrl, title, rating,review } = req.body;
 
+    await reviewModel.create({
+        userId: req.session.user.id,
+        gameId: Number(gameId),
+        cachedName,
+        cachedCoverUrl,
+        title,
+        rating: rating === "" ? null : Number(rating),
+        body: review,
+    });
+    res.redirect(`/game/${gameId}`)
+})
+app.post("/reviews/delete", checkLogin, async (req, res) => {
+    const { reviewId } = req.body;
+    await reviewModel.deleteOne({ _id: reviewId });
+    res.redirect(`/game/${gameId}`)
+})
 app.get("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {

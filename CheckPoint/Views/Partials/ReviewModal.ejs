@@ -1,0 +1,103 @@
+<div id="review-modal" class="modal-overlay" aria-hidden="true">
+  <div
+    class="modal review-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="review-modal-title"
+  >
+    <div class="modal-body">
+      <img id="review-modal-cover" class="modal-cover" src="" alt="" />
+
+      <div class="modal-info">
+        <div class="modal-header">
+          <h2 id="review-modal-title">Write a Review</h2>
+          <button
+            class="modal-close review-modal-close"
+            type="button"
+            aria-label="Close review dialog"
+          >
+            &CircleTimes;
+          </button>
+        </div>
+
+        <p id="review-modal-game-name" style="font-weight: bold; font-size: 1.2rem"></p>
+
+        <form action="/reviews/create" method="POST" class="review-form">
+          <input type="hidden" name="gameId" id="review-game-id" value="">
+          <input type="hidden" name="cachedName" id="review-cached-name" value="">
+          <input type="hidden" name="cachedCoverUrl" id="review-cached-cover" value="">
+
+          <div class="review-form-group">
+            <label for="review-title-input"><strong>Review Title</strong></label>
+            <input
+              type="text"
+              name="title"
+              id="review-title-input"
+              maxlength="100"
+              required
+              placeholder="Give your review a title"
+            >
+          </div>
+
+          <div class="review-form-group">
+            <label><strong>Your Rating</strong></label>
+            <input type="hidden" name="rating" id="review-rate-input" value="">
+
+            <div class="star-rating" id="review-star-rating">
+              <button type="button" class="star-btn" data-value="1" aria-label="1 star">
+                <i class="fa-regular fa-star"></i>
+              </button>
+              <button type="button" class="star-btn" data-value="2" aria-label="2 stars">
+                <i class="fa-regular fa-star"></i>
+              </button>
+              <button type="button" class="star-btn" data-value="3" aria-label="3 stars">
+                <i class="fa-regular fa-star"></i>
+              </button>
+              <button type="button" class="star-btn" data-value="4" aria-label="4 stars">
+                <i class="fa-regular fa-star"></i>
+              </button>
+              <button type="button" class="star-btn" data-value="5" aria-label="5 stars">
+                <i class="fa-regular fa-star"></i>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              id="review-clear-rating-btn"
+              class="clear-rating-btn"
+            >
+              Clear Rating
+            </button>
+
+            <p class="mutedText" style="margin-top: 8px;">
+              This rating will also update your library rating.
+            </p>
+          </div>
+
+          <div class="review-form-group review-textarea-group">
+            <label for="review-body-input"><strong>Your Review</strong></label>
+            <textarea
+              name="review"
+              id="review-body-input"
+              rows="7"
+              maxlength="3000"
+              required
+              placeholder="Write what you thought about the game..."
+            ></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="add-btn">Post Review</button>
+            <button
+              type="button"
+              class="go-to-game review-cancel-btn"
+              id="review-cancel-btn"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -45,6 +45,15 @@
             <p class="game-info"><strong>Rating:</strong>
                 <%= game.rating ? Math.round(game.rating) : "N/A" %>
             </p>
+            <button type="button" 
+            id="open-review-modal-btn" 
+            data-game-id="<%= game.id %>"
+            data-name="<%= game.name %>"
+            data-cover="<%= game.coverUrl %>"
+            data-rating="<%= userLibraryItem?.userRating || '' %>"
+            class="add-btn">
+                Add Review
+            </button>
         </div>
         <% if (game.completion) { %>
             <div class="completion-grid">
@@ -275,3 +284,4 @@
     </script>
 </div>
 <%- include('../Partials/footer') %>
+<script src="/Reviewfunction.js"></script>

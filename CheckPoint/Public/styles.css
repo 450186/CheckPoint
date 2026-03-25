@@ -618,7 +618,15 @@ button:hover {
 }
 
 /* ======== Modal Styles ======== */
-#game-modal {
+#review-title-input {
+    margin-left: 20px;
+}
+.review-textarea-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+#game-modal, #review-modal {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, .65);
@@ -637,14 +645,14 @@ button:hover {
     margin-bottom: 20px;
 }
 
-.modal-header #modal-title {
+.modal-header #modal-title, .modal-header #review-modal-title {
     margin: 0;
     min-width: 0;
     overflow-wrap: break-word;
     line-height: 1.2;
 }
 
-#game-modal.show {
+#game-modal.show, #review-modal.show {
     display: flex;
 }
 
@@ -706,7 +714,7 @@ button:hover {
 }
 
 /* Discover modal form spans full width and becomes its own grid */
-.modal-actions .library-form {
+.modal-actions .library-form, .modal-actions .review-form {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
