@@ -71,13 +71,23 @@
                 <button class="add-btn" type="button" onclick="window.location.href='/your-reviews'">View all of your reviews</button>
             </div>
         </div>
-        <div class="dash-card">
+        <div class="dash-card high-rated-card">
             <h3>Highest Rated</h3>
-            <p>Your highest rated games</p>
-            <p class="highest-rated"> <i class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> </p>
-            <div class="card-spacer"></div>
+            <p>Your highest rated games: </p>
+                <% if (highestRated.length === 0) { %>
+                    <p class="no-items">Rate games you've played via the library</p>
+                <% } %>
+                <div class="rating-list">
+                    <% highestRated.forEach(HR => { %>
+                        <div class="ranking-card">
+                            <div class="ranking-card-header">
+                                <img class="ranking-card-img" src="<%= HR.cachedCoverUrl.replace('t_cover_big', 't_thumb') %>" alt="<%= HR.cachedName %>">
+                                <p class="ranking-card-title"><%= HR.cachedName %></p>
+                            </div>
+                            <p class="ranking-card-rating">Rating: <%= HR.userRating %>/5<i class="fa-solid fa-star"></i></p>
+                        </div>
+                    <% }) %>
+                </div>
         </div>
     </div>
     <div class="card-rows">
@@ -176,5 +186,18 @@
 
 
     showReviewSlides(reviewSlideIndex);
+    syncCards();
+</script>
+<!-- Syncing the top row of cards to be the same height -->
+<script>
+    function syncCards() {
+        const reviewCard = document.querySelector(".review-card");
+        const ratingCard = document.querySelector(".high-rated-card");
+        if(!reviewCard || !ratingCard) return;
+
+        ratingCard.style.height = `${reviewCard.offsetHeight}px`;
+    }
+    window.addEventListener("resize", syncCards);
+    window.addEventListener("load", syncCards);
 </script>
 <%- include('../Partials/footer') %>

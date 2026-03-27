@@ -221,6 +221,11 @@ app.post("/register", async (req, res) => {
     }
 })
 app.get("/dashboard", checkLogin, async (req, res) => {
+    const highestRated = await libraryModel.find({ userId: req.session.user.id })
+        .sort({ userRating: -1 })
+        .limit(5)
+        .lean();
+
     const items = await libraryModel.find({ userId: req.session.user.id })
         .sort({ createdAt: -1 })
         .lean();
@@ -237,6 +242,7 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         user: req.session.user,
         playing,
         YourReviews,
+        highestRated,
     })
 })
 app.get("/search", checkLogin, (req, res) => {
