@@ -27,10 +27,49 @@
                     class="fa-solid fa-gamepad"></i> </p>
             <div class="card-spacer"></div>
         </div>
-        <div class="dash-card">
+        <div class="dash-card review-card">
             <h3>Your Reviews</h3>
-            <p>See all of your reviews here</p>
+            <p>See your most recent reviews here</p>
+            <% if (YourReviews.length === 0) { %>
+                <p class="no-items">Review games you've played for them to appear here</p>
+            <% } %>
+            <% if(YourReviews.length) { %>
+                <div class="review-container">
+                    <div class="slideshow-container" id="reviews-slideshow">
+                        <% YourReviews.forEach((review, index) => { %>
+                            <div class="review-slide"
+                                style="<%= index === 0 ? 'display:block;' : 'display:none;' %>"
+                            >
+                                <div class="review-header">
+                                    <div class="review-header-text">
+                                        <p style="font-weight: bold; font-size: 1.2rem" class="review-game"><%= review.cachedName %></p>
+                                        <p style="font-weight: bold;" class="review-title"><%= review.title %></p>
+                                    </div>
+                                    <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_thumb') %>" alt="<%= review.cachedName %>">
+                                </div>
+                                <p class="review-body"><%= review.body %></p>
+                            </div> 
+                        <% }) %>
+                    </div>
+                    <div class="review-controls">
+                        <% if (YourReviews.length > 1) { %>
+                            <a class="reviewPrev" onclick="plusReviewSlides(-1)">&#10094;</a>
+                        <% } %>
+                    <div class="dot-div">
+                        <% YourReviews.forEach((_, index) => { %>
+                            <span class="reviewDot <%= index === 0 ? 'active' : '' %>" onclick="currentReviewSlide(<%= index + 1 %>)"></span>
+                        <% }) %>
+                    </div>
+                    <% if (YourReviews.length > 1) { %>
+                        <a class="reviewNext" onclick="plusReviewSlides(1)">&#10095;</a>
+                    <% } %>
+                    </div>
+                </div>
+            <% } %>
             <div class="card-spacer"></div>
+            <div class="go-to-reviews">
+                <button class="add-btn" type="button" onclick="window.location.href='/your-reviews'">View all of your reviews</button>
+            </div>
         </div>
         <div class="dash-card">
             <h3>Highest Rated</h3>
@@ -104,4 +143,38 @@
         </div>
     </div>
 </div>
+
+<script>
+    let reviewSlideIndex = 1;
+
+    function showReviewSlides(n) {
+        const slides = document.getElementsByClassName("review-slide");
+        const dots = document.getElementsByClassName("reviewDot");
+
+        if (!slides.length) return;
+
+        if (n > slides.length) reviewSlideIndex = 1;
+        if (n < 1) reviewSlideIndex = slides.length;
+
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].classList.remove("active");
+        }
+
+        slides[reviewSlideIndex - 1].style.display = "block";
+        dots[reviewSlideIndex - 1].classList.add("active");
+    }
+    function plusReviewSlides(n) {
+        showReviewSlides(reviewSlideIndex += n);
+    }
+    function currentReviewSlide(n) {
+        showReviewSlides(reviewSlideIndex = n);
+    }
+
+
+    showReviewSlides(reviewSlideIndex);
+</script>
 <%- include('../Partials/footer') %>

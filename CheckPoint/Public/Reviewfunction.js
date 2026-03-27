@@ -17,6 +17,7 @@
   const reviewNameInput = document.getElementById("review-cached-name");
   const reviewCoverInput = document.getElementById("review-cached-cover");
 
+
   const reviewTitleInput = document.getElementById("review-title-input");
   const reviewTextInput = document.getElementById("review-body-input");
 

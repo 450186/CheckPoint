@@ -2,10 +2,6 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 4000;
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-})
-
 const userModel = require('./Models/users.js');
 const libraryModel = require('./Models/Library.js');
 const reviewModel = require('./Models/Review.js');
@@ -40,8 +36,25 @@ app.use(session({
 const connectionString = `mongodb+srv://${mongoUsername}:${mongoPassword}@checkpoint.iztnugv.mongodb.net/${mongoAppName}?retryWrites=true&w=majority`;
 const mongoose = require('mongoose');
 mongoose.connect(connectionString)
-    .then(() => console.log('Connected to MongoDB'))
+    .then(() => {
+        console.log('Connected to MongoDB')
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
+    })
     .catch((err) => console.error('Error connecting to MongoDB:', err));
+
+mongoose.connection.on("connected", () => {
+    console.log("Mongoose connected");
+});
+
+mongoose.connection.on("disconnected", () => {
+    console.log("Mongoose disconnected");
+});
+
+mongoose.connection.on("error", (err) => {
+    console.error("Mongoose error:", err);
+});
 
 const path = require('path');
 const { log } = require('console');
@@ -214,10 +227,16 @@ app.get("/dashboard", checkLogin, async (req, res) => {
 
     const playing = items.filter(i => i.status === 'playing').slice(0, 4);
 
+
+    const YourReviews = await reviewModel.find({ userId: req.session.user.id })
+        .sort({ createdAt: -1 })
+        .lean();
+
     res.render('pages/dashboard', {
         title: 'Dashboard',
         user: req.session.user,
         playing,
+        YourReviews,
     })
 })
 app.get("/search", checkLogin, (req, res) => {
@@ -717,8 +736,10 @@ app.post("/reviews/create", checkLogin, async (req, res) => {
     res.redirect(`/game/${gameId}`)
 })
 app.post("/reviews/delete", checkLogin, async (req, res) => {
-    const { reviewId } = req.body;
+    const { reviewId, gameId } = req.body;
+
     await reviewModel.deleteOne({ _id: reviewId });
+
     res.redirect(`/game/${gameId}`)
 })
 app.get("/logout", (req, res) => {

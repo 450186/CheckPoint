@@ -1392,7 +1392,8 @@ progress::-moz-progress-bar {
 }
 
 #screenshots-slideshow,
-#artworks-slideshow {
+#artworks-slideshow,
+#reviews-container {
     max-width: 100%;
 }
 
@@ -1408,7 +1409,10 @@ progress::-moz-progress-bar {
     height: 350px;
     background-color: var(--background);
 }
-
+.review-slide {
+    margin: 10px;
+    padding: 10px;
+}
 .video-slide {
     display: none;
     width: 100%;
@@ -1442,7 +1446,8 @@ progress::-moz-progress-bar {
 
 .SSdot,
 .Artdot,
-.Videodot {
+.Videodot,
+.reviewDot {
     cursor: pointer;
     height: 12px;
     width: 12px;
@@ -1457,7 +1462,8 @@ progress::-moz-progress-bar {
 .Videodot:hover,
 .SSdot.active,
 .Artdot.active,
-.Videodot.active {
+.Videodot.active,
+.reviewDot.active {
     background-color: var(--accent);
     transform: scale(1.1);
 }
@@ -1509,6 +1515,60 @@ progress::-moz-progress-bar {
         grid-column: 1;
         max-width: 100%;
     }
+}
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+.review-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.review-img-small {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+.review-title {
+    color: var(--secondText)
+}
+.review-body {
+    color: var(--secondText);
+    text-align: justify;
+    text-align-last: center;
+}
+.review-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px
+}
+.reviewPrev,
+.reviewNext {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+.reviewPrev:hover,
+.reviewNext:hover {
+    color: var(--accent);
+}
+.review-controls .dot-div {
+    margin: auto
+}
+.go-to-reviews {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 /* ======== ======== */
 /* ======== ======== */
