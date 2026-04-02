@@ -55,7 +55,11 @@ header {
     justify-content: center;
     align-items: center;
 }
-
+.error-msg {
+    text-align: center;
+    color: rgb(251, 64, 64);
+    font-weight: bold;
+}
 a {
     color: var(--text);
     text-decoration: none;
@@ -86,6 +90,31 @@ a:hover {
     max-width: 40%;
     box-shadow: var(--shadow);
 }
+.right-side {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+.add-friends-btn {
+    background: transparent;
+    border: none;
+}
+#friend-modal-title {
+    margin: auto;
+    margin-left: 0px;
+}
+.add-friends-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+.add-friends-icon {
+    font-size: 24px;
+    color: var(--text);
+    cursor: pointer;
+    line-height: 1;
+    align-self: center;
+}
+
 .account-container {
     display: flex;
     flex-flow: row;
@@ -629,7 +658,7 @@ button:hover {
     align-items: flex-start;
     gap: 15px;
 }
-#game-modal, #review-modal {
+#game-modal, #review-modal, #friend-modal {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, .65);
@@ -655,7 +684,7 @@ button:hover {
     line-height: 1.2;
 }
 
-#game-modal.show, #review-modal.show {
+#game-modal.show, #review-modal.show, #friend-modal.show {
     display: flex;
 }
 
@@ -1586,10 +1615,17 @@ progress::-moz-progress-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 16px;
+    padding: 5px;
     gap: 12px;
     margin: 10px 0;
 }
-
+.ranking-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .7);
+    background-color: var(--accentHover);
+    cursor: pointer;
+}
 .ranking-card-header {
     display: flex;
     gap: 10px;
@@ -1627,5 +1663,290 @@ progress::-moz-progress-bar {
 .high-rated-card {
     max-height: 65vh;
 }
+/* ======== Friend modal ======== */
+
+.friend-modal {
+    width: 100%;
+    max-width: 400px;
+}
+.friend-search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+#friend-search-input {
+    width: 80%;
+    margin: auto;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background-color: var(--background);
+    color: var(--text);
+}
+/* ======== Profile Page ======== */
+.profile-page {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    align-items: stretch;
+}
+
+.profile-page .card {
+    justify-content: flex-start;
+    align-items: stretch;
+    max-width: 100%;
+    margin: 0;
+}
+
+.profile-card {
+    text-align: center;
+    gap: 15px;
+}
+
+.profile-page-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 10px;
+    border: 1px solid var(--border);
+}
+
+.profile-right-column {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    align-content: start;
+}
+.profile-right-column > .review-card {
+    grid-column: 1 / -1;
+}
+.friendsList-card,
+.playing-card {
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 6px;
+}
+.profile-games {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    text-align: center;
+}
+.friends-container,
+.profile-reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.friend-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.friend-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-review-card {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+}
+
+.profile-review-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.profile-review-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.profile-review-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.profile-review-game {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.profile-review-title {
+    margin: 0;
+    font-weight: bold;
+    color: var(--secondText);
+}
+
+.profile-review-body {
+    margin: 0;
+    text-align: left;
+    color: var(--text);
+}
+.profile-game-img {
+    border-radius: 16px;
+}
+.profile-game-card {
+    padding: 10px;
+    border-radius: 16px;
+}
+.profile-game-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .7);
+    cursor: pointer;
+    background-color: var(--accentHover);
+}
+#remove-friend-form {
+    margin-left: auto;
+    margin-right: 10px;
+
+}
+.remove-friend-btn {
+    width: 100%;
+}
+.remove-friend-btn:hover {
+    background-color: #EF4444 !important;
+}
+.friend-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+/* ======== Activity Page ======== */
+.activity {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.activity-card {
+    background: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr) 140px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    gap: 20px;
+    align-items: stretch;
+    width: 75%;
+    margin: 0 auto;
+    cursor: pointer;
+}
+.activity-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+.activity-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.activity-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    height: 100%
+}
+.activity-msg-line {
+    font-size: 1.35rem;
+    margin: 0;
+    line-height: 1.4;
+}
+.activity-msg-line strong:first-child {
+    color: var(--text);
+}
+.activity-timestamp {
+    color: var(--secondText);
+    font-size: 0.9rem;
+    margin-bottom: 0
+}
+.activity-game-img {
+    width: 120px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+    justify-self: flex-end;
+    align-self: center;
+    border: 1px solid var(--border);
+}
+.activity-review-title {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.activity-review-body {
+    margin: 0;
+    color: var(--secondText);
+    line-height: 1.6;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+.activity-username {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.activity-username:hover {
+    color: var(--accent);
+}
+.activity-avatar {
+    cursor: pointer;
+}
+.activity-avatar:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-4px);
+}
+.filter-btn.active-filter {
+    background-color: var(--accent);
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+.activity-rating {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 6px;
+    margin-top: 10px;
+}
+.activity-star-rating {
+    display: flex;
+    gap: 4px;
+    font-size: 18px;
+    color: #FBBF24;
+}
+.activity-rating > p {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text);
+}
+/* ======== ======== */
+/* ======== ======== */
+/* ======== ======== */
+/* ======== ======== */
+/* ======== ======== */
+/* ======== ======== */
 /* ======== ======== */
 /* ======== ======== */

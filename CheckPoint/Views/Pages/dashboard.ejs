@@ -5,6 +5,7 @@
                 <%= title %>
             </a></li>
         <li class="nav-item"><a href="/discover">Discover</a></li>
+        <li class="nav-item"><a href="/activity">Friend Activity</a></li>
         <li class="nav-item"><a href="/library">My Library</a></li>
         <li class="nav-item logout"><a href="/logout">Logout</a></li>
     </ul>
@@ -18,6 +19,7 @@
             <%= user.firstName %>!
         </h3>
     </div>
+    <p class="error-msg"><%= errorMessage %></p>
     <div class="card-rows">
         <div class="dash-card">
             <h3>Your Stats</h3>
@@ -79,7 +81,7 @@
                 <% } %>
                 <div class="rating-list">
                     <% highestRated.forEach(HR => { %>
-                        <div class="ranking-card">
+                        <div class="ranking-card" data-game-id="<%= HR.gameId %>">
                             <div class="ranking-card-header">
                                 <img class="ranking-card-img" src="<%= HR.cachedCoverUrl.replace('t_cover_big', 't_thumb') %>" alt="<%= HR.cachedName %>">
                                 <p class="ranking-card-title"><%= HR.cachedName %></p>
@@ -186,18 +188,16 @@
 
 
     showReviewSlides(reviewSlideIndex);
-    syncCards();
-</script>
-<!-- Syncing the top row of cards to be the same height -->
-<script>
-    function syncCards() {
-        const reviewCard = document.querySelector(".review-card");
-        const ratingCard = document.querySelector(".high-rated-card");
-        if(!reviewCard || !ratingCard) return;
 
-        ratingCard.style.height = `${reviewCard.offsetHeight}px`;
-    }
-    window.addEventListener("resize", syncCards);
-    window.addEventListener("load", syncCards);
+</script>
+<script>
+    const ratedGame = document.querySelectorAll('.ranking-card');
+
+    ratedGame.forEach(card => {
+        card.addEventListener('click', () => {
+            const gameId = card.getAttribute('data-game-id');
+            window.location.href = `/game/${gameId}?from=${encodeURIComponent('/dashboard')}`;
+        });
+    });
 </script>
 <%- include('../Partials/footer') %>

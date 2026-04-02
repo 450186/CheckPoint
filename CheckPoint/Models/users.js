@@ -1,4 +1,3 @@
-const e = require('express');
 const mongoose = require('mongoose');
 
 const {Schema, model} = mongoose;
@@ -9,7 +8,8 @@ const userSchema = new Schema({
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
-    profilePicture: { type: String, default: 'account logo.png' },
+    avatarSeed: { type: String, trim: true, default: "" },
+    friendsList: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
 const userData = model('User', userSchema);
@@ -23,8 +23,16 @@ async function createUser(username, password, email, firstName, lastName) {
   if (userExists) return false;
 
   try {
-    await userData.create({ username, password, email, firstName, lastName });
-    return true;
+    const newUser = await userData.create({ 
+      username, 
+      password, 
+      email, 
+      firstName, 
+      lastName,
+      avatarSeed: username,
+    });
+  
+    return newUser;
   } catch (err) {
     console.error("Error creating user:", err);
     throw err;

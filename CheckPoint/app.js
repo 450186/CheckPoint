@@ -57,7 +57,7 @@ mongoose.connection.on("error", (err) => {
 });
 
 const path = require('path');
-const { log } = require('console');
+const { log, error } = require('console');
 app.use(express.static(path.join(__dirname, 'Public')));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -72,6 +72,11 @@ function checkLogin(req, res, next) {
 }
 function isLoggedIn(request) {
     return request.session && request.session.user;
+}
+function popErrorMessage(req) {
+    const errorMessage = req.session.errorMessage;
+    req.session.errorMessage = null;
+    return errorMessage;
 }
 
 let cachedToken = null;
@@ -122,28 +127,21 @@ async function IGDBrequest(endpoint, body) {
 
     return response.json()
 }
-
-app.use((req, res, next) => {
-  const ignore =
-    req.method !== "GET" ||
-    req.path.startsWith("/css") ||
-    req.path.startsWith("/js") ||
-    req.path.startsWith("/Public") ||
-    req.path === "/login" ||
-    req.path === "/register" ||
-    req.path === "/logout" ||
-    req.path === "/back";
-
-  if (!ignore) {
-    // shift current -> previous, then store new current
-    req.session.prevPage = req.session.currPage;
-    req.session.currPage = req.originalUrl;
-  }
-
-  next();
-});
-
-
+function toTimeAgo(date) {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (seconds < 60) {
+        return `${seconds} seconds ago`;
+    } else if (seconds < 3600) {
+        const minutes = Math.floor(seconds / 60);
+        return `${minutes} minutes ago`;
+    } else if (seconds < 86400) {
+        const hours = Math.floor(seconds / 3600);
+        return `${hours} hours ago`;
+    } else {
+        const days = Math.floor(seconds / 86400);
+        return `${days} days ago`;
+    }
+}
 
 app.get('/', (req, res) => {
     res.render('pages/home', {
@@ -156,70 +154,73 @@ app.get("/home", (req, res) => {
     })
 })
 app.get("/login", async (req, res) => {
+    const errorMessage = popErrorMessage(req);
 
     res.render('pages/login', {
         title: 'Login',
         user: req.session.user,
         loggedIn: isLoggedIn(req),
+        errorMessage,
     })
 })
-app.get("/back", (req, res) => {
-  const fallback = "/dashboard";
-  const prev = req.session.prevPage;
-  if (typeof prev === "string" && prev.startsWith("/")) return res.redirect(prev);
-  return res.redirect(fallback);
-});
-
-
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const user = await userModel.userData.findOne({ username });
     if (!user) {
-        return res.status(401).send('Invalid username or password');
+        req.session.errorMessage = 'Invalid username or password';
+        return res.redirect('/login');
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
+
     if (!passwordMatch) {
-        return res.status(401).send('Invalid username or password');
+        req.session.errorMessage = 'Invalid username or password';
+        return res.redirect('/login');
     }
     req.session.user = {
         username: user.username,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        profilePicture: user.profilePicture,
+        avatarSeed: user.avatarSeed,
         id: user._id,
     };
     res.redirect('/dashboard');
 })
-
 app.get("/register", (req, res) => {
+    const errorMessage = popErrorMessage(req);
     res.render('pages/register', {
         title: 'Register',
-        errorMessage: req.session.errorMessage || null,
+        errorMessage,
     })
 })
 app.post("/register", async (req, res) => {
     const { username, password, email, firstName, lastName } = req.body;
     const hashed = await bcrypt.hash(password, 10);
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     if (!passwordRegex.test(password)) {
         req.session.errorMessage = 'Password must match the rules, press the information icon to check the rules.';
         return res.redirect('/register');
     }
-    if (await userModel.createUser(username, hashed, email, firstName, lastName)) {
-        req.session.errorMessage = null;
-        req.session.user = { username, email, firstName, lastName, id: _id };
-        res.redirect('/dashboard');
+
+    const newUser = await userModel.createUser(username, hashed, email, firstName, lastName);
+
+    if (newUser) {
+        req.session.user = {
+            username: newUser.username,
+            email: newUser.email,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            avatarSeed: newUser.avatarSeed,
+            id: newUser._id,
+        };
+        return res.redirect('/dashboard');
     } else {
-        req.session.errorMessage = 'Username or email already exists.';
-        res.render('pages/Login', {
-            title: 'Login',
-            errorMessage: req.session.errorMessage,
-        });
+        req.session.errorMessage = 'Username or email already exists. Please choose another.';
+        return res.redirect('/register');
     }
-})
+});
 app.get("/dashboard", checkLogin, async (req, res) => {
     const highestRated = await libraryModel.find({ userId: req.session.user.id })
         .sort({ userRating: -1 })
@@ -237,12 +238,15 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         .sort({ createdAt: -1 })
         .lean();
 
+        const errorMessage= popErrorMessage(req);
+
     res.render('pages/dashboard', {
         title: 'Dashboard',
         user: req.session.user,
         playing,
         YourReviews,
         highestRated,
+        errorMessage,
     })
 })
 app.get("/search", checkLogin, (req, res) => {
@@ -259,10 +263,10 @@ app.get("/discover", checkLogin, async (req, res) => {
 
     const genres = (req.query.genres || "").toString().trim();
     const platforms = (req.query.platforms || "").toString().trim();
-    const minRating = Number(req.query.minRating || 0)
-    const yearFrom = (req.query.yearFrom || "").toString().trim()
-    const yearTo = (req.query.yearTo || "").toString().trim()
-    const sort = (req.query.sort || "newest").toString().toLowerCase()
+    const minRating = Number(req.query.minRating || 0);
+    const yearFrom = (req.query.yearFrom || "").toString().trim();
+    const yearTo = (req.query.yearTo || "").toString().trim();
+    const sort = (req.query.sort || "newest").toString().toLowerCase();
 
     function IDlist(str) {
         return str
@@ -275,67 +279,65 @@ app.get("/discover", checkLogin, async (req, res) => {
     const platformIds = IDlist(platforms);
 
     function monthStartToUnix(yyyyMm) {
-        // yyyyMm = "YYYY-MM"
         const ms = Date.parse(`${yyyyMm}-01T00:00:00.000Z`);
         return Number.isFinite(ms) ? Math.floor(ms / 1000) : null;
-        }
+    }
 
-        function monthEndToUnix(yyyyMm) {
-        // end of month: first day of next month - 1 second
+    function monthEndToUnix(yyyyMm) {
         const [y, m] = yyyyMm.split("-").map(Number);
         if (!Number.isFinite(y) || !Number.isFinite(m)) return null;
 
         const nextMonth = m === 12 ? 1 : m + 1;
         const nextYear = m === 12 ? y + 1 : y;
 
-        const ms = Date.parse(`${String(nextYear).padStart(4,"0")}-${String(nextMonth).padStart(2,"0")}-01T00:00:00.000Z`);
+        const ms = Date.parse(
+            `${String(nextYear).padStart(4, "0")}-${String(nextMonth).padStart(2, "0")}-01T00:00:00.000Z`
+        );
         return Number.isFinite(ms) ? Math.floor(ms / 1000) - 1 : null;
     }
 
-        const fromDate = yearFrom ? monthStartToUnix(yearFrom) : null;
-        const toDate = yearTo ? monthEndToUnix(yearTo) : null;
+    const fromDate = yearFrom ? monthStartToUnix(yearFrom) : null;
+    const toDate = yearTo ? monthEndToUnix(yearTo) : null;
 
     try {
         const libraryItems = await libraryModel
             .find({ userId: req.session.user.id })
             .lean();
+
         const ownedGames = new Set(libraryItems.map((item) => item.gameId));
 
         const limit = 12;
         const offset = (pageNum - 1) * limit;
 
         const whereParts = ["cover != null & aggregated_rating != null"];
-
         const safeQ = q.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
-        if(genreIds.length) {
-            whereParts.push(`genres = (${genreIds.join(",")})`)
-        }
-        if(platformIds.length) {
-            whereParts.push(`platforms = (${platformIds.join(",")})`)
-        }
-        if(Number.isFinite(minRating) && minRating > 0) {
-            whereParts.push(`aggregated_rating != null`)
-            whereParts.push(`aggregated_rating >= ${Math.min(minRating, 100)}`)
+        if (genreIds.length) whereParts.push(`genres = (${genreIds.join(",")})`);
+        if (platformIds.length) whereParts.push(`platforms = (${platformIds.join(",")})`);
+
+        if (Number.isFinite(minRating) && minRating > 0) {
+            whereParts.push(`aggregated_rating != null`);
+            whereParts.push(`aggregated_rating >= ${Math.min(minRating, 100)}`);
         }
 
-        if(fromDate) {
-            whereParts.push(`first_release_date != null`)
-            whereParts.push(`first_release_date >= ${fromDate}`)
-        }
-        if(toDate) {
-            whereParts.push(`first_release_date != null`)
-            whereParts.push(`first_release_date <= ${toDate}`)
+        if (fromDate) {
+            whereParts.push(`first_release_date != null`);
+            whereParts.push(`first_release_date >= ${fromDate}`);
         }
 
-        whereParts.push(`version_parent = null`)
-        whereParts.push(`parent_game = null`)
+        if (toDate) {
+            whereParts.push(`first_release_date != null`);
+            whereParts.push(`first_release_date <= ${toDate}`);
+        }
+
+        whereParts.push(`version_parent = null`);
+        whereParts.push(`parent_game = null`);
 
         let sortLine = "";
         if (!q) {
-        sortLine = `sort first_release_date desc`;
-        if (sort === "rating") sortLine = `sort aggregated_rating desc`;
-        if (sort === "name") sortLine = `sort name asc`;
+            sortLine = `sort first_release_date desc`;
+            if (sort === "rating") sortLine = `sort aggregated_rating desc`;
+            if (sort === "name") sortLine = `sort name asc`;
         }
 
         const igdbBody = `
@@ -364,7 +366,8 @@ app.get("/discover", checkLogin, async (req, res) => {
             "Nintendo Switch",
             "iOS",
             "Android",
-        ]
+        ];
+
         const allowedPlatformsSet = new Set(allowedPlatforms);
 
         const allPlatforms = await IGDBrequest("platforms", `
@@ -372,27 +375,26 @@ app.get("/discover", checkLogin, async (req, res) => {
             sort name asc;
             limit 200;
         `);
-        const popularPlatforms = allPlatforms
-        .filter(p => allowedPlatformsSet.has(p.name))
-        .sort((a, b) =>
-            allowedPlatforms.indexOf(a.name) - allowedPlatforms.indexOf(b.name)
-        )
-        const otherPlatforms = allPlatforms
-        .filter(p => !allowedPlatformsSet.has(p.name))
 
+        const popularPlatforms = allPlatforms
+            .filter(p => allowedPlatformsSet.has(p.name))
+            .sort((a, b) => allowedPlatforms.indexOf(a.name) - allowedPlatforms.indexOf(b.name));
+
+        const otherPlatforms = allPlatforms.filter(p => !allowedPlatformsSet.has(p.name));
+
+        const errorMessage = popErrorMessage(req);
 
         res.render("pages/discover", {
             title: "Discover",
             user: req.session.user,
             games,
-            errorMessage: null,
+            errorMessage,
             pageNum,
             ownedGames,
             query: q,
             availableGenres,
             popularPlatforms,
             otherPlatforms,
-
             filters: {
                 genres: genreIds,
                 platforms: platformIds,
@@ -404,19 +406,18 @@ app.get("/discover", checkLogin, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        req.session.errorMessage = "Failed to load games. Please try again later.";
+
         res.render("pages/discover", {
             title: "Discover",
             user: req.session.user,
             games: [],
-            errorMessage: req.session.errorMessage,
+            errorMessage: "Failed to load games. Please try again later.",
             pageNum,
             ownedGames: new Set(),
             query: q,
             availableGenres: [],
             popularPlatforms: [],
             otherPlatforms: [],
-
             filters: {
                 genres: [],
                 platforms: [],
@@ -430,12 +431,10 @@ app.get("/discover", checkLogin, async (req, res) => {
 });
 app.get("/game/:id", checkLogin, async (req, res) => {
     const id = Number(req.params.id);
+    const from = req.query.from;
+
       if (!Number.isFinite(id)) {
         return res.redirect("/discover"); 
-  }
-  const from = req.query.from;
-  if(typeof from === 'string' && from.startsWith('/' ) && !from.startsWith('/game/')) {
-    req.session.prevPage = from      
   }
 
     const [g] = await IGDBrequest("games", `
@@ -590,13 +589,50 @@ similarGenres = similarGenres.slice(0, 6);
         moreFromDev,
         devCompanyName,
         TimeToBeat,
+        from: (typeof from === 'string' && from.startsWith('/') && !from.startsWith('/game/')) ? from : "/dashboard",
     })
 })
-app.get("/profile", checkLogin, (req, res) => {
+app.get("/profile", checkLogin, async (req, res) => {
+    const profileUser = await userModel.userData
+    .findById(req.session.user.id)
+    .populate("friendsList")
+    .lean();
+
+    const userReviews = await reviewModel.find({ userId: req.session.user.id })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    const items = await libraryModel.find({ userId: req.session.user.id })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    const playing = items.filter(i => i.status === 'playing').slice(0, 4);
+
+    const errorMessage = popErrorMessage(req);
+
     res.render('pages/profile', {
         title: 'Profile',
         user: req.session.user,
+        profileUser,
+        isOwnProfile: true,
+        errorMessage,
+        userReviews,
+        playing,
     })
+})
+app.post('/friends/remove', checkLogin, async (req, res) => {
+    const { friendId } = req.body;
+    
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $pull: { friendsList: friendId } }
+    );
+    await userModel.userData.updateOne(
+        { _id: friendId },
+        { $pull: { friendsList: req.session.user.id } }
+    );
+
+    res.redirect(req.get("referer") || "/profile");
 })
 app.get("/library", checkLogin, async (req, res) => {
 
@@ -710,7 +746,8 @@ app.post("/library/rate", checkLogin, async (req, res) => {
             gameId: Number(gameId) 
         },
         { 
-            $set: { userRating: ratingValue } 
+            $set: { userRating: ratingValue }, 
+            $currentDate: { updatedAt: true }
         }
     );
 
@@ -747,6 +784,167 @@ app.post("/reviews/delete", checkLogin, async (req, res) => {
     await reviewModel.deleteOne({ _id: reviewId });
 
     res.redirect(`/game/${gameId}`)
+})
+app.get("/users/:username", checkLogin, async (req, res) => {
+    const profileUser = await userModel.userData.findOne({
+        username: req.params.username
+    }).populate("friendsList").lean();
+    if(!profileUser) {
+        req.session.errorMessage = "User not found.";
+        return res.redirect(req.get("referer") || "/dashboard");
+    }
+        
+    const items = await libraryModel.find({ userId: profileUser._id })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    const playing = items.filter(i => i.status === 'playing').slice(0, 4);
+
+    const userReviews = await reviewModel.find({ userId: profileUser._id })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    const alreadyFriends = profileUser.friendsList.some(
+        friend => String(friend._id) === String(req.session.user.id)
+    );
+
+    const errorMessage = popErrorMessage(req);
+
+    res.render("pages/profile", {
+        title: "Profile",
+        user: req.session.user,
+        profileUser,
+        alreadyFriends,
+        isOwnProfile: req.session.user.username === profileUser.username,
+        userReviews,
+        errorMessage,
+        playing
+    })
+})
+app.post("/profile/avatar/randomise", checkLogin, async (req, res) => {
+    const newSeed = Math.random().toString(36).slice(2) + Date.now();
+
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $set: { avatarSeed: newSeed } }
+    );
+
+    req.session.user.avatarSeed = newSeed;
+
+    res.redirect("/profile");
+})
+app.get("/friends/search", checkLogin, async (req, res) => {
+    const query = (req.query.query || "").trim();
+
+    if(!query) {
+        return res.redirect(req.get("referer") || "/dashboard");
+    }
+    const user = await userModel.userData.findOne({
+        username: query,
+    })
+
+    if(!user) {
+        req.session.errorMessage = "User not found.";
+        return res.redirect(req.get("referer") || "/dashboard");
+    }
+    res.redirect(`/users/${encodeURIComponent(user.username)}`);
+})
+app.post("/friends/add", checkLogin, async (req, res) => {
+    try {
+        const {friendId} = req.body;
+        if(!friendId) {
+            req.session.errorMessage = "Invalid user.";
+            return res.redirect(req.get("referer") || "/dashboard");
+        }
+        if(String(friendId) === String(req.session.user.id)) {
+            req.session.errorMessage = "You cannot add yourself as a friend.";
+            return res.redirect(req.get("referer") || "/dashboard");
+        }
+        const friend = await userModel.userData.findById(friendId);
+        if(!friend) {
+            req.session.errorMessage = "User not found.";
+            return res.redirect(req.get("referer") || "/dashboard");
+        }
+        const currentUser = await userModel.userData.findById(req.session.user.id);
+        if(!currentUser) {
+            req.session.errorMessage = "Your Account could not be found.";
+            return res.redirect(req.get("referer") || "/dashboard");
+        }
+        const alreadyFriends = currentUser.friendsList.some(
+            id => String(id) === String(friendId)
+        );
+        if(alreadyFriends) {
+            req.session.errorMessage = "You are already friends with this user.";
+            return res.redirect(`/users/${encodeURIComponent(friend.username)}`);
+        }
+        await userModel.userData.updateOne(
+            { _id: req.session.user.id },
+            { $addToSet: { friendsList: friend._id } }
+        );
+        await userModel.userData.updateOne(
+            { _id: friend._id },
+            { $addToSet: { friendsList: currentUser._id } }
+        );
+        req.session.errorMessage = "You are now friends with " + friend.username + "!";
+        return res.redirect(`/users/${encodeURIComponent(friend.username)}`);
+    } catch (e) {
+        console.error(e);
+        req.session.errorMessage = "An error occurred while adding friend.";
+        return res.redirect(req.get("referer") || "/dashboard");    
+    }
+})
+app.get("/activity", checkLogin, async (req, res) => {
+    const user = await userModel.userData.findById(req.session.user.id)
+    .populate("friendsList")
+    .lean();
+
+    const friends = user.friendsList.map(friend => friend._id)
+
+    const reviews = await reviewModel.find({
+        userId: { $in: friends },
+    }).sort({ createdAt: -1 }).lean();
+
+    const libraryUpdates = await libraryModel.find({
+        userId: { $in: friends },
+    }).sort({ updatedAt: -1 }).lean();
+
+    const friendMap = new Map(user.friendsList.map(f => [String(f._id), f]));
+
+    const reviewActivities = reviews.map(r => ({
+        type: "review",
+        createdAt: toTimeAgo(r.createdAt),
+        user: friendMap.get(String(r.userId)),
+        gameId: r.gameId,
+        gameName: r.cachedName,
+        coverUrl: r.cachedCoverUrl,
+        reviewId: r._id,
+        title: r.title,
+        rating: r.rating,
+        body: r.body,
+    }))
+
+    const libraryActivities = libraryUpdates.map(l => ({
+        type: "status",
+        createdAt: toTimeAgo(l.createdAt) || toTimeAgo(l.updatedAt),
+        user: friendMap.get(String(l.userId)),
+        gameId: l.gameId,
+        gameName: l.cachedName,
+        coverUrl: l.cachedCoverUrl,
+        status: l.status,
+        userRating: l.userRating,
+    }))
+
+    const activityFeed = [...reviewActivities, ...libraryActivities] //get all activities using ... to spread the arrays into one array
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const errorMessage = popErrorMessage(req);
+
+    res.render("pages/activity", {
+        title: "Activity",
+        user: req.session.user,
+        activityFeed,
+        errorMessage
+    })
 })
 app.get("/logout", (req, res) => {
     req.session.destroy((err) => {
