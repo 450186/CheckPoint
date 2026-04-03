@@ -1,13 +1,7 @@
 <%- include('../Partials/header') %>
-<div class="sidebar">
-    <ul class="nav-list">
-        <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
-        <li class="nav-item"><a href="/discover">Discover</a></li>
-        <li class="nav-item"><a href="/activity">Friend Activity</a></li>
-        <li class="nav-item"><a href="/library">My Library</a></li>
-        <li class="nav-item logout"><a href="/logout">Logout</a></li>
-    </ul>
-</div>
+
+<%- include('../Partials/navi') %>
+
 <div class="main-content">
     <h2 class="title">
         <%= isOwnProfile ? "Your Profile" : `${profileUser.firstName}'s Profile` %>
@@ -38,8 +32,16 @@
             <div class="card-spacer"></div>
             <button type="button" class="edit-profile">Edit Profile</button>
         <% } else if (alreadyFriends) { %>
-                <i class="fa-solid fa-user-check add-friends-icon" style="color: green;"></i><span style="color: green;">Friends</span>
+            <div class="card-spacer"></div>
+            <i class="fa-solid fa-user-check add-friends-icon" style="color: green;"></i><span style="color: green;">Friends</span>
+            <form class="remove-friend-form" method="POST" action="/friends/remove">
+                <input type="hidden" name="friendId" value="<%= profileUser._id %>">
+                <button type="submit" class="remove-friends-btn">
+                    <i class="fa-solid fa-user-minus remove-friends-icon"></i> Unfriend
+                </button>
+            </form>
         <% } else { %>
+            <div class="card-spacer"></div>
             <form method="POST" action="/friends/add">
                 <input type="hidden" name="friendId" value="<%= profileUser._id %>">
                 <button type="submit" class="add-friends-btn">
@@ -47,6 +49,7 @@
                 </button>
             </form>
         <% } %>
+
     </div>
 
     <div class="profile-right-column">
@@ -62,7 +65,7 @@
             <% if (profileUser.friendsList.length) { %>
                 <div class="friends-container">
                     <% profileUser.friendsList.forEach(friend => { %>
-                        <div class="friend-card" data-username="<%= friend.username %>">
+                        <div class="friend-card clickable" data-username="<%= friend.username %>">
                             <img
                                 src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= friend.avatarSeed || friend.username %>"
                                 alt="<%= friend.username %>"
@@ -83,7 +86,7 @@
             <% } %>
         </div>
         <div class="card playing-card">
-            <h3><%= isOwnProfile ? "What you're playing" : `What ${profileUser.firstName}'s playing` %></h3>
+            <h3 style="position: sticky"><%= isOwnProfile ? "What you're playing" : `What ${profileUser.firstName}'s playing` %></h3>
 
             <% if (playing.length === 0) { %>
              <p class="no-items">
@@ -119,7 +122,7 @@
             <% if (userReviews.length > 0) { %>
                 <div class="profile-reviews">
                     <% userReviews.forEach(review => { %>
-                        <div class="profile-review-card">
+                        <div class="profile-review-card clickable">
                             <div class="profile-review-header">
                                 <img
                                     class="profile-review-img"
@@ -161,4 +164,5 @@
         });
     });
 </script>
+
 <%- include('../Partials/footer') %>

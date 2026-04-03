@@ -1,0 +1,16 @@
+<div class="sidebar">
+    <ul class="nav-list">
+        <li class="nav-item <%= activePage === "dashboard" ? "active-link" : ""  %>">
+            <i class="fa-solid fa-gauge"></i> <a href="/dashboard">Dashboard</a></li>
+        <li class="nav-item <%= activePage === "discover" ? "active-link" : ""  %>">
+            <i class="fa-solid fa-compass"></i> <a href="/discover">Discover</a>
+        </li>
+        <li class="nav-item" <%= activePage === "activity" ? "active-link" : ""  %>>
+            <i class="fa-solid fa-user-group"></i> <a href="/activity">Friend Activity</a>
+        </li>
+        <li class="nav-item <%= activePage === "library" ? "active-link" : ""  %>">
+            <i class="fa-solid fa-layer-group"></i> <a href="/library">My Library</a>
+        </li>
+
+    </ul>
+</div>

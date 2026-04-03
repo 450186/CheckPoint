@@ -130,17 +130,25 @@ async function IGDBrequest(endpoint, body) {
 function toTimeAgo(date) {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
     if (seconds < 60) {
-        return `${seconds} seconds ago`;
+        return `${seconds} second${seconds === 1 ? "" : "s"} ago`;
     } else if (seconds < 3600) {
         const minutes = Math.floor(seconds / 60);
-        return `${minutes} minutes ago`;
+        return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
     } else if (seconds < 86400) {
         const hours = Math.floor(seconds / 3600);
-        return `${hours} hours ago`;
-    } else {
+        return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    } else if (seconds < 7 * 86400) {
         const days = Math.floor(seconds / 86400);
-        return `${days} days ago`;
+        return `${days} day${days === 1 ? "" : "s"} ago`;
+    } else if (seconds < 30 * 86400) {
+        const weeks= Math.floor(seconds / (7 * 86400));
+        return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+    } else if (seconds < 365 * 86400) {
+        const months = Math.floor(seconds / (30 * 86400));
+        return `${months} month${months === 1 ? "" : "s"} ago`;
     }
+    const years = Math.floor(seconds / (365 * 86400));
+    return `${years} year${years === 1 ? "" : "s"} ago`;
 }
 
 app.get('/', (req, res) => {
@@ -805,7 +813,7 @@ app.get("/users/:username", checkLogin, async (req, res) => {
         .lean();
 
     const alreadyFriends = profileUser.friendsList.some(
-        friend => String(friend._id) === String(req.session.user.id)
+        friend => friend._id.equals(req.session.user.id)
     );
 
     const errorMessage = popErrorMessage(req);
@@ -912,7 +920,8 @@ app.get("/activity", checkLogin, async (req, res) => {
 
     const reviewActivities = reviews.map(r => ({
         type: "review",
-        createdAt: toTimeAgo(r.createdAt),
+        createdAt: r.createdAt,
+        timeAgo: toTimeAgo(new Date(r.createdAt)),
         user: friendMap.get(String(r.userId)),
         gameId: r.gameId,
         gameName: r.cachedName,
@@ -925,7 +934,8 @@ app.get("/activity", checkLogin, async (req, res) => {
 
     const libraryActivities = libraryUpdates.map(l => ({
         type: "status",
-        createdAt: toTimeAgo(l.createdAt) || toTimeAgo(l.updatedAt),
+        createdAt: l.updatedAt || l.createdAt,
+        timeAgo: toTimeAgo(new Date(l.updatedAt)) || toTimeAgo(new Date(l.createdAt)),
         user: friendMap.get(String(l.userId)),
         gameId: l.gameId,
         gameName: l.cachedName,

@@ -95,19 +95,36 @@ a:hover {
     flex-direction: row;
     gap: 20px;
 }
-.add-friends-btn {
+.add-friends-btn, .remove-friends-btn {
     background: transparent;
     border: none;
+    font-size: 18px;
 }
 #friend-modal-title {
     margin: auto;
     margin-left: 0px;
 }
-.add-friends-btn:hover {
+.add-friends-btn:hover, .remove-friends-btn:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow);
 }
-.add-friends-icon {
+.add-friends-btn:hover {
+    background-color: #00aa3e;
+}
+.remove-friends-btn {
+    color: #EF4444;
+}   
+.remove-friends-icon {
+    color: #EF4444 !important;
+}
+.remove-friends-btn:hover{
+    color: var(--text);
+    background-color: #EF4444;
+}
+.remove-friends-btn:hover .remove-friends-icon {
+    color: var(--text) !important;
+}
+.add-friends-icon, .remove-friends-icon {
     font-size: 24px;
     color: var(--text);
     cursor: pointer;
@@ -346,7 +363,7 @@ button:hover {
     box-shadow: var(--shadow);
     color: var(--text);
     text-align: left;
-    border-radius: 50px;
+    border-radius: 25px;
     z-index: 1500;
     padding: 20px;
     display: none;
@@ -418,15 +435,8 @@ button:hover {
     justify-content: flex-start;
     min-height: 180px;
     height: 100%;
-    transition: transform .15s ease, box-shadow .15s ease;
     box-shadow: var(--shadow);
     min-width: 0;
-}
-
-.dash-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, .7);
-    cursor: pointer;
 }
 
 .discover-content {
@@ -526,7 +536,14 @@ button:hover {
     border-bottom: 1px solid var(--border);
     cursor: pointer;
 }
-
+.nav-item i {
+    margin-top: 20px;
+}
+.nav-item a {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
 .active-link {
     font-weight: bold;
     background: linear-gradient(90deg, var(--accent), transparent);
@@ -556,7 +573,7 @@ button:hover {
 .account-dropdown ul {
     list-style: none;
     margin: 0;
-    padding: 10px 0;
+    padding: 0;
 }
 
 .account-dropdown li {
@@ -618,19 +635,17 @@ button:hover {
     flex-direction: column;
     min-height: 200px;
     box-shadow: var(--shadow);
+    cursor: pointer
 }
-
-.library-card:hover, .card:hover{
+.clickable {
+    cursor: pointer;
+}
+.clickable:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, .7);
-    cursor: pointer;
 }
 #login-card {
     box-shadow: var(--shadow);
-}
-#login-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, .7);
 }
 .status-form {
     display: flex;
@@ -1268,7 +1283,7 @@ button:hover {
     backdrop-filter: blur(4px);
 }
 .confirm-box {
-    width: 40%;
+    width: 30%;
     height: fit-content;
     background: var(--cards);
     border: 1px solid var(--border);
@@ -1619,12 +1634,12 @@ progress::-moz-progress-bar {
     padding: 5px;
     gap: 12px;
     margin: 10px 0;
+    cursor: pointer;
 }
 .ranking-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, .7);
     background-color: var(--accentHover);
-    cursor: pointer;
 }
 .ranking-card-header {
     display: flex;
@@ -1699,6 +1714,9 @@ progress::-moz-progress-bar {
 }
 
 .profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     text-align: center;
     gap: 15px;
 }
@@ -1732,6 +1750,10 @@ progress::-moz-progress-bar {
     flex-direction: row;
     gap: 15px;
     text-align: center;
+    justify-content: center;
+}
+.profile-game-card {
+    max-width: calc(33% - 10px);
 }
 .friends-container,
 .profile-reviews {
@@ -1826,10 +1848,7 @@ progress::-moz-progress-bar {
 .remove-friend-btn:hover {
     background-color: #EF4444 !important;
 }
-.friend-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow);
-}
+
 /* ======== Activity Page ======== */
 .activity {
     display: flex;
@@ -1851,10 +1870,6 @@ progress::-moz-progress-bar {
     margin: 0 auto;
     cursor: pointer;
 }
-.activity-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow);
-}
 .activity-avatar {
     width: 60px;
     height: 60px;
@@ -1862,6 +1877,7 @@ progress::-moz-progress-bar {
     object-fit: cover;
     border: 1px solid var(--border);
     flex-shrink: 0;
+    cursor: pointer;
 }
 .activity-content {
     display: flex;
@@ -1912,13 +1928,7 @@ progress::-moz-progress-bar {
 .activity-username:hover {
     color: var(--accent);
 }
-.activity-avatar {
-    cursor: pointer;
-}
-.activity-avatar:hover {
-    box-shadow: var(--shadow);
-    transform: translateY(-4px);
-}
+
 .filter-btn.active-filter {
     background-color: var(--accent);
     color: var(--text);

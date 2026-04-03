@@ -1,14 +1,6 @@
 <%- include('../Partials/header') %>
 
-<div class="sidebar">
-    <ul class="nav-list">
-        <li class="nav-item"><a href="/dashboard">Dashboard</a></li>
-        <li class="nav-item"><a href="/discover">Discover</a></li>
-        <li class="nav-item active-link"><a href="/activity">Friend Activity</a></li>
-        <li class="nav-item"><a href="/library">My Library</a></li>
-        <li class="nav-item logout"><a href="/logout">Logout</a></li>
-    </ul>
-</div>
+<%- include('../Partials/navi', {activePage: 'activity'}) %>
 
 <div class="main-content">
     <h2 class="title">Recent Activity</h2>
@@ -31,11 +23,14 @@
             <p class="no-items">Your friends haven't been very busy recently!</p>
         <% } %>
         <% activityFeed.forEach(activity => { %>
-            <div class="activity-card"
+            <div class="activity-card clickable"
             data-game-id = "<%= activity.gameId %>"
             data-type = "<%= activity.type %>"
             >
-                    <img class="activity-avatar" data-username="<%= activity.user.username %>" src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= activity.user.avatarSeed || activity.user.username %>" alt="<%= activity.user.username %>">
+                    <img class="activity-avatar clickable" 
+                    data-username="<%= activity.user.username %>" 
+                    src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= activity.user.avatarSeed || activity.user.username %>" 
+                    alt="<%= activity.user.username %>">
                     <div class="activity-content">
                         <p class="activity-msg-line">
                             <strong class="activity-username" data-username="<%= activity.user.username %>"><%= activity.user.username %></strong>
@@ -83,7 +78,7 @@
                         <% } %>
                         <div class="card-spacer"></div>
                         <p class="activity-timestamp">
-                            <%= activity.createdAt %>
+                            <%= activity.timeAgo %>
                         </p>
                     </div>
                     <img class="activity-game-img" src="<%= activity.coverUrl.replace('t_cover_big', 't_thumb') %>" alt="<%= activity.gameName %>">
