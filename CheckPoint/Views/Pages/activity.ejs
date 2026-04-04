@@ -107,7 +107,8 @@
         user.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent the card click event from firing
             const clickedUser = user.dataset.username
-            window.location.href = `/users/${clickedUser}`;
+            const from = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/users/${clickedUser}?from=${from}`;
         })
     });
 
@@ -115,7 +116,8 @@
         avatar.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent the card click event from firing
             const clickedUser = avatar.dataset.username
-            window.location.href = `/users/${clickedUser}`;
+            const from = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/users/${clickedUser}?from=${from}`;
         })
     });
 

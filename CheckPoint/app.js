@@ -154,11 +154,13 @@ function toTimeAgo(date) {
 app.get('/', (req, res) => {
     res.render('pages/home', {
         title: 'Home',
+        requestPath: req.originalUrl
     })
 })
 app.get("/home", (req, res) => {
     res.render('pages/home', {
         title: 'Home',
+        requestPath: req.originalUrl
     })
 })
 app.get("/login", async (req, res) => {
@@ -169,6 +171,7 @@ app.get("/login", async (req, res) => {
         user: req.session.user,
         loggedIn: isLoggedIn(req),
         errorMessage,
+        requestPath: req.originalUrl
     })
 })
 app.post("/login", async (req, res) => {
@@ -199,6 +202,7 @@ app.get("/register", (req, res) => {
     res.render('pages/register', {
         title: 'Register',
         errorMessage,
+        requestPath: req.originalUrl
     })
 })
 app.post("/register", async (req, res) => {
@@ -255,6 +259,7 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         YourReviews,
         highestRated,
         errorMessage,
+        requestPath: req.originalUrl
     })
 })
 app.get("/search", checkLogin, (req, res) => {
@@ -410,7 +415,8 @@ app.get("/discover", checkLogin, async (req, res) => {
                 yearFrom: yearFrom || "",
                 yearTo: yearTo || "",
                 sort,
-            }
+            },
+            requestPath: req.originalUrl
         });
     } catch (error) {
         console.error(error);
@@ -433,7 +439,8 @@ app.get("/discover", checkLogin, async (req, res) => {
                 yearFrom: "",
                 yearTo: "",
                 sort: "newest"
-            }
+            },
+            requestPath: req.originalUrl
         });
     }
 });
@@ -588,6 +595,8 @@ similarGenres = similarGenres.slice(0, 6);
         })).filter(v => v.url) || [],
     }
 
+    const errorMessage = popErrorMessage(req);
+
     res.render('pages/game', {
         title: game.name,
         user: req.session.user,
@@ -598,6 +607,8 @@ similarGenres = similarGenres.slice(0, 6);
         devCompanyName,
         TimeToBeat,
         from: (typeof from === 'string' && from.startsWith('/') && !from.startsWith('/game/')) ? from : "/dashboard",
+        errorMessage,
+        requestPath: req.originalUrl
     })
 })
 app.get("/profile", checkLogin, async (req, res) => {
@@ -618,6 +629,10 @@ app.get("/profile", checkLogin, async (req, res) => {
 
     const errorMessage = popErrorMessage(req);
 
+    const from = (typeof req.query.from === "string" && req.query.from.startsWith("/")) 
+    ? req.query.from 
+    : "/dashboard";
+
     res.render('pages/profile', {
         title: 'Profile',
         user: req.session.user,
@@ -626,6 +641,8 @@ app.get("/profile", checkLogin, async (req, res) => {
         errorMessage,
         userReviews,
         playing,
+        from,
+        requestPath: req.originalUrl
     })
 })
 app.post('/friends/remove', checkLogin, async (req, res) => {
@@ -700,6 +717,7 @@ app.get("/library", checkLogin, async (req, res) => {
         totalGames,
         completionRate,
         genreData,
+        requestPath: req.originalUrl
     })
 })
 app.post('/library/add', checkLogin, async (req, res) => {
@@ -818,6 +836,10 @@ app.get("/users/:username", checkLogin, async (req, res) => {
 
     const errorMessage = popErrorMessage(req);
 
+    const from = (typeof req.query.from === "string" && req.query.from.startsWith("/")) 
+    ? req.query.from 
+    : "/dashboard";
+
     res.render("pages/profile", {
         title: "Profile",
         user: req.session.user,
@@ -826,7 +848,9 @@ app.get("/users/:username", checkLogin, async (req, res) => {
         isOwnProfile: req.session.user.username === profileUser.username,
         userReviews,
         errorMessage,
-        playing
+        playing,
+        from,
+        requestPath: req.originalUrl
     })
 })
 app.post("/profile/avatar/randomise", checkLogin, async (req, res) => {
@@ -953,7 +977,8 @@ app.get("/activity", checkLogin, async (req, res) => {
         title: "Activity",
         user: req.session.user,
         activityFeed,
-        errorMessage
+        errorMessage,
+        requestPath: req.originalUrl
     })
 })
 app.get("/logout", (req, res) => {

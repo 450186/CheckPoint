@@ -88,7 +88,10 @@
             <h3>Continue Playing</h3>
             <p>Pick up where you left off in your current games.</p>
             <% if (playing && playing.length > 0) { %>
-                <div class="library-row">
+                <div class="library-row 
+                    <%= playing.length <= 4 ? "center4" : "" %>
+                    <%= playing.length <= 3 ? "center3" : "" %>
+                ">
                     <% playing.forEach(game => { %>
                     <div class="library-card game-card"
                       data-game-id="<%= game.gameId %>"

@@ -53,7 +53,7 @@
 
      <div class="account-dropdown">
         <ul>
-            <li><a href="/profile" role="menuitem"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+            <li><a href="/profile?from=<%= encodeURIComponent(requestPath || '/dashboard') %>" role="menuitem"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
             <li><a href="/settings" role="menuitem"><i class="fa-solid fa-user-gear"></i> Settings</a></li>
             <li><a href="/logout" role="menuitem"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
         </ul>
@@ -67,7 +67,7 @@
         </div>
     <% } %>
 
-    <% if (title !== "Home" || title !== "Register" || title !== "Login") { %>
+    <% if (title !== "Home" && title !== "Register" && title !== "Login") { %>
         <%- include('../Partials/Modal') %>
     <% } %>
 

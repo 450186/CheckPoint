@@ -1,16 +1,40 @@
-<div class="sidebar">
+<div class="sidebar collapsed">
     <ul class="nav-list">
+        
         <li class="nav-item <%= activePage === "dashboard" ? "active-link" : ""  %>">
-            <i class="fa-solid fa-gauge"></i> <a href="/dashboard">Dashboard</a></li>
-        <li class="nav-item <%= activePage === "discover" ? "active-link" : ""  %>">
-            <i class="fa-solid fa-compass"></i> <a href="/discover">Discover</a>
+             <a href="/dashboard">
+                <i class="fa-solid fa-gauge nav-icon"></i>
+                <span class="nav-label">Dashboard</span>
+            </a>
         </li>
-        <li class="nav-item" <%= activePage === "activity" ? "active-link" : ""  %>>
-            <i class="fa-solid fa-user-group"></i> <a href="/activity">Friend Activity</a>
+        <li class="nav-item <%= activePage === "discover" ? "active-link" : ""  %>">
+             <a href="/discover">
+                <i class="fa-solid fa-compass nav-icon"></i>
+                <span class="nav-label">Discover</span>
+            </a>
+        </li>
+        <li class="nav-item <%= activePage === "activity" ? "active-link" : ""  %>">
+             <a href="/activity">
+                <i class="fa-solid fa-user-group nav-icon"></i>
+                <span class="nav-label">Friend Activity</span>
+            </a>
         </li>
         <li class="nav-item <%= activePage === "library" ? "active-link" : ""  %>">
-            <i class="fa-solid fa-layer-group"></i> <a href="/library">My Library</a>
+            <a href="/library">
+                <i class="fa-solid fa-layer-group nav-icon"></i>
+                <span class="nav-label">My Library</span>
+            </a>
         </li>
-
     </ul>
+    <button id="sidebar-toggle" type="button" class="sidebar-toggle">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
 </div>
+<script>
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.getElementById('sidebar-toggle');
+
+    toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+    })
+</script>

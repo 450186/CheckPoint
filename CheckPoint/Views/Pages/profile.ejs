@@ -1,14 +1,19 @@
 <%- include('../Partials/header') %>
 
-<%- include('../Partials/navi') %>
+<%- include('../Partials/navi', {activePage: 'profile'}) %>
 
 <div class="main-content">
-    <h2 class="title">
-        <%= isOwnProfile ? "Your Profile" : `${profileUser.firstName}'s Profile` %>
+    <div class="profile-header">
+        <button onclick="window.location.href='<%= from || `/dashboard` %>'" class="back-button">
+            <i class="fa-solid fa-circle-chevron-left"></i> <span>Back</span>
+        </button>
+        <h2 class="title">
+            <%= isOwnProfile ? "Your Profile" : `${profileUser.firstName}'s Profile` %>
+        </h2>
+    </div>
         <p class="error-msg">
             <%= errorMessage %>
         </p>
-    </h2>
 <div class="profile-page">
     <div class="card profile-card">
         <img
@@ -86,7 +91,7 @@
             <% } %>
         </div>
         <div class="card playing-card">
-            <h3 style="position: sticky"><%= isOwnProfile ? "What you're playing" : `What ${profileUser.firstName}'s playing` %></h3>
+            <h3><%= isOwnProfile ? "What you're playing" : `What ${profileUser.firstName}'s playing` %></h3>
 
             <% if (playing.length === 0) { %>
              <p class="no-items">
@@ -95,10 +100,12 @@
             <% } %>
 
             <% if (playing.length > 0) { %>
-                <div class="profile-games">
+                <div class="profile-games
+                <%= playing.length <= 3 ? "profile-center" : ""%>
+                ">
                     <% playing.forEach(game => { %>
                         <div class="profile-game-card"
-                            data-gameId="<%= game.gameId %>">
+                            data-game-id="<%= game.gameId %>">
                             <img
                                 class="profile-game-img"
                                 src="<%= game.cachedCoverUrl.replace('t_cover_big', 't_thumb') %>"
@@ -148,8 +155,9 @@
     games.forEach(game => {
         game.addEventListener('click', () => {
 
-            const gameId = game.dataset.gameid;
-            window.location.href = `/game/${gameId}`;
+            const gameId = game.dataset.gameId;
+            const from = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/game/${gameId}?from=${from}`;
         });
     });
 
@@ -160,7 +168,8 @@
             if(e.target.closest('form, button')) return; // Prevent navigation when clicking the remove friend button
             
             const userId = card.dataset.username;
-            window.location.href = `/users/${userId}`;
+            const from = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/users/${userId}?from=${from}`;
         });
     });
 </script>

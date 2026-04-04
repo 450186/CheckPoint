@@ -24,7 +24,9 @@
                     <% if (grouped[section.key].length === 0) { %>
                         <p class="no-items">No items in this section.</p>
                     <% } else { %>
-                        <div class="library-grid">
+                        <div class="library-grid
+                        <%= grouped[section.key].length <= 4 ? "library-center4" : "" %>
+                        ">
                             <% grouped[section.key].forEach(item => { %>
                                 <div class="library-card library-img-card"
                                     data-game-id="<%= item.gameId %>"
