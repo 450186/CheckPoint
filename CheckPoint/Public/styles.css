@@ -512,6 +512,8 @@ button:hover {
     display: flex;
     flex-direction: column;
     padding: 20px 10px;
+    transition: width 0.3s ease;
+    padding-left: 0;
     z-index: 999;
     overflow: hidden;
 }
@@ -555,6 +557,9 @@ button:hover {
     flex-direction: column;
     gap: 10px;
     flex-grow: 1;
+}
+.nav-item {
+    padding: 5px;
 }
 .nav-item a {
     display: flex;
