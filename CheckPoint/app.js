@@ -151,10 +151,19 @@ function toTimeAgo(date) {
     return `${years} year${years === 1 ? "" : "s"} ago`;
 }
 
+async function getFriendRequests(userId) {
+    const user = await userModel.userData.findById(userId)
+    .populate("friendRequests")
+    .lean();
+
+    const friendRequests = user?.friendRequests || [];
+    return friendRequests
+}
+
 app.get('/', (req, res) => {
     res.render('pages/home', {
         title: 'Home',
-        requestPath: req.originalUrl
+        requestPath: req.originalUrl,
     })
 })
 app.get("/home", (req, res) => {
@@ -252,6 +261,8 @@ app.get("/dashboard", checkLogin, async (req, res) => {
 
         const errorMessage= popErrorMessage(req);
 
+    const friendRequests = await getFriendRequests(req.session.user.id);
+
     res.render('pages/dashboard', {
         title: 'Dashboard',
         user: req.session.user,
@@ -259,7 +270,8 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         YourReviews,
         highestRated,
         errorMessage,
-        requestPath: req.originalUrl
+        requestPath: req.originalUrl,
+        friendRequests: friendRequests || [],
     })
 })
 app.get("/search", checkLogin, (req, res) => {
@@ -273,6 +285,8 @@ app.get("/search", checkLogin, (req, res) => {
 app.get("/discover", checkLogin, async (req, res) => {
     const q = (req.query.query || "").trim();
     const pageNum = Math.max(parseInt(req.query.page || "1", 10), 1);
+
+    const friendRequests = await getFriendRequests(req.session.user.id);
 
     const genres = (req.query.genres || "").toString().trim();
     const platforms = (req.query.platforms || "").toString().trim();
@@ -416,7 +430,8 @@ app.get("/discover", checkLogin, async (req, res) => {
                 yearTo: yearTo || "",
                 sort,
             },
-            requestPath: req.originalUrl
+            requestPath: req.originalUrl,
+            friendRequests,
         });
     } catch (error) {
         console.error(error);
@@ -440,7 +455,8 @@ app.get("/discover", checkLogin, async (req, res) => {
                 yearTo: "",
                 sort: "newest"
             },
-            requestPath: req.originalUrl
+            requestPath: req.originalUrl,
+            friendRequests
         });
     }
 });
@@ -596,6 +612,7 @@ similarGenres = similarGenres.slice(0, 6);
     }
 
     const errorMessage = popErrorMessage(req);
+    const friendRequests = await getFriendRequests(req.session.user.id);
 
     res.render('pages/game', {
         title: game.name,
@@ -608,7 +625,8 @@ similarGenres = similarGenres.slice(0, 6);
         TimeToBeat,
         from: (typeof from === 'string' && from.startsWith('/') && !from.startsWith('/game/')) ? from : "/dashboard",
         errorMessage,
-        requestPath: req.originalUrl
+        requestPath: req.originalUrl,
+        friendRequests
     })
 })
 app.get("/profile", checkLogin, async (req, res) => {
@@ -633,6 +651,8 @@ app.get("/profile", checkLogin, async (req, res) => {
     ? req.query.from 
     : "/dashboard";
 
+    const friendRequests = await getFriendRequests(req.session.user.id);
+
     res.render('pages/profile', {
         title: 'Profile',
         user: req.session.user,
@@ -642,7 +662,8 @@ app.get("/profile", checkLogin, async (req, res) => {
         userReviews,
         playing,
         from,
-        requestPath: req.originalUrl
+        requestPath: req.originalUrl,
+        friendRequests
     })
 })
 app.post('/friends/remove', checkLogin, async (req, res) => {
@@ -710,6 +731,8 @@ app.get("/library", checkLogin, async (req, res) => {
 
     const completionRate = totalGames > 0 ? Math.round((grouped['completed'].length / totalGames) * 100) : 0;
 
+    const friendRequests = await getFriendRequests(req.session.user.id);
+
     res.render('pages/library', {
         title: 'Library',
         user: req.session.user,
@@ -717,7 +740,8 @@ app.get("/library", checkLogin, async (req, res) => {
         totalGames,
         completionRate,
         genreData,
-        requestPath: req.originalUrl
+        requestPath: req.originalUrl,
+        friendRequests
     })
 })
 app.post('/library/add', checkLogin, async (req, res) => {
@@ -836,6 +860,8 @@ app.get("/users/:username", checkLogin, async (req, res) => {
 
     const errorMessage = popErrorMessage(req);
 
+    const friendRequests = await getFriendRequests(req.session.user.id);
+
     const from = (typeof req.query.from === "string" && req.query.from.startsWith("/")) 
     ? req.query.from 
     : "/dashboard";
@@ -850,7 +876,8 @@ app.get("/users/:username", checkLogin, async (req, res) => {
         errorMessage,
         playing,
         from,
-        requestPath: req.originalUrl
+        requestPath: req.originalUrl,
+        friendRequests
     })
 })
 app.post("/profile/avatar/randomise", checkLogin, async (req, res) => {
@@ -911,19 +938,51 @@ app.post("/friends/add", checkLogin, async (req, res) => {
         }
         await userModel.userData.updateOne(
             { _id: req.session.user.id },
-            { $addToSet: { friendsList: friend._id } }
+            { $addToSet: {sentFriendRequests: friendId} }
         );
         await userModel.userData.updateOne(
             { _id: friend._id },
-            { $addToSet: { friendsList: currentUser._id } }
+            { $addToSet: {friendRequests: req.session.user.id} }
         );
-        req.session.errorMessage = "You are now friends with " + friend.username + "!";
+        req.session.errorMessage = "You have sent a friend request to " + friend.username + "!";
         return res.redirect(`/users/${encodeURIComponent(friend.username)}`);
     } catch (e) {
         console.error(e);
         req.session.errorMessage = "An error occurred while adding friend.";
         return res.redirect(req.get("referer") || "/dashboard");    
     }
+})
+app.post("/friends/accept", checkLogin, async (req, res) => {
+    const {friendId} = req.body;
+
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { 
+            $addToSet: {friendsList: friendId},
+            $pull: {friendRequests: friendId}
+        }
+    )
+    await userModel.userData.updateOne(
+        { _id: friendId },
+        { 
+            $addToSet: {friendsList: req.session.user.id},
+            $pull: {sentFriendRequests: req.session.user.id} 
+        },
+    )
+    res.redirect(req.get("referer") || "/dashboard");
+})
+app.post("/friends/reject", checkLogin, async (req, res) => {
+    const {friendId} = req.body;
+
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $pull: {friendRequests: friendId} }
+    )
+    await userModel.userData.updateOne(
+        { _id: friendId },
+        { $pull: {sentFriendRequests: req.session.user.id} }
+    )
+    res.redirect(req.get("referer") || "/dashboard");
 })
 app.get("/activity", checkLogin, async (req, res) => {
     const user = await userModel.userData.findById(req.session.user.id)
@@ -941,6 +1000,8 @@ app.get("/activity", checkLogin, async (req, res) => {
     }).sort({ updatedAt: -1 }).lean();
 
     const friendMap = new Map(user.friendsList.map(f => [String(f._id), f]));
+
+    const friendRequests = await getFriendRequests(req.session.user.id);
 
     const reviewActivities = reviews.map(r => ({
         type: "review",
@@ -978,7 +1039,8 @@ app.get("/activity", checkLogin, async (req, res) => {
         user: req.session.user,
         activityFeed,
         errorMessage,
-        requestPath: req.originalUrl
+        requestPath: req.originalUrl,
+        friendRequests
     })
 })
 app.get("/logout", (req, res) => {

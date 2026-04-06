@@ -42,13 +42,40 @@
         </div>
     </form>
     <div class="right-side">
+      <button id="noti-open" class="open-noti-btn" aria-label="Notifications" type="button">
+        <i class="fa-solid fa-bell open-noti-icon"></i>
+      </button>
         <button id="open-friend-modal-btn" class="add-friends-btn" aria-label="Add Friends" type="button">
             <i class="fa-solid fa-user-plus add-friends-icon"></i>
         </button>
         <div class="account-container">
-            <p class="account-name"><%= user?.username || 'Account' %></p>
             <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= user?.avatarSeed || user?.username %>" alt="Account Logo" class="account-logo"> 
         </div>
+    </div>
+    <div class="noti-dropdown">
+      <% if (friendRequests.length === 0) { %>
+        <p class="no-items" style="text-align: center; font-weight: bold;">You have no friend requests</p>
+      <% } %>
+      <% friendRequests.forEach(request => { %>
+        <div class="noti-container clickable" data-username ="<%= request?.username %>">
+          <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= request?.avatarSeed || request?.username %>" alt="Account Logo" class="noti-logo">
+          <p><%= request.username %> wants to be friends</p>
+          <div class="request-actions">
+            <form id="accept-friend-request-form" method="POST" action="/friends/accept">
+              <input type="hidden" name="friendId" value="<%= request._id %>">
+              <button type="submit" class="accept-request-btn">
+                <i class="fa-solid fa-user-plus accept-request-icon"></i>
+              </button>
+            </form>
+            <form id="decline-friend-request-form" method="POST" action="/friends/reject">
+              <input type="hidden" name="friendId" value="<%= request._id %>">
+              <button type="submit" class="reject-request-btn">
+                <i class="fa-solid fa-user-minus reject-request-icon"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
     </div>
 
      <div class="account-dropdown">
@@ -89,6 +116,35 @@
             dropdown.style.display = 'none';
         }
     });
+    //dropdown notification center functionality
+    const notiDropdown = document.querySelector('.noti-dropdown');
+    const notiOpen = document.querySelector('.open-noti-btn');
+    const notifications = document.querySelectorAll(".noti-container")
+
+    notiOpen.addEventListener('click', function() {
+        notiDropdown.style.display = notiDropdown.style.display === 'block' ? 'none' : 'block';
+        const rect = notiOpen.getBoundingClientRect();
+        notiDropdown.style.left = `${rect.left + rect.width / 2}px`;
+        notiDropdown.style.top = `${rect.top + 60 + window.scrollY}px`;
+        notiDropdown.style.transform = "translateX(-50%)";
+    });
+    document.addEventListener('click', function(event) {
+        if (!notiOpen.contains(event.target) && !notiDropdown.contains(event.target)) {
+            notiDropdown.style.display = 'none';
+        }
+    });
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            notiDropdown.style.display = 'none';
+        }
+    });
+    notifications.forEach(noti => {
+      noti.addEventListener('click', () => {
+          const userId = noti.dataset.username;
+          const from = encodeURIComponent(window.location.pathname + window.location.search);
+          window.location.href = `/users/${userId}?from=${from}`;
+      })
+    })
     </script>
 <!-- ADD FRIEND MODAL -->
 <div id="friend-modal" class="modal-overlay" aria-hidden="true">

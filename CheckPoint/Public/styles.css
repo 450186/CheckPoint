@@ -100,7 +100,7 @@ a:hover {
     flex-direction: row;
     gap: 20px;
 }
-.add-friends-btn, .remove-friends-btn {
+.add-friends-btn, .remove-friends-btn, .open-noti-btn {
     background: transparent;
     border: none;
     font-size: 18px;
@@ -129,7 +129,7 @@ a:hover {
 .remove-friends-btn:hover .remove-friends-icon {
     color: var(--text) !important;
 }
-.add-friends-icon, .remove-friends-icon {
+.add-friends-icon, .remove-friends-icon, .open-noti-icon {
     font-size: 24px;
     color: var(--text);
     cursor: pointer;
@@ -598,13 +598,68 @@ button:hover {
 .sidebar.collapsed .nav-item a {
     justify-content: center;
 }
+/* ======== Notifications ======== */
+.noti-dropdown {
+    position: absolute;
+    background-color: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    z-index: 1001;
+    display: none;
+    box-shadow: var(--shadow);
+    min-width: 400px;
+    width: 400px;
+    height: 300px;
+    overflow-y: scroll;
+}
+.noti-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 10px;
+    width: 95%;
+    margin: auto;
+    margin-top: 10px;
+    border-radius: 6px;
+    background-color: var(--cards);
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--shadow);
+}
+.noti-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.request-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+.accept-request-btn {
+    background-color: #22C55E;
+}
+.accept-request-btn:hover {
+    background-color: #00aa3e;
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+.reject-request-btn {
+    background-color: #EF4444;
+}
+.reject-request-btn:hover {
+    background-color: #DC2626;
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
 /* ======== Dropdown Menu ======== */
 .account-dropdown {
     position: absolute;
-    top: calc(var(--header-height) + 10px);
+    top: calc(var(--header-height) + 20px);
     right: 20px;
     background-color: var(--primary);
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: 5px;
     z-index: 1001;
     display: none;
@@ -2016,7 +2071,6 @@ progress::-moz-progress-bar {
     font-weight: 600;
     color: var(--text);
 }
-/* ======== ======== */
 /* ======== ======== */
 /* ======== ======== */
 /* ======== ======== */

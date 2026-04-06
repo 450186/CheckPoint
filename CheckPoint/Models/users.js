@@ -10,6 +10,8 @@ const userSchema = new Schema({
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     avatarSeed: { type: String, trim: true, default: "" },
     friendsList: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    friendRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    sentFriendRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
 const userData = model('User', userSchema);
