@@ -36,6 +36,28 @@
         <% if (isOwnProfile) { %>
             <div class="card-spacer"></div>
             <button type="button" class="edit-profile">Edit Profile</button>
+            <div class="delete-acc-container">
+                <button type="button" class="delete-profile-btn" id="show-del-confirmation">
+                    <i class="fa-solid fa-user-xmark"></i> Delete Account
+                </button>
+                <form class="delete-profile-form hidden" method="POST" action="/profile/delete">
+                    <p class="no-items">Are you sure you want to delete your account? This action is irreversible</p>
+                    <p>type DELETE to confirm</p>
+                    <input 
+                    type="text" 
+                    name="delete-confirm" 
+                    id="delete-confirm-input" 
+                    placeholder="type DELETE"
+                    autotcomplete="off"
+                    required>
+                    <input type="hidden" value="<%= profileUser._id %>">
+
+                    <div class="del-profile-actions">
+                        <button type="submit" class="delete-profile-btn" id="final-del-btn" disabled>Confirm</button>
+                        <button type="button" class="delete-profile-btn" id="cancel-del-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
         <% } else if (alreadyFriends) { %>
             <div class="card-spacer"></div>
             <i class="fa-solid fa-user-check add-friends-icon" style="color: green;"></i><span style="color: green;">Friends</span>
@@ -173,5 +195,30 @@
         });
     });
 </script>
+<script>
+    const showBtn = document.getElementById('show-del-confirmation')
+    const delForm = document.querySelector('.delete-profile-form')
+    const cancelBtn = document.getElementById('cancel-del-btn')
+    const input = document.getElementById('delete-confirm-input')
+    const finalBtn = document.getElementById('final-del-btn')
 
+    showBtn.addEventListener('click', () => {
+        showBtn.classList.add('hidden')
+        delForm.classList.remove('hidden')
+        input.focus()
+    })
+    cancelBtn.addEventListener('click', () => {
+        showBtn.classList.remove('hidden')
+        delForm.classList.add('hidden')
+        input.value = ''
+        finalBtn.disabled = true
+    })
+    input.addEventListener('input', () => {
+        if(input.value !== "DELETE") {
+            finalBtn.disabled = true
+        } else {
+            finalBtn.disabled = false
+        }
+    })
+</script>
 <%- include('../Partials/footer') %>

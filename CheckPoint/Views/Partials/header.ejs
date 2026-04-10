@@ -42,9 +42,14 @@
         </div>
     </form>
     <div class="right-side">
-      <button id="noti-open" class="open-noti-btn" aria-label="Notifications" type="button">
+      <div class="noti-header-container">
+        <button id="noti-open" class="open-noti-btn" aria-label="Notifications" type="button">
         <i class="fa-solid fa-bell open-noti-icon"></i>
+        <% if (friendRequests.length > 0) { %>
+            <span class="noti-badge"> <%= friendRequests.length %> </span>
+        <% } %>
       </button>
+      </div>
         <button id="open-friend-modal-btn" class="add-friends-btn" aria-label="Add Friends" type="button">
             <i class="fa-solid fa-user-plus add-friends-icon"></i>
         </button>
@@ -191,5 +196,29 @@
     </div>
   </div>
 </div>
+<div id="page-loader" class="page-loader" hidden>
+    <div class="page-loader-content">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+</div>
+<script>
+  function showPageLoader(message = "Loading...") {
+      const loader = document.getElementById("page-loader")
+      if(!loader) return
+
+      const text = loader.querySelector("p")
+      if(text) text.textContent = message
+
+      loader.hidden = false
+  }
+
+document.querySelectorAll('a[href="/discover"]').forEach(link => {
+    link.addEventListener('click', () => {
+        showPageLoader("Loading discover...");
+    });
+});
+</script>
+
 <script src="/addFriendFunction.js"></script>
 </header>

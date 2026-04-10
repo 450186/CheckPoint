@@ -251,6 +251,8 @@ button {
 input[type="submit"]:hover,
 button:hover {
     background-color: var(--accentHover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
 }
 
 #info-icon {
@@ -632,6 +634,55 @@ button:hover {
     border-radius: 50%;
     object-fit: cover;
 }
+.noti-header-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.open-noti-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+    padding: 0;
+
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.open-noti-btn:hover {
+    background-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+.open-noti-icon {
+    font-size: 24px;
+    color: var(--text);
+}
+.noti-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+    background-color: #DC2626;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1;
+}
 .request-actions {
     display: flex;
     flex-direction: row;
@@ -653,6 +704,7 @@ button:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow);
 }
+
 /* ======== Dropdown Menu ======== */
 .account-dropdown {
     position: absolute;
@@ -1967,7 +2019,47 @@ progress::-moz-progress-bar {
 .remove-friend-btn:hover {
     background-color: #EF4444 !important;
 }
-
+.delete-profile-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.delete-profile-btn {
+    margin: auto;
+    background-color: #EF4444;
+}
+.delete-profile-btn:hover {
+    background-color: #DC2626;
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+.hidden {
+    display: none;
+}
+.delete-acc-container {
+    text-align: center;
+}
+#final-del-btn {
+    background-color: #22C55E;
+}
+#final-del-btn:hover {
+    background-color: #00aa3e;
+}
+#delete-confirm-input {
+    padding: 10px 20px;
+    background-color: var(--background);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+#final-del-btn[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: var(--accentHover);
+}
 /* ======== Activity Page ======== */
 .activity {
     display: flex;
@@ -2071,7 +2163,48 @@ progress::-moz-progress-bar {
     font-weight: 600;
     color: var(--text);
 }
-/* ======== ======== */
+/* ======== Loader ======== */
+.page-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 11, 22, 0.82);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+}
+.page-loader[hidden] {
+    display: none;
+}
+.page-loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+.page-loader-content p {
+    margin: 0;
+    font-weight: bold;
+    color: var(--text);
+}
+.page-spinner {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 5px solid var(--accent);
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 /* ======== ======== */
 /* ======== ======== */
 /* ======== ======== */

@@ -1,6 +1,6 @@
 <%- include('../Partials/header') %>
 
-<%- include('../Partials/navi', activePage: 'game') %>
+<%- include('../Partials/navi', {activePage: 'game'}) %>
 
 <div class="main-content">
     <div class="game-header"> 
@@ -68,7 +68,14 @@
             </strong></h3>
         <div class="library-row">
             <% moreFromDev.forEach(g => { %>
-            <div class="library-card">
+            <div class="library-card"
+            data-game-id="<%= g.id %>"
+            data-name="<%= g.name %>"
+            data-cover="http:<%= g.cover.url.replace('t_thumb', 't_cover_big') %>"
+            data-genres="<%= g.genres ? g.genres.map(game => game.name).join(', ') : 'Unknown' %>"
+            data-rating="<%= g.aggregated_rating ? Math.round(g.aggregated_rating) : '' %>"
+            data-release="<%= g.first_release_date ? new Date(g.first_release_date * 1000).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'}) : 'Unknown' %>"
+            >
                 <div class="game-card-header">
                     <% if (g.cover && g.cover.url) { %>
                      <img
@@ -88,7 +95,14 @@
         <h3>Same Genre</h3>
         <div class="library-row">
             <% similarGenres.forEach(g => { %>
-            <div class="library-card">
+                <div class="library-card"
+                data-game-id="<%= g.id %>"
+                data-name="<%= g.name %>"
+                data-cover="http:<%= g.cover.url.replace('t_thumb', 't_cover_big') %>"
+                data-genres="<%= g.genres ? g.genres.map(game => game.name).join(', ') : 'Unknown' %>"
+                data-rating="<%= g.aggregated_rating ? Math.round(g.aggregated_rating) : '' %>"
+                data-release="<%= g.first_release_date ? new Date(g.first_release_date * 1000).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'}) : 'Unknown' %>"
+            >
                 <div class="game-card-header">
                     <% if (g.cover && g.cover.url) { %>
                      <img

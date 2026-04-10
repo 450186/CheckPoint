@@ -37,7 +37,7 @@
     <div class="card-rows">
         <% games.forEach(game => { %>
             <div
-                class="dash-card game-card"
+                class="dash-card game-card clickable"
                 data-game-id="<%= game.id %>"
                 data-name="<%= game.name %>"
                 data-cover="http:<%= game.cover.url.replace('t_thumb','t_cover_big') %>"
@@ -152,7 +152,18 @@
         <i class="chevron fa-solid fa-circle-chevron-right"></i>
     </a>
     </div>
+<div id="initial-loader" class="page-loader">
+  <div class="page-loader-content">
+    <div class="page-spinner"></div>
+    <p>Loading discover...</p>
+  </div>
+</div>
 
+<script>
+  window.addEventListener("load", () => {
+    document.getElementById("initial-loader").style.display = "none";
+  });
+</script>
 
 </div>
 <script>

@@ -241,8 +241,14 @@
     }
 
     if (goToGameLink) {
-      const from = window.location.pathname + window.location.search;
-      goToGameLink.href = `/game/${id}?from=${encodeURIComponent(from)}`;
+      // const from = window.location.pathname + window.location.search;
+      // goToGameLink.href = `/game/${id}?from=${encodeURIComponent(from)}`;
+      goToGameLink.addEventListener("click", () => {
+        const gameId = id;
+        showPageLoader("Loading game...");
+        const from = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/game/${gameId}?from=${from}`;
+      })
     }
 
     overlay.classList.add("show");

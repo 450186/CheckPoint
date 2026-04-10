@@ -462,7 +462,6 @@ app.get("/discover", checkLogin, async (req, res) => {
 });
 app.get("/game/:id", checkLogin, async (req, res) => {
     const id = Number(req.params.id);
-    const from = req.query.from;
 
       if (!Number.isFinite(id)) {
         return res.redirect("/discover"); 
@@ -503,7 +502,7 @@ let similarGenres = [];
 
 if (similarIds.length) {
   similarGenres = await IGDBrequest("games", `
-    fields id, name, cover.url, first_release_date, aggregated_rating, genres.id;
+    fields id, name, cover.url, genres.name, first_release_date, aggregated_rating, genres.id;
     where id = (${similarIds.join(",")})
       & cover != null
       & id != ${id}
@@ -515,7 +514,7 @@ if (similarIds.length) {
 
 if (!similarGenres.length && genreIds.length >= 2) {
   const candidates = await IGDBrequest("games", `
-    fields id, name, cover.url, first_release_date, aggregated_rating, genres.id;
+    fields id, name, cover.url, genres.name, first_release_date, aggregated_rating, genres.id;
     where genres = (${genreIds.join(",")})
       & cover != null
       & id != ${id}
@@ -551,7 +550,7 @@ similarGenres = similarGenres.slice(0, 6);
 
     const moreFromDev = devCompanyId
         ? await IGDBrequest("games", `
-      fields id, name, cover.url, first_release_date, aggregated_rating;
+      fields id, name, genres.id, genres.name, cover.url, first_release_date, aggregated_rating;
       where involved_companies.company = ${devCompanyId}
         & involved_companies.developer = true
         & version_parent = null
@@ -614,6 +613,10 @@ similarGenres = similarGenres.slice(0, 6);
     const errorMessage = popErrorMessage(req);
     const friendRequests = await getFriendRequests(req.session.user.id);
 
+    const from = (typeof req.query.from === "string" && req.query.from.startsWith("/")) 
+    ? req.query.from 
+    : "/dashboard";
+
     res.render('pages/game', {
         title: game.name,
         user: req.session.user,
@@ -623,7 +626,7 @@ similarGenres = similarGenres.slice(0, 6);
         moreFromDev,
         devCompanyName,
         TimeToBeat,
-        from: (typeof from === 'string' && from.startsWith('/') && !from.startsWith('/game/')) ? from : "/dashboard",
+        from,
         errorMessage,
         requestPath: req.originalUrl,
         friendRequests
@@ -665,6 +668,52 @@ app.get("/profile", checkLogin, async (req, res) => {
         requestPath: req.originalUrl,
         friendRequests
     })
+})
+app.post('/profile/delete', checkLogin, async (req, res) => {
+    try {
+        const user = await userModel.userData.findById(req.session.user.id)
+        if(!user) {
+            req.session.destroy(() => {
+                res.redirect("/home")
+            })
+            return
+        }
+        await userModel.userData.updateMany(
+            {_id : {$in : user.friendsList}},
+            {$pull : {friendsList : req.session.user.id}}
+        )
+        await userModel.userData.updateMany(
+            {
+                $or : [
+                    { friendRequests : req.session.user.id },
+                    { sentFriendRequests : req.session.user.id }
+                ]
+            },
+            {
+                $pull : {
+                    friendRequests : req.session.user.id,
+                    sentFriendRequests : req.session.user.id
+                }
+            }
+        )
+
+        await libraryModel.deleteMany({ userId: req.session.user.id });
+        await reviewModel.deleteMany({ userId: req.session.user.id });
+
+        await userModel.userData.findByIdAndDelete(req.session.user.id);
+
+        req.session.destroy((e) => {
+            if(e) {
+                console.log(e)
+                res.redirect("/home")
+            }
+            res.redirect("/home")
+        })
+    } catch (e) {
+        console.error(e)
+        console.log("error deleting user: ", e)
+        res.redirect("/profile")
+    }
 })
 app.post('/friends/remove', checkLogin, async (req, res) => {
     const { friendId } = req.body;
