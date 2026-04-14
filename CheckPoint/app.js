@@ -243,7 +243,10 @@ app.post("/register", async (req, res) => {
     }
 });
 app.get("/dashboard", checkLogin, async (req, res) => {
-    const highestRated = await libraryModel.find({ userId: req.session.user.id })
+    const highestRated = await libraryModel.find({ 
+        userId: req.session.user.id, 
+        userRating: { $ne: null }
+    })
         .sort({ userRating: -1 })
         .limit(5)
         .lean();
@@ -617,6 +620,38 @@ similarGenres = similarGenres.slice(0, 6);
     ? req.query.from 
     : "/dashboard";
 
+    const userReviews = await reviewModel.find({ gameId: id })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    const statusCounts = await libraryModel.aggregate([
+        { $match: {gameId: id}},
+        { $group: { _id: "$status", count: { $sum: 1 } } }
+    ])
+
+    const statusMap = {
+        playing: 0,
+        completed: 0,
+        dropped: 0,
+        wishlist: 0,
+    }
+    statusCounts.forEach(sc => {
+        if(statusMap.hasOwnProperty(sc._id)) {
+            statusMap[sc._id] = sc.count
+        }
+    })
+    const totalTracked = 
+        statusMap.playing +
+        statusMap.completed +
+        statusMap.dropped +
+        statusMap.wishlist;
+
+    const statusPercents = {
+        playing: totalTracked ? Math.round((statusMap.playing / totalTracked) * 100) : 0,
+        completed: totalTracked ? Math.round((statusMap.completed / totalTracked) * 100) : 0,
+        dropped: totalTracked ? Math.round((statusMap.dropped / totalTracked) * 100) : 0,
+        wishlist: totalTracked ? Math.round((statusMap.wishlist / totalTracked) * 100) : 0,
+    }
     res.render('pages/game', {
         title: game.name,
         user: req.session.user,
@@ -629,7 +664,11 @@ similarGenres = similarGenres.slice(0, 6);
         from,
         errorMessage,
         requestPath: req.originalUrl,
-        friendRequests
+        friendRequests,
+        userReviews,
+        statusMap,
+        statusPercents,
+        totalTracked
     })
 })
 app.get("/profile", checkLogin, async (req, res) => {

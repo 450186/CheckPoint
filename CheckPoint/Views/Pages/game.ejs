@@ -10,6 +10,35 @@
         <h2 class="title">
             <%= title %>
         </h2>
+        <% if (totalTracked > 0) { %>
+        <div class="community-status-container">
+            <h4>Community Status:</h4>
+                <div class="community-bar">
+                    <div class="community-fill playing-fill" 
+                    style="width: <%= statusPercents.playing %>%;" 
+                    title="Playing: <%= statusMap.playing %> users (<%= statusPercents.playing %>%)">
+                </div>
+                    <div class="community-fill completed-fill"
+                     style="width: <%= statusPercents.completed %>%;" 
+                     title="Completed: <%= statusMap.completed %> users (<%= statusPercents.completed %>%)">
+                </div>
+                    <div class="community-fill dropped-fill" 
+                    style="width: <%= statusPercents.dropped %>%;" 
+                    title="Dropped: <%= statusMap.dropped %> users (<%= statusPercents.dropped %>%)">
+                </div>
+                    <div class="community-fill wishlist-fill" 
+                    style="width: <%= statusPercents.wishlist %>%;" 
+                    title="Wishlist: <%= statusMap.wishlist %> users (<%= statusPercents.wishlist %>%)">
+                </div>
+                </div>
+                <div class="community-status-legend">
+                    <span><i class="fa-solid fa-circle-dot playing-dot"></i><strong>Playing: </strong><%= statusMap.playing %></span>
+                    <span><i class="fa-solid fa-circle-dot completed-dot"></i><strong>Completed: </strong><%= statusMap.completed %></span>
+                    <span><i class="fa-solid fa-circle-dot dropped-dot"></i><strong>Dropped: </strong><%= statusMap.dropped %></span>
+                    <span><i class="fa-solid fa-circle-dot wishlist-dot"></i><strong>Wishlist: </strong><%= statusMap.wishlist %></span>
+                </div>
+        </div>
+                <% } %>
     </div>
     <div class="game-info-container">
         <div> <img src="<%= game.coverUrl %>"
@@ -119,8 +148,11 @@
         </div>
     <% } %>
             <div class="media-section">
-             <% if (game.screenshots.length) { %>
                 <div class="screenshot-container">
+                    <% if (game.screenshots.length === 0) { %>
+                     <p class="error-msg">No Screenshots</p>
+                    <% } %>
+                <% if (game.screenshots.length) { %>
                     <h3 style="text-align: center;">Screenshots</h3>
                     <div class="slideshow-container" id="screenshots-slideshow">
                     <% game.screenshots.forEach((screenshot, index) => { %>
@@ -139,10 +171,14 @@
                         <span class="SSdot <%= index === 0 ? 'active' : '' %>" onclick="ssCurrentSlide(<%= index + 1 %>)"></span>
                     <% }) %>
                     </div>
-                </div>
                 <% } %>
-                <% if (game.artworks.length) { %>
+                </div>
                 <div class="artwork-container">
+                    <% if (game.artworks.length === 0) { %>
+                     <p class="error-msg">No Artwork</p>
+                     <div class="card-spacer"></div>
+                    <% } %>
+                <% if (game.artworks.length) { %>
                     <h3 style="text-align: center;">Artwork</h3>
                     <div class="slideshow-container" id="artworks-slideshow">
                     <% game.artworks.forEach((artwork, index) => { %>
@@ -162,10 +198,13 @@
                         <span class="Artdot <%= index === 0 ? 'active' : '' %>" onclick="artCurrentSlide(<%= index + 1 %>)"></span>
                     <% }) %>
                     </div>
-                </div>
                 <% } %>
-                <% if (game.videos.length) { %>
+                </div>
                     <div class="video-container">
+                        <% if (game.videos.length === 0) { %>
+                            <p class="error-msg">No Videos</p>
+                        <% } %>
+                <% if (game.videos.length) { %>
                         <h3 style="text-align: center;">Videos</h3>
                         <div class="slideshow-container" id="videos-container">
                             <% game.videos.forEach((video, index) => { %>
@@ -191,8 +230,8 @@
                                 <span class="Videodot <%= index === 0 ? 'active' : '' %>" onclick="videoCurrentSlide(<%= index + 1 %>)"></span>
                             <% }) %>
                         </div>
-                    </div>
                 <% } %>  
+            </div>
             </div>
     <!-- Slideshow Javascript -->
     <script>

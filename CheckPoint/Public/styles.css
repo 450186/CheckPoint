@@ -9,7 +9,7 @@
     --secondText: #9CA3AF;
     --playing: #FBBF24;
     --completed: #22C55E;
-    --wishlist: #8B5CF6;
+    --wishlist: #f1f430;
     --dropped: #EF4444;
 
     --shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
@@ -577,6 +577,7 @@ button:hover {
     width: 25px;
     min-width: 25px;
     text-align: center;
+    justify-self: center;
     font-size: 20px;
 }
 .nav-label {
@@ -599,6 +600,9 @@ button:hover {
 }
 .sidebar.collapsed .nav-item a {
     justify-content: center;
+}
+.sidebar.collapsed .nav-icon {
+    margin: auto;
 }
 /* ======== Notifications ======== */
 .noti-dropdown {
@@ -1077,7 +1081,7 @@ button:hover {
     height: 100%;
 }
 .game-details {
-    margin-top: auto;
+    margin-top: 80px;
     margin-bottom: auto;
 }
 .game-header, .profile-header {
@@ -1138,7 +1142,63 @@ button:hover {
     padding-bottom: 20px;
     font-weight: bold;
 }
-
+.community-status-container {
+    position: absolute;
+    right: 20px;
+    margin-top: calc(var(--header-height) + 100px);
+    background-color: var(--cards);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 40px;
+}
+.community-bar {
+    width: 100%;
+    height: 20px;
+    display: flex;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background-color: var(--background);
+    margin: 16px 0
+}
+.community-fill {
+    height: 100%;
+}
+.playing-fill {
+    background-color: var(--playing);
+}
+.completed-fill {
+    background-color: var(--completed);
+}
+.wishlist-fill {
+    background-color: var(--wishlist);
+}
+.dropped-fill {
+    background-color: var(--dropped);
+}
+.community-status-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+.community-status-legend .fa-circle-dot {
+    width: 20px;
+    height: 20px;
+}
+.playing-dot {
+    color: var(--playing);
+}
+.completed-dot {
+    color: var(--completed);
+}
+.wishlist-dot {
+    color: var(--wishlist);
+}
+.dropped-dot {
+    color: var(--dropped);
+}
 /* ======== Filter Styles ======== */
 .filter-container {
     display: flex;
@@ -1281,6 +1341,7 @@ button:hover {
     border-radius: 16px;
     box-shadow: var(--shadow);
     overflow: hidden;
+    transition: transform 0.3s ease box-shadow 0.3s ease;
 }
 
 .accordion-trigger {
@@ -1294,12 +1355,16 @@ button:hover {
     font-size: 18px;
     border: none;
     cursor: pointer;
+    transition: background 0.3s ease
 }
-
+.accordion-item:has(.accordion-trigger:hover) {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
 .accordion-trigger:hover {
     background: rgba(59, 130, 246, 0.12);
+    transform: none
 }
-
 .accordion-panel {
     display: none;
     padding: 20px;
@@ -1556,6 +1621,7 @@ progress::-moz-progress-bar {
     padding: 20px;
     box-shadow: var(--shadow);
     width: 100%;
+    min-height: 470px
 }
 
 .screenshot-container {
