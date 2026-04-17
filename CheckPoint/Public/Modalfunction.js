@@ -241,8 +241,6 @@
     }
 
     if (goToGameLink) {
-      // const from = window.location.pathname + window.location.search;
-      // goToGameLink.href = `/game/${id}?from=${encodeURIComponent(from)}`;
       goToGameLink.addEventListener("click", () => {
         const gameId = id;
         showPageLoader("Loading game...");

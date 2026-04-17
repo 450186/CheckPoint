@@ -7,12 +7,9 @@
         <button onclick="window.location.href='<%= from %>'" class="back-button">
             <i class="fa-solid fa-circle-chevron-left"></i> <span>Back</span>
         </button>
-        <h2 class="title">
-            <%= title %>
-        </h2>
         <% if (totalTracked > 0) { %>
         <div class="community-status-container">
-            <h4>Community Status:</h4>
+            <h3 style="margin-top: 0;">Community Status:</h3>
                 <div class="community-bar">
                     <div class="community-fill playing-fill" 
                     style="width: <%= statusPercents.playing %>%;" 
@@ -41,10 +38,12 @@
                 <% } %>
     </div>
     <div class="game-info-container">
-        <div> <img src="<%= game.coverUrl %>"
+        <div class="game-cover-container"> 
+            <img src="<%= game.coverUrl %>"
                 alt="<%= game.name %>" class="game-cover">
         </div>
         <div class="game-details">
+            <h2><%= game.name %></h2>
             <p class="game-info"><strong>Developer:</strong>
                 <%= game.developer %>
             </p>
@@ -68,17 +67,19 @@
             <p class="game-info"><strong>Rating:</strong>
                 <%= game.rating ? Math.round(game.rating) : "N/A" %>
             </p>
-            <button type="button" 
-            id="open-review-modal-btn" 
-            data-game-id="<%= game.id %>"
-            data-name="<%= game.name %>"
-            data-cover="<%= game.coverUrl %>"
-            data-rating="<%= userLibraryItem?.userRating || '' %>"
-            class="add-btn">
-                Add Review
-            </button>
+            <% if (isInLibrary) { %>
+                <button type="button" 
+                id="open-review-modal-btn" 
+                data-game-id="<%= game.id %>"
+                data-name="<%= game.name %>"
+                data-cover="<%= game.coverUrl %>"
+                data-rating="<%= userLibraryItem?.userRating || '' %>"
+                class="add-btn">
+                    Add Review
+                </button>
+            <% } %>
         </div>
-        <% if (game.completion) { %>
+        <!-- <% if (game.completion) { %>
             <div class="completion-grid">
                 <p class="grid-header"><strong>Time to Complete</strong></p>
                 <p class="header-cell">Hastily</p>
@@ -89,9 +90,49 @@
                 <p class="time-cell"><%= game.completion.main != null ? `${game.completion.main} hours` : "No Record" %></p>
                 <p class="time-cell"><%= game.completion.completionist != null ? `${game.completion.completionist} hours` : "No Record" %></p>
             </div>
-        <% } %>
+        <% } %> -->
     </div>
-    <% if (moreFromDev && moreFromDev.length) { %>
+    <% if (reviews.length > 0) { %>
+        <h3>User's Reviews</h3>
+        <div class="review-row-wrap <%= reviews.length > 3 ? 'scrollable' : '' %>">
+            <div class="review-row">
+                <% reviews.forEach(r => { %>
+                    <div class="game-review-card">
+                        <div class="review-card-content">
+                            <h3><%= r.title %></h3>
+                            <p><%= r.body %></p>
+                        </div>
+
+                        <div class="card-spacer"></div>
+
+                        <div class="activity-star-rating">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <% if (r.rating >= i) { %>
+                                    <i class="fa-solid fa-star"></i>
+                                <% } else if (r.rating >= i - 0.5) { %>
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                <% } else { %>
+                                    <i class="fa-regular fa-star"></i>
+                                <% } %>
+                            <% } %>
+                        </div>
+
+                        <div class="review-byline">
+                            <img
+                                src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= r.user.avatarSeed || r.user.username %>"
+                                alt="<%= r.user.username %>'s avatar"
+                                class="activity-avatar clickable"
+                                data-username="<%= r.user.username %>"
+                            >
+                            <p class="activity-username" data-username="<%= r.user.username %>"><strong><%= r.user.username %></strong></p>
+                            <p><%= r.timeAgo %></p>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% } %>   
+<% if (moreFromDev && moreFromDev.length) { %>
         <h3>More From <strong>
                 <%= game.developer %>
             </strong></h3>
@@ -121,7 +162,7 @@
         </div>
     <% } %>
     <% if (similarGenres && similarGenres.length) { %>
-        <h3>Same Genre</h3>
+        <h3>Similar Games</h3>
         <div class="library-row">
             <% similarGenres.forEach(g => { %>
                 <div class="library-card"
@@ -332,3 +373,23 @@
 </div>
 <%- include('../Partials/footer') %>
 <script src="/Reviewfunction.js"></script>
+<script>
+    const usernames = document.querySelectorAll('.activity-username');
+    const userAvatars = document.querySelectorAll('.activity-avatar');
+
+    usernames.forEach(user => {
+        user.addEventListener('click', (e) => {
+            const clickedUser = user.dataset.username
+            const from = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/users/${clickedUser}?from=${from}`;
+        })
+    });
+
+    userAvatars.forEach(avatar => {
+        avatar.addEventListener('click', (e) => {
+            const clickedUser = avatar.dataset.username
+            const from = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/users/${clickedUser}?from=${from}`;
+        })
+    });
+</script>

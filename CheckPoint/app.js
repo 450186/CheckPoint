@@ -6,6 +6,8 @@ const userModel = require('./Models/users.js');
 const libraryModel = require('./Models/Library.js');
 const reviewModel = require('./Models/Review.js');
 
+const platformsData = require('./data/platforms.json')
+
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 
@@ -36,8 +38,9 @@ app.use(session({
 const connectionString = `mongodb+srv://${mongoUsername}:${mongoPassword}@checkpoint.iztnugv.mongodb.net/${mongoAppName}?retryWrites=true&w=majority`;
 const mongoose = require('mongoose');
 mongoose.connect(connectionString)
-    .then(() => {
+    .then( () => {
         console.log('Connected to MongoDB')
+
         app.listen(port, () => {
             console.log(`Server is running on port ${port}`);
         });
@@ -58,6 +61,8 @@ mongoose.connection.on("error", (err) => {
 
 const path = require('path');
 const { log, error } = require('console');
+const { platform } = require('os');
+const { get } = require('http');
 app.use(express.static(path.join(__dirname, 'Public')));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -95,37 +100,50 @@ async function getAccessToken() {
     url.searchParams.append("client_secret", twitchClientSecret);
     url.searchParams.append("grant_type", "client_credentials");
 
-    const resp = await fetch(url.toString(), { method: "POST" })
-    const data = await resp.json();
+    try {
+        const resp = await fetch(url.toString(), { method: "POST" });
+        const data = await resp.json();
 
-    if (!resp.ok) {
-        throw new Error(`Token request failed: ${resp.status} ${JSON.stringify(data)}`);
+        if (!resp.ok) {
+            throw new Error(`Token request failed: ${resp.status} ${JSON.stringify(data)}`);
+        }
+
+        cachedToken = data.access_token;
+        tokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
+
+        return cachedToken;
+    } catch (err) {
+        console.error("Token fetch error:", err);
+        console.error("Token fetch cause:", err.cause);
+        throw err;
     }
-
-    cachedToken = data.access_token;
-    tokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
-
-    return cachedToken;
 }
 
 async function IGDBrequest(endpoint, body) {
     const token = await getAccessToken();
-    const response = await fetch(`https://api.igdb.com/v4/${endpoint}`, {
-        method: 'POST',
-        headers: {
-            'Client-ID': twitchClientId,
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'text/plain',
-        },
-        body,
-    })
 
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`IGDB request failed: ${response.status} ${text}`);
+    try {
+        const response = await fetch(`https://api.igdb.com/v4/${endpoint}`, {
+            method: "POST",
+            headers: {
+                "Client-ID": twitchClientId,
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "text/plain",
+            },
+            body,
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`IGDB request failed: ${response.status} ${text}`);
+        }
+
+        return response.json();
+    } catch (err) {
+        console.error("IGDB fetch error:", err);
+        console.error("IGDB fetch cause:", err.cause);
+        throw err;
     }
-
-    return response.json()
 }
 function toTimeAgo(date) {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -159,7 +177,6 @@ async function getFriendRequests(userId) {
     const friendRequests = user?.friendRequests || [];
     return friendRequests
 }
-
 app.get('/', (req, res) => {
     res.render('pages/home', {
         title: 'Home',
@@ -387,30 +404,7 @@ app.get("/discover", checkLogin, async (req, res) => {
             limit 100;
         `);
 
-        const allowedPlatforms = [
-            "PC (Microsoft Windows)",
-            "PlayStation 5",
-            "PlayStation 4",
-            "Xbox Series X|S",
-            "Xbox One",
-            "Nintendo Switch",
-            "iOS",
-            "Android",
-        ];
-
-        const allowedPlatformsSet = new Set(allowedPlatforms);
-
-        const allPlatforms = await IGDBrequest("platforms", `
-            fields id, name;
-            sort name asc;
-            limit 200;
-        `);
-
-        const popularPlatforms = allPlatforms
-            .filter(p => allowedPlatformsSet.has(p.name))
-            .sort((a, b) => allowedPlatforms.indexOf(a.name) - allowedPlatforms.indexOf(b.name));
-
-        const otherPlatforms = allPlatforms.filter(p => !allowedPlatformsSet.has(p.name));
+        const { popularPlatforms, otherPlatforms } = platformsData;
 
         const errorMessage = popErrorMessage(req);
 
@@ -652,6 +646,23 @@ similarGenres = similarGenres.slice(0, 6);
         dropped: totalTracked ? Math.round((statusMap.dropped / totalTracked) * 100) : 0,
         wishlist: totalTracked ? Math.round((statusMap.wishlist / totalTracked) * 100) : 0,
     }
+    const isInLibrary = userLibraryItem !== null;
+
+    const gameReviews = await reviewModel.find({ gameId: id })
+        .populate("userId", "username avatarSeed")
+        .sort({ createdAt: -1 })
+        .lean();
+
+    const reviews = gameReviews.map(r => ({
+        createdAt: r.createdAt,
+        timeAgo: toTimeAgo(new Date(r.createdAt)),
+        user: r.userId,
+        rating: r.rating,
+        body: r.body,
+        rating: r.rating,
+        reviewId: r._id,
+        title: r.title
+    }))
     res.render('pages/game', {
         title: game.name,
         user: req.session.user,
@@ -665,10 +676,11 @@ similarGenres = similarGenres.slice(0, 6);
         errorMessage,
         requestPath: req.originalUrl,
         friendRequests,
-        userReviews,
         statusMap,
         statusPercents,
-        totalTracked
+        totalTracked,
+        isInLibrary,
+        reviews
     })
 })
 app.get("/profile", checkLogin, async (req, res) => {

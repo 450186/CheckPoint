@@ -25,7 +25,16 @@
         <div class="filter-item">
             <button data-filter="sort">Sort</button>
         </div>
-        <% if (URLSearchParams !== "/discover") { %>
+        <% const hasActiveFilters =
+            (filters?.genres?.length) ||
+            (filters?.platforms?.length) ||
+            (filters?.minRating) ||
+            (filters?.yearFrom) ||
+            (filters?.yearTo) ||
+            (filters?.sort && filters.sort !== "newest");
+        %>
+
+        <% if (hasActiveFilters) { %>
           <div class="filter-item">
             <button data-filter="reset">Reset</button>
           </div>

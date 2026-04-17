@@ -75,7 +75,17 @@
                                 <img class="ranking-card-img" src="<%= HR.cachedCoverUrl.replace('t_cover_big', 't_thumb') %>" alt="<%= HR.cachedName %>">
                                 <p class="ranking-card-title"><%= HR.cachedName %></p>
                             </div>
-                            <p class="ranking-card-rating">Rating: <%= HR.userRating %>/5<i class="fa-solid fa-star"></i></p>
+                            <div class="activity-star-rating">
+                                <% for( let i = 1; i <= 5; i++) { %>
+                                    <% if (HR.userRating >= i) { %>
+                                        <i class="fa-solid fa-star"></i>
+                                    <% } else if (HR.userRating >= i - 0.5) { %>
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    <% } else { %>
+                                        <i class="fa-regular fa-star"></i>
+                                    <% } %>
+                                <% } %>
+                            </div>
                         </div>
                     <% }) %>
                 </div>

@@ -47,7 +47,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
+    z-index: 5000;
     position: fixed;
     top: 0;
     left: 0;
@@ -526,10 +526,13 @@ button:hover {
 }
 .sidebar-toggle {
     position: absolute;
-    top: 50%;
-    width: 30px;
-    height: 30px;
+    bottom: 30px;
+    left: 15px;
+    width: 50px;
+    height: 50px;
     border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0;
 
     display: flex;
     align-items: center;
@@ -578,7 +581,10 @@ button:hover {
     min-width: 25px;
     text-align: center;
     justify-self: center;
-    font-size: 20px;
+    font-size: 24px;
+}
+.sidebar.collapsed .nav-label {
+    display: none;
 }
 .nav-label {
     opacity: 1;
@@ -824,6 +830,22 @@ button:hover {
 /* ======== Modal Styles ======== */
 #review-title-input {
     margin-left: 20px;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    width: 65%;
+    height: 50px;
+    color: var(--text);
+    font-size: 20px;
+}
+#review-title-input::placeholder {
+    font-size: 20px;
+}
+textarea {
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    width: 300px;
+    color: var(--text);
+    font-size: 16px;
 }
 .review-textarea-group {
     display: flex;
@@ -1075,14 +1097,24 @@ button:hover {
 /* ======== Game Page ======== */
 .game-info-container {
     display: grid;
-    grid-template-columns: 0.5fr 1fr;
+    grid-template-columns: 0.2fr 1fr;
     gap: 20px;
     overflow-y: hidden;
     height: 100%;
 }
+.game-cover-container {
+    margin: auto;
+}
+.game-cover-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 .game-details {
-    margin-top: 80px;
     margin-bottom: auto;
+}
+.game-details h2 {
+    margin-bottom: 50px;
 }
 .game-header, .profile-header {
     position: relative;
@@ -1118,8 +1150,8 @@ button:hover {
 .completion-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    width: 50%;
+    gap: 10px;
+    width: 25%;
     margin: auto;
     padding: 20px;
     border-radius: 16px;
@@ -1128,8 +1160,11 @@ button:hover {
     text-align: center;
     grid-column: span 2;
     border: 1px solid var(--border);
-}
 
+    position: absolute;
+    top: calc(var(--header-height) + 375px);
+    right: 40px;
+}
 .time-cell {
     font-size: 20px;
     color: var(--accent);
@@ -1139,8 +1174,8 @@ button:hover {
     text-align: center;
     font-size: 24px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 20px;
     font-weight: bold;
+    margin-bottom: 0;
 }
 .community-status-container {
     position: absolute;
@@ -1199,6 +1234,59 @@ button:hover {
 .dropped-dot {
     color: var(--dropped);
 }
+.review-row-wrap {
+    position: relative;
+}
+.review-row {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+    margin-top: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+.review-row-wrap.scrollable .game-review-card {
+    flex: 0 0 calc((100% - 40px) / 2.75);
+}
+.review-row-wrap.scrollable::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(to right, transparent, var(--background));
+    pointer-events: none;
+}
+.game-review-card {
+    flex: 0 0 calc((100% - 40px) / 3);
+    background-color: var(--cards);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+.review-byline {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+.game-review-card .activity-star-rating {
+    margin: 5px;
+}
+.review-row::-webkit-scrollbar {
+    height: 10px;
+}
+
+.review-row::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+}
 /* ======== Filter Styles ======== */
 .filter-container {
     display: flex;
@@ -1208,7 +1296,7 @@ button:hover {
     margin-bottom: 20px;
     justify-content: space-evenly;
     align-items: center;
-    background-color: var(--primary);
+    background-color: var(--cards);
     border-radius: 16px;
 }
 .filter-item {

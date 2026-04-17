@@ -9,7 +9,7 @@
         {key: "dropped", label: "Dropped 🔴"}
     ]; %>
 <div class="main-content">
-    <h2 class="title"><%= title %></h2>
+    <h2 class="title">My Vault</h2>
     <div class="library-accordion">
         <% sections.forEach(section => { %>
             <section class="accordion-item <%= grouped[section.key].length ? '' : 'empty' %>">
@@ -86,7 +86,7 @@
         </div>
     </div>
         <div class="stats-sidebar">
-            <h3 style="text-align: center; margin-top: 0;">Library Stats</h3>
+            <h3 style="text-align: center; margin-top: 0;">Vault Breakdown</h3>
         <div class="total-games">
             <p>Total Games:</p>
             <p style="font-weight: bold;"><%= totalGames %></p>

@@ -1,0 +1,43 @@
+{
+  "popularPlatforms": [
+    { "id": 6, "name": "PC (Microsoft Windows)" },
+    { "id": 167, "name": "PlayStation 5" },
+    { "id": 48, "name": "PlayStation 4" },
+    { "id": 169, "name": "Xbox Series X|S" },
+    { "id": 49, "name": "Xbox One" },
+    { "id": 130, "name": "Nintendo Switch" },
+    { "id": 39, "name": "iOS" },
+    { "id": 34, "name": "Android" }
+  ],
+  "otherPlatforms": [
+    { "id": 9, "name": "PlayStation 3" },
+    { "id": 8, "name": "PlayStation 2" },
+    { "id": 7, "name": "PlayStation" },
+
+    { "id": 12, "name": "Xbox 360" },
+    { "id": 11, "name": "Xbox" },
+
+    { "id": 41, "name": "Wii U" },
+    { "id": 5, "name": "Wii" },
+    { "id": 24, "name": "GameCube" },
+    { "id": 4, "name": "Nintendo 64" },
+    { "id": 18, "name": "Nintendo Entertainment System" },
+    { "id": 19, "name": "Super Nintendo Entertainment System" },
+
+    { "id": 29, "name": "Sega Mega Drive/Genesis" },
+    { "id": 32, "name": "Sega Saturn" },
+    { "id": 23, "name": "Sega Dreamcast" },
+
+    { "id": 37, "name": "Nintendo 3DS" },
+    { "id": 20, "name": "Nintendo DS" },
+    { "id": 33, "name": "Game Boy" },
+    { "id": 22, "name": "Game Boy Color" },
+    { "id": 24, "name": "Game Boy Advance" },
+
+    { "id": 46, "name": "PlayStation Vita" },
+    { "id": 38, "name": "PlayStation Portable" },
+
+    { "id": 14, "name": "Mac" },
+    { "id": 3, "name": "Linux" }
+  ]
+}
