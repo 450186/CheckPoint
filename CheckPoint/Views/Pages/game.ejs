@@ -99,23 +99,39 @@
                 <% reviews.forEach(r => { %>
                     <div class="game-review-card">
                         <div class="review-card-content">
-                            <h3><%= r.title %></h3>
+                            <div class="game-review-header">
+                                <h3><%= r.title %></h3>
+                                <% if (r.ownReview) { %>
+                                    <div class="review-btns">
+                                        <form action="/reviews/delete" class="review-remove-form" onclick="event.stopPropagation()" method="POST">
+                                            <input type="hidden" name="reviewId" value="<%= r.reviewId %>">
+                                            <input type="hidden" name="gameId" value="<%= r.gameId %>">
+                                            <button type="submit" class="delete-btn" onclick="event.stopPropagation()">
+                                                <i class="fa-solid fa-trash"></i> Delete</button>
+                                        </form>
+                                        <form action="/reviews/edit" onclick="event.stopPropagation()" method="POST">
+                                            <input type="hidden" name="gameId" value="<%= r.gameId %>">
+                                            <input type="hidden" name="reviewId" value="<%= r.reviewId %>">
+                                            <button type="submit" class="edit-btn">
+                                                <i class="fa-solid fa-pen"></i> Edit</button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
                             <p><%= r.body %></p>
                         </div>
-
                         <div class="card-spacer"></div>
-
-                        <div class="activity-star-rating">
-                            <% for (let i = 1; i <= 5; i++) { %>
-                                <% if (r.rating >= i) { %>
-                                    <i class="fa-solid fa-star"></i>
-                                <% } else if (r.rating >= i - 0.5) { %>
-                                    <i class="fa-solid fa-star-half-stroke"></i>
-                                <% } else { %>
-                                    <i class="fa-regular fa-star"></i>
+                            <div class="activity-star-rating">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <% if (r.rating >= i) { %>
+                                        <i class="fa-solid fa-star"></i>
+                                    <% } else if (r.rating >= i - 0.5) { %>
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    <% } else { %>
+                                        <i class="fa-regular fa-star"></i>
+                                    <% } %>
                                 <% } %>
-                            <% } %>
-                        </div>
+                            </div>
 
                         <div class="review-byline">
                             <img
@@ -132,6 +148,17 @@
             </div>
         </div>
     <% } %>   
+    <div id="confirm-overlay" class="confirm-overlay" hidden>
+        <div class="confirm-box">
+            <h3>Are you sure you want to delete your review of <em>"<%= game.name %>"</em> called
+                <span class="confirm-game-name"></span>
+                ?</h3>
+            <div class="confirm-buttons">
+                <button id="cancel-remove" type="button">Cancel</button>
+                <button id="confirm-remove" type="button">Remove</button>
+            </div>
+        </div>
+    </div>
 <% if (moreFromDev && moreFromDev.length) { %>
         <h3>More From <strong>
                 <%= game.developer %>
@@ -391,5 +418,46 @@
             const from = encodeURIComponent(window.location.pathname + window.location.search);
             window.location.href = `/users/${clickedUser}?from=${from}`;
         })
+    });
+</script>
+<script>
+    const overlay = document.getElementById('confirm-overlay');
+    const confirmBtn = document.getElementById('confirm-remove');
+    const cancelBtn = document.getElementById('cancel-remove');
+    const nameSpace = document.querySelector('.confirm-game-name');
+
+    let pendingForm = null;
+
+    document.querySelectorAll('.review-remove-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const card = form.closest('.game-review-card');
+            const reviewTitle = card?.querySelector('.game-review-header h3')?.textContent?.trim() || 'this review';
+
+            nameSpace.textContent = `"${reviewTitle}"`;
+            pendingForm = form;
+            overlay.hidden = false;
+        });
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        if (pendingForm) {
+            pendingForm.submit();
+            pendingForm = null;
+        }
+        overlay.hidden = true;
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        pendingForm = null;
+        overlay.hidden = true;
+    });
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            pendingForm = null;
+            overlay.hidden = true;
+        }
     });
 </script>

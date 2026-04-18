@@ -657,11 +657,13 @@ similarGenres = similarGenres.slice(0, 6);
         createdAt: r.createdAt,
         timeAgo: toTimeAgo(new Date(r.createdAt)),
         user: r.userId,
+        gameId: r.gameId,
         rating: r.rating,
         body: r.body,
         rating: r.rating,
         reviewId: r._id,
-        title: r.title
+        title: r.title,
+        ownReview: String(r.userId._id) === String(req.session.user.id)
     }))
     res.render('pages/game', {
         title: game.name,

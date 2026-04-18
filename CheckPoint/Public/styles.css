@@ -1277,7 +1277,7 @@ textarea {
     align-items: center;
 }
 .game-review-card .activity-star-rating {
-    margin: 5px;
+    margin: 10px;
 }
 .review-row::-webkit-scrollbar {
     height: 10px;
@@ -1286,6 +1286,26 @@ textarea {
 .review-row::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 999px;
+}
+.game-review-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+.game-review-header h3 {
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+.review-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 /* ======== Filter Styles ======== */
 .filter-container {
@@ -2244,6 +2264,11 @@ progress::-moz-progress-bar {
     flex-shrink: 0;
     cursor: pointer;
 }
+.activity-avatar:hover + .activity-username {
+    color: var(--accent);
+    text-decoration: underline;
+}
+.activity-avatar:hover
 .activity-content {
     display: flex;
     flex-direction: column;
