@@ -4,7 +4,8 @@
 
 <div class="main-content">
     <div class="game-header"> 
-        <button onclick="window.location.href='<%= from %>'" class="back-button">
+        <button onclick="showPageLoader('<%= from.startsWith('/discover') ? 'Loading discover...' : 'Loading...' %>'); window.location.href='<%= from %>'" 
+            class="back-button">
             <i class="fa-solid fa-circle-chevron-left"></i> <span>Back</span>
         </button>
         <% if (totalTracked > 0) { %>

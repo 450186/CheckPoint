@@ -271,18 +271,64 @@ app.get("/dashboard", checkLogin, async (req, res) => {
     const items = await libraryModel.find({ userId: req.session.user.id })
         .sort({ createdAt: -1 })
         .lean();
+    const grouped = {
+        playing: items.filter(i => i.status === 'playing'),
+        completed: items.filter(i => i.status === 'completed'),
+        wishlist: items.filter(i => i.status === 'wishlist'),
+        dropped: items.filter(i => i.status === 'dropped'),
+    }
+    const totalGames = grouped['playing'].length + grouped['completed'].length + grouped['wishlist'].length + grouped['dropped'].length;
 
+    const Completion = totalGames > 0 ? Math.round((grouped['completed'].length / items.length) * 100) : 0;
     const playing = items.filter(i => i.status === 'playing').slice(0, 4);
-
+    
+    const wishlistCount = grouped.wishlist.length
+    const completedCount = grouped.completed.length
+    const droppedCount = grouped.dropped.length
+    const playingCount = grouped.playing.length
 
     const YourReviews = await reviewModel.find({ userId: req.session.user.id })
         .sort({ createdAt: -1 })
         .lean();
 
-        const errorMessage= popErrorMessage(req);
+    let sum = 0;
+    let count = 0;
+
+    items.forEach(item => {
+        if (item.userRating != null) {
+            sum += item.userRating;
+            count++;
+        }
+    });
+
+    const averageRating = count ? sum / count : 0;
+    let avgRatingComment;
+
+    if(averageRating > 0 && averageRating <= 1) {
+        avgRatingComment = 'Maybe try a different genre?';
+    } else if(averageRating > 1 && averageRating <= 2) {
+        avgRatingComment = 'Tough Crowd!';
+    } else if(averageRating > 2 && averageRating <= 3) {
+        avgRatingComment = 'You think games are fun?';
+    } else if(averageRating > 3 && averageRating <= 4) {
+        avgRatingComment = 'You know what you like!';
+    } else if(averageRating > 4 && averageRating <= 5) {
+        avgRatingComment = 'You are a true gamer!';
+    }
+        const errorMessage = popErrorMessage(req);
 
     const friendRequests = await getFriendRequests(req.session.user.id);
 
+    const statsInfo = {
+        totalGames,
+        Completion,
+        averageRating,
+        wishlistCount,
+        avgRatingComment,
+        completedCount,
+        droppedCount,
+        playingCount
+    }
     res.render('pages/dashboard', {
         title: 'Dashboard',
         user: req.session.user,
@@ -292,6 +338,8 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         errorMessage,
         requestPath: req.originalUrl,
         friendRequests: friendRequests || [],
+        items,
+        statsInfo
     })
 })
 app.get("/search", checkLogin, (req, res) => {
@@ -834,6 +882,8 @@ app.get("/library", checkLogin, async (req, res) => {
     const completionRate = totalGames > 0 ? Math.round((grouped['completed'].length / totalGames) * 100) : 0;
 
     const friendRequests = await getFriendRequests(req.session.user.id);
+
+    const errorMessage= popErrorMessage(req);
 
     res.render('pages/library', {
         title: 'Library',

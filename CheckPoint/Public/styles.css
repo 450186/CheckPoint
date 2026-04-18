@@ -1307,6 +1307,38 @@ textarea {
     flex-shrink: 0;
     white-space: nowrap;
 }
+.stats-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    justify-content: space-evenly;
+}
+.tab {
+    background: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    opacity: 0.75;
+}
+.tab.active {
+    opacity: 1;
+    border-bottom: 2px solid var(--accent);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+.rating-comment {
+    color: var(--secondText);
+}
+.avg-rating-div {
+    display: flex;
+    flex-direction: row;
+    height: 19.5px;
+    align-items: center;
+    justify-content: space-between;
+}
 /* ======== Filter Styles ======== */
 .filter-container {
     display: flex;

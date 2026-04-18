@@ -198,26 +198,60 @@
 </div>
 <div id="page-loader" class="page-loader" hidden>
     <div class="page-loader-content">
-        <div class="spinner"></div>
+        <div class="page-spinner"></div>
         <p>Loading...</p>
     </div>
 </div>
 <script>
   function showPageLoader(message = "Loading...") {
-      const loader = document.getElementById("page-loader")
-      if(!loader) return
+    const loader = document.getElementById("page-loader");
+    if (!loader) return;
 
-      const text = loader.querySelector("p")
-      if(text) text.textContent = message
+    const text = loader.querySelector("p");
+    if (text) text.textContent = message;
 
-      loader.hidden = false
+    loader.hidden = false;
   }
 
-document.querySelectorAll('a[href="/discover"]').forEach(link => {
-    link.addEventListener('click', () => {
-        showPageLoader("Loading discover...");
-    });
-});
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a");
+    if (!link) return;
+
+    const href = link.getAttribute("href");
+    if (!href) return;
+
+    if (
+      href.startsWith("#") ||
+      href.startsWith("http") ||
+      href.startsWith("javascript:") ||
+      link.hasAttribute("download") ||
+      link.target === "_blank"
+    ) {
+      return;
+    }
+
+    if (href.startsWith("/discover")) {
+      showPageLoader("Loading the discovery page...");
+    } else if (href.startsWith("/game")) {
+      showPageLoader("Loading game...");
+    } else {
+      showPageLoader("Loading...");
+    }
+  });
+
+  window.addEventListener("pageshow", (event) => {
+    const loader = document.getElementById("page-loader");
+    if (!loader) return;
+
+    if (event.persisted) {
+      loader.hidden = true;
+    }
+  });
+
+  window.addEventListener("load", () => {
+    const loader = document.getElementById("page-loader");
+    if (loader) loader.hidden = true;
+  });
 </script>
 
 <script src="/addFriendFunction.js"></script>

@@ -14,11 +14,32 @@
     <div class="card-rows">
         <div class="dash-card">
             <h3>Your Stats</h3>
-            <p>Your key stats below:</p>
-            <p class="stats-list"> <i class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> </p>
-            <div class="card-spacer"></div>
+            <div class="stats-tabs">
+                <button class="tab active" data-tab="vault">Vault</button>
+                <button class="tab" data-tab="habits">Habits</button>
+                <button class="tab" data-tab="activity">Activity</button>
+            </div>
+            <div class="tab-content active" id="vault">
+                <p><strong>Total Games: </strong><%= statsInfo.totalGames %></p>
+                <p><strong>Completion Rate: </strong><%= statsInfo.Completion %>%</p>
+                <div class="avg-rating-div">
+                    <p><strong>Average Rating: </strong>
+                        <%= statsInfo.averageRating.toFixed(2) %> 
+                        <i class="fa-solid fa-star" style="color: #FBBF24;"></i>
+                    </p>
+                    <p class="rating-comment"><%= statsInfo.avgRatingComment %></p>
+                </div>
+                <p><strong>🟡 Wishlisted Games: </strong><%= statsInfo.wishlistCount %></p>
+                <p><strong>🟢 Completed Games: </strong><%= statsInfo.completedCount %></p>
+                <p><strong>🔴 Dropped Games: </strong><%= statsInfo.droppedCount %></p>
+                <p><strong>🟠 Playing Games: </strong><%= statsInfo.playingCount %></p>
+            </div>
+            <div class="tab-content" id="habits">
+                <p class="no-items">No stats yet</p>
+            </div>
+            <div class="tab-content" id="activity">
+                <p class="no-items">No stats yet</p>
+            </div>
         </div>
         <div class="dash-card review-card">
             <h3>Your Reviews</h3>
@@ -201,5 +222,19 @@
             window.location.href = `/game/${gameId}?from=${encodeURIComponent('/dashboard')}`;
         });
     });
+</script>
+<script>
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(tc => tc.classList.remove('active'));
+
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+        })
+    })
 </script>
 <%- include('../Partials/footer') %>
