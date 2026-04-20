@@ -7,6 +7,7 @@ const libraryModel = require('./Models/Library.js');
 const reviewModel = require('./Models/Review.js');
 
 const platformsData = require('./data/platforms.json')
+const genreComments = require('./data/genreComments.json')
 
 const session = require('express-session');
 const bcrypt = require('bcrypt');
@@ -279,7 +280,9 @@ app.get("/dashboard", checkLogin, async (req, res) => {
     }
     const totalGames = grouped['playing'].length + grouped['completed'].length + grouped['wishlist'].length + grouped['dropped'].length;
 
-    const Completion = totalGames > 0 ? Math.round((grouped['completed'].length / items.length) * 100) : 0;
+    const completion = totalGames > 0 ? 
+    Math.round((grouped['completed'].length / items.length) * 100) 
+    : 0;
     const playing = items.filter(i => i.status === 'playing').slice(0, 4);
     
     const wishlistCount = grouped.wishlist.length
@@ -313,21 +316,125 @@ app.get("/dashboard", checkLogin, async (req, res) => {
     } else if(averageRating > 3 && averageRating <= 4) {
         avgRatingComment = 'You know what you like!';
     } else if(averageRating > 4 && averageRating <= 5) {
-        avgRatingComment = 'You are a true gamer!';
+        avgRatingComment = 'A true gamer!';
     }
         const errorMessage = popErrorMessage(req);
 
     const friendRequests = await getFriendRequests(req.session.user.id);
+    const reviewCount = YourReviews.length
+
+    const playedGamesTotal = grouped['playing'].length + grouped['completed'].length + grouped['dropped'].length;
+
+    const reviewRate = playedGamesTotal > 0 ? Math.round((YourReviews.length / playedGamesTotal) * 100) : 0
+    
+    let reviewComment;
+
+    if(reviewRate === 0) {
+        reviewComment = 'You have not reviewed any games yet.'
+    } else if(reviewRate < 25) {
+        reviewComment = 'Quiet Observer 👀'
+    } else if(reviewRate < 50) {
+        reviewComment = 'Getting involved!'
+    } else if(reviewRate < 75) {
+        reviewComment = 'A true critic! 🔥'
+    } else {
+        reviewComment = 'Certified Critic! 🎉'
+    }
+
+    const genreCounts = {};
+    items.forEach(item => {
+        const genres = (item.cachedGenres || "")
+        .split(",")
+        .map((genre) => genre.trim())
+        .filter(Boolean);
+
+        genres.forEach((genre) => {
+            genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+        });
+    })
+    const sortedGenres = Object.entries(genreCounts)
+    .sort((a, b) => b[1] - a[1])
+    const topGenre = sortedGenres.length ? sortedGenres[0][0] : "None Yet";
+    const topGenreCount = sortedGenres.length ? sortedGenres[0][1] : 0
+
+    const genreComment = 
+    genreComments[topGenre] ||
+    genreComments[topGenre?.trim()] ||
+    "Eclectic Gamer 🎮"
 
     const statsInfo = {
         totalGames,
-        Completion,
+        completion,
         averageRating,
         wishlistCount,
         avgRatingComment,
         completedCount,
         droppedCount,
-        playingCount
+        playingCount,
+        reviewCount,
+        reviewRate,
+        reviewComment,
+        playedGamesTotal,
+        topGenre,
+        topGenreCount,
+        genreComment
+    }
+    let droppedComment;
+    const dropRate = playedGamesTotal > 0 ?
+    Math.round((grouped['dropped'].length / playedGamesTotal) * 100)
+    : 0
+    if (dropRate === 0) {
+        droppedComment = 'You really know what clicks for you.';
+    } else if (dropRate < 25) {
+        droppedComment = 'You usually stick with the games you start.';
+    } else if (dropRate < 50) {
+        droppedComment = 'You’re pretty selective about what keeps your attention.';
+    } else if (dropRate < 75) {
+        droppedComment = 'You sample a lot before finding the right fit.';
+    } else {
+        droppedComment = 'You like testing games before committing to them.';
+    }
+    let playStyle;
+    let playStyleComment;
+
+    const backlogCount = wishlistCount + playingCount;
+
+    let backlogComment;
+
+    if(backlogCount === 0) {
+        backlogComment = "You're on top of things."
+    } else if(backlogCount <= 5) {
+        backlogComment = "You have a healthy backlog."
+    } else if(backlogCount <= 10) {
+        backlogComment = "You have a lot to get through."
+    } else {
+        backlogComment = "Might want to get through some of your backlog."
+    }
+
+    if (playedGamesTotal >= 4 && completion >= 70 && dropRate <= 10) {
+        playStyle = "Finisher";
+        playStyleComment = "You usually see games through to the end.";
+    } else if (playedGamesTotal >= 4 && reviewRate >= 50) {
+        playStyle = "Critic";
+        playStyleComment = "You like reflecting on the games you play.";
+    } else if (totalGames >= 5 && topGenreCount >= 3) {
+        playStyle = "Explorer";
+        playStyleComment = `You gravitate toward ${topGenre} games.`;
+    } else if (totalGames >= 5 && backlogCount > completedCount * 1.5) {
+        playStyle = "Backlog Builder";
+        playStyleComment = "You love collecting your next adventure.";
+    } else {
+        playStyle = "Steady Player";
+        playStyleComment = "You’ve got a balanced gaming style.";
+    }
+
+    const habitStats = {
+        playStyle,
+        playStyleComment,
+        dropRate,
+        droppedComment,
+        backlogCount,
+        backlogComment
     }
     res.render('pages/dashboard', {
         title: 'Dashboard',
@@ -339,7 +446,8 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         requestPath: req.originalUrl,
         friendRequests: friendRequests || [],
         items,
-        statsInfo
+        statsInfo,
+        habitStats
     })
 })
 app.get("/search", checkLogin, (req, res) => {
@@ -708,7 +816,6 @@ similarGenres = similarGenres.slice(0, 6);
         gameId: r.gameId,
         rating: r.rating,
         body: r.body,
-        rating: r.rating,
         reviewId: r._id,
         title: r.title,
         ownReview: String(r.userId._id) === String(req.session.user.id)

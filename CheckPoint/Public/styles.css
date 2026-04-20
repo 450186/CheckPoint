@@ -1307,6 +1307,9 @@ textarea {
     flex-shrink: 0;
     white-space: nowrap;
 }
+.stats-card {
+    overflow: hidden;
+}
 .stats-tabs {
     display: flex;
     gap: 10px;
@@ -1327,17 +1330,98 @@ textarea {
     display: none;
 }
 .tab-content.active {
-    display: block;
-}
-.rating-comment {
-    color: var(--secondText);
-}
-.avg-rating-div {
     display: flex;
-    flex-direction: row;
-    height: 19.5px;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+.dash-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    flex-shrink: 0;
+    align-items: stretch;
+}
+.stat-grid-item {
+    background-color: #122650;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+}
+.stat-grid-item .stat-label {
+    color: var(--secondText);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+}
+.stat-comment {
+    margin-top: auto;
+    color: var(--secondText);
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 10px;
+    border-radius: 16px;
+    background-color: #1c3263;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    width: 100%;
+    margin-top: auto;
+}
+.tab-content::-webkit-scrollbar {
+    width: 8px;
+}
+.tab-content::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+}
+.stats-card .community-status-legend {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 15px;
+    background-color: var(--background);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+.stats-card .fa-circle-dot {
+    margin-left: 20px
+}
+.stats-card .tab-content p,
+.stats-card .tab-content h3 {
+    margin: 0;
+}
+.stat-grid-item i:first-of-type {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    vertical-align: middle;
+}
+.stat-grid-item h4 {
+    font-size: 1.5rem;
+    margin: 0;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avg-rating-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avg-rating-star {
+    color: #FBBF24;
+    font-size: 1.5rem;
+    line-height: 1;
+    display: inline-block;
+    transform: translateY(8px);
 }
 /* ======== Filter Styles ======== */
 .filter-container {
@@ -1830,7 +1914,7 @@ progress::-moz-progress-bar {
     display: none;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: #000;
+    background: var(--background);
 }
 
 .ss-img-slide img,
@@ -2042,7 +2126,8 @@ progress::-moz-progress-bar {
     min-height: 0;
 }
 .review-card,
-.high-rated-card {
+.high-rated-card,
+.stats-card {
     max-height: 65vh;
 }
 /* ======== Friend modal ======== */

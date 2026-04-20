@@ -12,7 +12,7 @@
     </div>
     <p class="error-msg"><%= errorMessage %></p>
     <div class="card-rows">
-        <div class="dash-card">
+        <div class="dash-card stats-card">
             <h3>Your Stats</h3>
             <div class="stats-tabs">
                 <button class="tab active" data-tab="vault">Vault</button>
@@ -20,22 +20,83 @@
                 <button class="tab" data-tab="activity">Activity</button>
             </div>
             <div class="tab-content active" id="vault">
-                <p><strong>Total Games: </strong><%= statsInfo.totalGames %></p>
-                <p><strong>Completion Rate: </strong><%= statsInfo.Completion %>%</p>
-                <div class="avg-rating-div">
-                    <p><strong>Average Rating: </strong>
-                        <%= statsInfo.averageRating.toFixed(2) %> 
-                        <i class="fa-solid fa-star" style="color: #FBBF24;"></i>
-                    </p>
-                    <p class="rating-comment"><%= statsInfo.avgRatingComment %></p>
+                <div class="dash-stats-grid">
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-gamepad"></i>
+                        <h4><%= statsInfo.totalGames %></h4>
+                        <div class="card-spacer"></div>
+                        <p class="stat-label">Total Games</p>
+                    </div>
+
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <h4><%= statsInfo.completion %>%</h4>
+                        <div class="card-spacer"></div>
+                        <p class="stat-label">Completion Rate</p>
+                    </div>
+
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-ranking-star"></i>
+                        <h4>
+                            <span class="star-rating-header">
+                                <span><%= statsInfo.averageRating.toFixed(1) %> / 5</span>
+                                <i class="fa-solid fa-star avg-rating-star"></i>
+                            </span>
+                        </h4>
+                        <p class="stat-label">Average Rating</p>
+                        <p class="stat-comment"><%= statsInfo.avgRatingComment %></p>
+                    </div>
+
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-trophy"></i>
+                        <h4><%= statsInfo.topGenre %></h4>
+                        <p class="stat-label"><%= statsInfo.topGenreCount %> games</p>
+                        <p class="stat-comment"><%= statsInfo.genreComment %></p>
+                    </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-pen"></i>
+                        <h4><%= statsInfo.reviewCount %></h4>
+                        <div class="card-spacer"></div>
+                        <p class="stat-label">Number of Reviews</p>
+                    </div>
+
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-eye"></i>
+                        <h4><%= statsInfo.reviewRate %>%</h4>
+                        <p class="stat-label"><%= statsInfo.reviewCount %> / <%= statsInfo.playedGamesTotal %> reviewed</p>
+                        <div class="card-spacer"></div>
+                        <p class="stat-comment"><%= statsInfo.reviewComment %></p>
+                    </div>
                 </div>
-                <p><strong>🟡 Wishlisted Games: </strong><%= statsInfo.wishlistCount %></p>
-                <p><strong>🟢 Completed Games: </strong><%= statsInfo.completedCount %></p>
-                <p><strong>🔴 Dropped Games: </strong><%= statsInfo.droppedCount %></p>
-                <p><strong>🟠 Playing Games: </strong><%= statsInfo.playingCount %></p>
+                <h3>Vault Breakdown:</h3>
+                <div class="community-status-legend">
+                    <p><i class="fa-solid fa-circle-dot wishlist-dot"></i><strong>Wishlisted: </strong><%= statsInfo.wishlistCount %></p>
+                    <p><i class="fa-solid fa-circle-dot completed-dot"></i><strong>Completed: </strong><%= statsInfo.completedCount %></p>
+                    <p><i class="fa-solid fa-circle-dot dropped-dot"></i><strong>Dropped: </strong><%= statsInfo.droppedCount %></p>
+                    <p><i class="fa-solid fa-circle-dot playing-dot"></i><strong>Playing: </strong><%= statsInfo.playingCount %></p>
+                </div>
             </div>
             <div class="tab-content" id="habits">
-                <p class="no-items">No stats yet</p>
+                <div class="dash-stats-grid">
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-heart-circle-xmark" style="color: red;"></i>
+                        <h4><%= habitStats.dropRate %>%</h4>
+                        <p class="stat-label">Drop Rate</p>
+                        <p class="stat-comment"><%= habitStats.droppedComment %></p>
+                    </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-brain"></i>
+                        <h4><%= habitStats.playStyle %></h4>
+                        <p class="stat-label">How you Play</p>
+                        <p class="stat-comment"><%= habitStats.playStyleComment %></p>
+                    </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-list-check"></i>
+                        <h4><%= habitStats.backlogCount %> games</h4>
+                        <p class="stat-label">Your Backlog</p>
+                        <p class="stat-comment"><%= habitStats.backlogComment %></p>
+                    </div>
+                </div>
             </div>
             <div class="tab-content" id="activity">
                 <p class="no-items">No stats yet</p>
