@@ -1423,6 +1423,12 @@ textarea {
     display: inline-block;
     transform: translateY(8px);
 }
+.icon-blue { color: #3B82F6; }
+.icon-green { color: #22C55E; }
+.icon-orange { color: #F59E0B; }
+.icon-yellow { color: #FBBF24; }
+.icon-red { color: #EF4444; }
+.icon-purple { color: #8B5CF6; }
 /* ======== Filter Styles ======== */
 .filter-container {
     display: flex;

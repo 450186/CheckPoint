@@ -22,50 +22,49 @@
             <div class="tab-content active" id="vault">
                 <div class="dash-stats-grid">
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-gamepad"></i>
+                        <i class="fa-solid fa-gamepad icon-purple"></i>
                         <h4><%= statsInfo.totalGames %></h4>
                         <div class="card-spacer"></div>
                         <p class="stat-label">Total Games</p>
                     </div>
 
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-chart-pie"></i>
+                        <i class="fa-solid fa-chart-pie icon-green"></i>
                         <h4><%= statsInfo.completion %>%</h4>
                         <div class="card-spacer"></div>
                         <p class="stat-label">Completion Rate</p>
                     </div>
 
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-ranking-star"></i>
+                        <i class="fa-solid fa-ranking-star icon-yellow"></i>
                         <h4>
                             <span class="star-rating-header">
                                 <span><%= statsInfo.averageRating.toFixed(1) %> / 5</span>
-                                <i class="fa-solid fa-star avg-rating-star"></i>
+                                <i class="fa-solid fa-star avg-rating-star icon-yellow"></i>
                             </span>
                         </h4>
                         <p class="stat-label">Average Rating</p>
                         <p class="stat-comment"><%= statsInfo.avgRatingComment %></p>
                     </div>
-
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-trophy"></i>
+                        <i class="fa-solid fa-trophy icon-yellow"></i>
                         <h4><%= statsInfo.topGenre %></h4>
                         <p class="stat-label"><%= statsInfo.topGenreCount %> games</p>
                         <p class="stat-comment"><%= statsInfo.genreComment %></p>
                     </div>
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-pen"></i>
+                        <i class="fa-solid fa-pen icon-blue"></i>
                         <h4><%= statsInfo.reviewCount %></h4>
-                        <div class="card-spacer"></div>
                         <p class="stat-label">Number of Reviews</p>
-                    </div>
-
-                    <div class="stat-grid-item">
-                        <i class="fa-solid fa-eye"></i>
-                        <h4><%= statsInfo.reviewRate %>%</h4>
-                        <p class="stat-label"><%= statsInfo.reviewCount %> / <%= statsInfo.playedGamesTotal %> reviewed</p>
                         <div class="card-spacer"></div>
-                        <p class="stat-comment"><%= statsInfo.reviewComment %></p>
+                        <p class="stat-comment"><%= statsInfo.reviewCountComment %></p>
+                    </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-diagram-project icon-purple"></i>
+                        <h4><%= statsInfo.genreDiversity %></h4>
+                        <p class="stat-label">Genre Diversity!</p>
+                        <div class="card-spacer"></div>
+                        <p class="stat-comment"><%= statsInfo.diversityComment %></p>
                     </div>
                 </div>
                 <h3>Vault Breakdown:</h3>
@@ -79,27 +78,63 @@
             <div class="tab-content" id="habits">
                 <div class="dash-stats-grid">
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-heart-circle-xmark" style="color: red;"></i>
+                        <i class="fa-solid fa-heart-circle-xmark icon-red"></i>
                         <h4><%= habitStats.dropRate %>%</h4>
                         <p class="stat-label">Drop Rate</p>
                         <p class="stat-comment"><%= habitStats.droppedComment %></p>
                     </div>
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-brain"></i>
+                        <i class="fa-solid fa-brain icon-purple"></i>
                         <h4><%= habitStats.playStyle %></h4>
                         <p class="stat-label">How you Play</p>
                         <p class="stat-comment"><%= habitStats.playStyleComment %></p>
                     </div>
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-list-check"></i>
+                        <i class="fa-solid fa-layer-group icon-orange"></i>
                         <h4><%= habitStats.backlogCount %> games</h4>
                         <p class="stat-label">Your Backlog</p>
                         <p class="stat-comment"><%= habitStats.backlogComment %></p>
                     </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-pen-nib icon-blue"></i>
+                        <h4><%= habitStats.reviewRate %>%</h4>
+                        <p class="stat-label"><%= habitStats.reviewCount %> / <%= habitStats.playedGamesTotal %> reviewed</p>
+                        <div class="card-spacer"></div>
+                        <p class="stat-comment"><%= habitStats.reviewComment %></p>
+                    </div>
                 </div>
             </div>
             <div class="tab-content" id="activity">
-                <p class="no-items">No stats yet</p>
+                <div class="dash-stats-grid">
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-pen-nib icon-blue"></i>
+                        <h4><%= activityStats.recentReviews %></h4>
+                        <p class="stat-label">Reviews this month</p>
+                        <div class="card-spacer"></div>
+                        <p class="stat-comment"><%= activityStats.recentReviewsComment %></p>
+                    </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-square-plus icon-green"></i>
+                        <h4><%= activityStats.recentAdds %></h4>
+                        <p class="stat-label">Adds this month</p>
+                        <div class="card-spacer"></div>
+                        <p class="stat-comment"><%= activityStats.recentAddsComment %></p>
+                    </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-arrows-rotate icon-orange"></i>
+                        <h4><%= activityStats.recentUpdates %></h4>
+                        <p class="stat-label">Updates this month</p>
+                        <div class="card-spacer"></div>
+                        <p class="stat-comment"><%= activityStats.recentUpdatesComment %></p>
+                    </div>
+                    <div class="stat-grid-item">
+                        <i class="fa-solid fa-star icon-yellow"></i>
+                        <h4><%= activityStats.recentRatings %></h4>
+                        <p class="stat-label">Ratings this month</p>
+                        <div class="card-spacer"></div>
+                        <p class="stat-comment"><%= activityStats.recentRatingsComment %></p>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="dash-card review-card">

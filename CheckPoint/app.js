@@ -64,6 +64,7 @@ const path = require('path');
 const { log, error } = require('console');
 const { platform } = require('os');
 const { get } = require('http');
+const { doesNotThrow } = require('assert');
 app.use(express.static(path.join(__dirname, 'Public')));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -362,6 +363,30 @@ app.get("/dashboard", checkLogin, async (req, res) => {
     genreComments[topGenre?.trim()] ||
     "Eclectic Gamer 🎮"
 
+    const genreDiversity = Object.keys(genreCounts).length
+
+    let diversityComment;
+
+    if(genreDiversity === 0) {
+        diversityComment = 'You have not played any games yet.'
+    } else if(genreDiversity <= 5) {
+        diversityComment = 'You know what you like!'
+    } else if(genreDiversity <= 10) {
+        diversityComment = 'A Well balanced collection!'
+    } else {
+        diversityComment = 'You have a broad taste!'
+    }
+    let reviewCountComment;
+
+    if(reviewCount === 0) {
+        reviewCountComment = 'You have not reviewed any games yet.'
+    } else if(reviewCount <= 5) {
+        reviewCountComment = 'Get reviewing!'
+    } else if(reviewCount <= 10) {
+        reviewCountComment = 'You are a true critic!'
+    } else {
+        reviewCountComment = 'Certified Critic! 🎉'
+    }
     const statsInfo = {
         totalGames,
         completion,
@@ -372,12 +397,13 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         droppedCount,
         playingCount,
         reviewCount,
-        reviewRate,
-        reviewComment,
+        reviewCountComment,
         playedGamesTotal,
         topGenre,
         topGenreCount,
-        genreComment
+        genreComment,
+        genreDiversity,
+        diversityComment,
     }
     let droppedComment;
     const dropRate = playedGamesTotal > 0 ?
@@ -386,7 +412,7 @@ app.get("/dashboard", checkLogin, async (req, res) => {
     if (dropRate === 0) {
         droppedComment = 'You really know what clicks for you.';
     } else if (dropRate < 25) {
-        droppedComment = 'You usually stick with the games you start.';
+        droppedComment = 'You tend to stick with games';
     } else if (dropRate < 50) {
         droppedComment = 'You’re pretty selective about what keeps your attention.';
     } else if (dropRate < 75) {
@@ -434,7 +460,80 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         dropRate,
         droppedComment,
         backlogCount,
-        backlogComment
+        backlogComment,
+        reviewCount,
+        reviewRate,
+        playedGamesTotal,
+        reviewComment,
+    }
+
+    const now = new Date();
+    const oneMonthAgo = new Date(now.getDate() - 30);
+
+    const recentReviews = YourReviews.filter( review =>
+        review.createdAt && new Date(review.createdAt) > oneMonthAgo
+    ).length
+    let recentReviewsComment;
+
+    if(recentReviews === 0) {
+        recentReviewsComment = 'You have not reviewed any games in the last month.'
+    } else if(recentReviews <= 5) {
+        recentReviewsComment = 'You are a true critic!'
+    } else {
+        recentReviewsComment = 'Certified Critic! 🎉'
+    }
+    const recentAdds = items.filter( item => 
+        item.createdAt && new Date(item.createdAt) > oneMonthAgo
+    ).length
+    let recentAddsComment;
+
+    if(recentAdds === 0) {
+        recentAddsComment = 'You have not added any games in the last month.'
+    } else if(recentAdds <= 5) {
+        recentAddsComment = 'You are a true collector!'
+    } else {
+        recentAddsComment = 'Certified Collector! 🎉'
+    }
+
+    const recentUpdates = items.filter( item => 
+        item.updatedAt && 
+        item.createdAt &&
+        new Date(item.updatedAt) > oneMonthAgo &&
+        new Date(item.updatedAt).getTime() !== new Date(item.createdAt).getTime()
+    ).length
+    let recentUpdatesComment;
+
+    if(recentUpdates === 0) {
+        recentUpdatesComment = 'You have not updated any games in the last month.'
+    } else if(recentUpdates <= 5) {
+        recentUpdatesComment = "Keep the updates coming!"
+    } else {
+        recentUpdatesComment = "You've updated a lot of games!"
+    }
+    const recentRatings = items.filter( item =>
+        item.userRating !== null &&
+        item.userRating !== undefined &&
+        item.updatedAt &&
+        new Date(item.updatedAt) > oneMonthAgo
+    ).length
+    let recentRatingsComment;
+
+    if(recentRatings === 0) {
+        recentRatingsComment = 'You have not rated any games in the last month.'
+    } else if(recentRatings <= 5) {
+        recentRatingsComment = 'Keep the ratings Coming!'
+    } else {
+        recentRatingsComment = "You've rated a lot of games!"
+    }
+    const activityStats = {
+        recentReviews,
+        recentAdds,
+        recentUpdates,
+        recentRatings,
+        recentReviewsComment,
+        recentAddsComment,
+        recentUpdatesComment,
+        recentRatingsComment
     }
     res.render('pages/dashboard', {
         title: 'Dashboard',
@@ -447,7 +546,8 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         friendRequests: friendRequests || [],
         items,
         statsInfo,
-        habitStats
+        habitStats,
+        activityStats
     })
 })
 app.get("/search", checkLogin, (req, res) => {
