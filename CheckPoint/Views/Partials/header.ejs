@@ -147,6 +147,7 @@
       noti.addEventListener('click', () => {
           const userId = noti.dataset.username;
           const from = encodeURIComponent(window.location.pathname + window.location.search);
+          showPageLoader("Loading Profile...")
           window.location.href = `/users/${userId}?from=${from}`;
       })
     })

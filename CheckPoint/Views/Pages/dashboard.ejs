@@ -84,7 +84,7 @@
                         <p class="stat-comment"><%= habitStats.droppedComment %></p>
                     </div>
                     <div class="stat-grid-item">
-                        <i class="fa-solid fa-brain icon-purple"></i>
+                        <i class="fa-solid fa-brain icon-playstyle"></i>
                         <h4><%= habitStats.playStyle %></h4>
                         <p class="stat-label">How you Play</p>
                         <p class="stat-comment"><%= habitStats.playStyleComment %></p>
@@ -155,7 +155,7 @@
                                         <p style="font-weight: bold; font-size: 1.2rem" class="review-game"><%= review.cachedName %></p>
                                         <p style="font-weight: bold;" class="review-title"><%= review.title %></p>
                                     </div>
-                                    <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_thumb') %>" alt="<%= review.cachedName %>">
+                                    <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= review.cachedName %>">
                                 </div>
                                 <p class="review-body"><%= review.body %></p>
                             </div> 
@@ -183,13 +183,13 @@
             <h3>Highest Rated</h3>
             <p>Your highest rated games: </p>
                 <% if (highestRated.length === 0) { %>
-                    <p class="no-items">Rate games you've played via the library</p>
+                    <p class="no-items">Rate games you've played via the vault</p>
                 <% } %>
                 <div class="rating-list">
                     <% highestRated.forEach(HR => { %>
                         <div class="ranking-card" data-game-id="<%= HR.gameId %>">
                             <div class="ranking-card-header">
-                                <img class="ranking-card-img" src="<%= HR.cachedCoverUrl.replace('t_cover_big', 't_thumb') %>" alt="<%= HR.cachedName %>">
+                                <img class="ranking-card-img" src="<%= HR.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= HR.cachedName %>">
                                 <p class="ranking-card-title"><%= HR.cachedName %></p>
                             </div>
                             <div class="activity-star-rating">
@@ -246,25 +246,66 @@
         </div>
     </div>
     <div class="card-rows">
-        <div class="dash-card">
-            <h3>Recently Played</h3>
-            <p>View your recently played games and jump back in with one click.
-            </p>
-            <p class="recent"> <i class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> </p>
+        <div class="dash-card next-game-card">
+            <h3>What's next?</h3>
+            <p>Don't know what to play next? Try this:</p>
+            <% if (nextPlay === 0) { %>
+                <p class="no-items">There's nothing in your wishlist and you're not currently playing anything.</p>
+                <button
+                onclick="window.location.href='/discover'"
+                class="view-library">Discover Games</button>
+            <% } %>
+            <% if (nextPlay > 0) { %>
+                <div class="next-game">
+                    <div class="next-game-header">
+                        <img class="next-game-cover" src="<%= nextPlay.cover.url %>" alt="<%= nextPlay.name %>">
+                        <p class="next-game-title"><%= nextPlay.name %></p>
+                    </div>
+                </div>
+            <% } %>
             <div class="card-spacer"></div>
         </div>
-        <div class="dash-card">
-            <h3>Recommended for You</h3>
-            <p>Based on your gaming history, we think you'll love these titles.
-            </p>
-            <p class="recommended"> <i class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> </p>
-            <div class="card-spacer"></div>
-        </div>
-        <div class="dash-card">
+        <div class="dash-card recommended-card">
+           <h3>Recommended For You</h3>
+           <p style="margin-bottom: 0;">Based on your vault, we think you'd love these games.</p>
+            <% if (recommendedGames.length === 0) { %>
+                <p class="no-items">No games recommended for you.</p>
+            <% } %>
+            <div class="recommended-list">
+                <% recommendedGames.forEach(game => { %>
+                 <div class="recommended-content-card clickable"
+                 data-game-id="<%= game.gameId %>"
+                 data-name="<%= game.cachedName %>"
+                 data-cover="<%= game.cachedCoverUrl %>"
+                 data-genres="<%= game.cachedGenres || '' %>"
+                 data-rating="<%= game.cachedRating || '' %>"
+                 data-release="<%= game.cachedRelease || '' %>"
+                 >
+                    <div class="recommended-card-content">
+                        <div class="recommended-card-header">
+                            <img class="recommended-card-img" src="<%= game.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= game.cachedName %>">
+                            <div class="recommended-card-info">
+                                <p class="recommended-card-title"><%= game.cachedName %></p>
+                                <p class="agg-rating"><%= game.cachedRating ? Math.round(game.cachedRating) + ' / 100 Rating' : 'N/A' %></p>
+                                <p class="rec-genres"><%= game.cachedGenres %></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recommended-byline">
+                        <p class="release-line"> Release Date:
+                        <%= game.cachedRelease %>
+                        </p>
+                    </div>
+                 </div>
+                <% }) %>
+            </div>
+            <form action="/refresh-recommendations" class="refresh-form" method="POST">
+                <button type="submit" class="refresh-rec-btn" title="Refresh Recommendations">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                </button>
+            </form>
+           </div>
+            <div class="dash-card new-releases-card">
             <h3>New Releases</h3>
             <p>Check out the latest games added to our library.</p>
             <p class="releases"> <i class="fa-solid fa-gamepad"></i> <i
@@ -272,6 +313,9 @@
                     class="fa-solid fa-gamepad"></i> </p>
             <div class="card-spacer"></div>
         </div>
+            <div class="card-spacer"></div>
+        </div>
+
     </div>
 </div>
 
@@ -315,6 +359,18 @@
     ratedGame.forEach(card => {
         card.addEventListener('click', () => {
             const gameId = card.getAttribute('data-game-id');
+            showPageLoader('Loading game...');
+            window.location.href = `/game/${gameId}?from=${encodeURIComponent('/dashboard')}`;
+        });
+    });
+</script>
+<script>
+    const recommendation = document.querySelectorAll('.recommended-content-card');
+
+    recommendation.forEach(card => {
+        card.addEventListener('click', () => {
+            const gameId = card.getAttribute('data-game-id');
+            showPageLoader('Loading game...');
             window.location.href = `/game/${gameId}?from=${encodeURIComponent('/dashboard')}`;
         });
     });

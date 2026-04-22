@@ -948,14 +948,10 @@ textarea {
     width: 100%;
     align-items: end;
 }
-
-/* Library modal form can stay simple */
 .modal-actions .status-form {
     width: 100%;
     margin: 0;
 }
-
-/* Status dropdown on discover modal spans both columns */
 .modal-actions .library-form #modal-add-status-select {
     grid-column: 1 / -1;
     width: 100%;
@@ -967,16 +963,12 @@ textarea {
     cursor: pointer;
     margin: 0;
 }
-
-/* Add button left column */
 .modal-actions .library-form .add-btn,
 .modal-actions .status-form {
     grid-column: 1;
     width: 100%;
     margin: 0;
 }
-
-/* Go to game right column */
 #modal-go-to-game {
     grid-column: 2;
     width: 100%;
@@ -1429,6 +1421,84 @@ textarea {
 .icon-yellow { color: #FBBF24; }
 .icon-red { color: #EF4444; }
 .icon-purple { color: #8B5CF6; }
+.icon-playstyle { color: #7C3AED; }
+
+.recommended-card,
+.next-game-card,
+.new-releases-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 75vh;
+}
+.recommended-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px
+}
+.recommeded-card-content {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    justify-content: space-between;
+}
+.recommended-byline {
+    display: flex;
+    justify-content: center;
+    color: var(--secondText);
+}
+.recommended-card-img {
+    width: 150px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin-top: 20px;
+}
+.recommended-card-header {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 20px;
+    margin-bottom: 0;
+}
+.recommended-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.recommended-content-card {
+    border-radius: 16px;
+    background-color: #122650;
+    border: 1px solid var(--borer);
+    box-shadow: var(--shadow);
+}
+.recommended-content-card:last-of-type {
+    margin-bottom: 20px;
+}
+.recommended-content-card:hover {
+    background-color: var(--accent);
+    transform: translateY(-4px)
+}
+.refresh-form {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.recommended-card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.agg-rating,
+.rec-genres {
+    font-size: 0.9rem;
+    margin-top: 0;
+}
+
 /* ======== Filter Styles ======== */
 .filter-container {
     display: flex;
@@ -1617,7 +1687,7 @@ textarea {
     grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
     justify-content: center;
 }
-.library-card {
+.library-card, .next-game {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: 14px;
@@ -1634,7 +1704,7 @@ textarea {
     text-align: center;
 }
 
-.library-card .game-cover {
+.library-card .game-cover, .next-game .next-game-cover {
     width: 100%;
     border-radius: 10px;
 }

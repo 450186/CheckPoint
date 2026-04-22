@@ -12,6 +12,18 @@ const userSchema = new Schema({
     friendsList: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     friendRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     sentFriendRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    recommendedGames: [
+      {
+        gameId: { type: Number, required: true },
+        cachedName: { type: String, required: true },
+        cachedCoverUrl: { type: String, required: true },
+        cachedGenres: { type: String, required: true },
+        cachedRating: { type: Number, required: true },
+        cachedRelease: { type: String, required: true },
+      }
+    ],
+    recommendationsUpdatedAt: { type: Date },
+    recommendationsDirty: { type: Boolean, default: true },
 });
 
 const userData = model('User', userSchema);

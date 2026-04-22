@@ -179,6 +179,100 @@ async function getFriendRequests(userId) {
     const friendRequests = user?.friendRequests || [];
     return friendRequests
 }
+async function buildRecommendations({ items, highestRated, topGenre, excluded = [] }) {
+    const ownedGames = new Set(items.map(item => item.gameId));
+    const excludedIds = new Set(excluded);
+    const faveGenres = new Set();
+
+    highestRated.forEach(game => {
+        const genres = (game.cachedGenres || "")
+            .split(",")
+            .map(genre => genre.trim())
+            .filter(Boolean);
+
+        genres.forEach(genre => faveGenres.add(genre));
+    });
+
+    if (!faveGenres.size && topGenre && topGenre !== "None Yet") {
+        faveGenres.add(topGenre);
+    }
+
+    if (!faveGenres.size) return [];
+
+    const genreNames = Array.from(faveGenres).slice(0, 3);
+
+    const genreResults = await Promise.all(
+        genreNames.map(name =>
+            IGDBrequest("genres", `
+                fields id, name;
+                where name = "${name.replace(/'/g, "\\'")}";
+                limit 1;
+            `)
+        )
+    );
+
+    const genreIds = genreResults
+        .flat()
+        .filter(Boolean)
+        .map(genre => genre.id)
+        .filter(Boolean);
+
+    if (!genreIds.length) return [];
+
+    const recs = await IGDBrequest("games", `
+        fields id, name, cover.url, first_release_date, aggregated_rating, genres.name, genres.id;
+        where genres = (${genreIds.join(",")})
+          & cover != null
+          & aggregated_rating != null
+          & version_parent = null
+          & parent_game = null
+          & aggregated_rating > 80;
+        sort aggregated_rating desc;
+        limit 50;
+    `);
+
+    const mapped = recs
+        .filter(game => !ownedGames.has(game.id))
+        .map(game => ({
+            gameId: game.id,
+            cachedName: game.name,
+            cachedCoverUrl: game.cover?.url
+                ? `https:${game.cover.url.replace('t_thumb', 't_cover_big')}`
+                : "",
+            cachedGenres: game.genres?.map(g => g.name).join(", ") || "",
+            cachedRating: game.aggregated_rating ? Math.round(game.aggregated_rating) : null,
+            cachedRelease: game.first_release_date
+                ? new Date(game.first_release_date * 1000).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                })
+                : ""
+        }));
+    
+    const freshRecs = mapped.filter(game => !excludedIds.has(game.gameId));
+    const shuffleFresh = freshRecs.sort(() => Math.random() - 0.5);
+    let picked = shuffleFresh.slice(0, 5);
+
+    if(picked.length < 5) {
+        const fallback = mapped.filter(
+            game => !picked.some(p => p.gameId === game.gameId)
+        )
+        const shuffledFallback = fallback.sort(() => Math.random() - 0.5);
+        picked = [...picked, ...shuffledFallback.slice(0, 5 - picked.length)];
+    }
+    return picked
+}
+function staleRecs(document) {
+    if(!document) return true;
+    if(document.recommendationsDirty) return true;
+    if(!document.recommendationsUpdatedAt) return true;
+
+    const age = Date.now() - new Date(document.recommendationsUpdatedAt).getTime();
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    return age > oneDay
+}
 app.get('/', (req, res) => {
     res.render('pages/home', {
         title: 'Home',
@@ -262,6 +356,7 @@ app.post("/register", async (req, res) => {
     }
 });
 app.get("/dashboard", checkLogin, async (req, res) => {
+    const currentUser = await userModel.userData.findById(req.session.user.id).lean();
     const highestRated = await libraryModel.find({ 
         userId: req.session.user.id, 
         userRating: { $ne: null }
@@ -467,8 +562,8 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         reviewComment,
     }
 
-    const now = new Date();
-    const oneMonthAgo = new Date(now.getDate() - 30);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
     const recentReviews = YourReviews.filter( review =>
         review.createdAt && new Date(review.createdAt) > oneMonthAgo
@@ -535,6 +630,39 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         recentUpdatesComment,
         recentRatingsComment
     }
+    let recommendedGames = currentUser?.recommendedGames || [];
+
+    const missingRecommendationCache = !recommendedGames.length;
+    const brokenRecommendationCache =
+        recommendedGames.length > 0 &&
+        recommendedGames.some(game => !game.cachedName || !game.cachedCoverUrl);
+
+    if (staleRecs(currentUser) || missingRecommendationCache || brokenRecommendationCache) {
+        recommendedGames = await buildRecommendations({
+            items,
+            highestRated,
+            topGenre,
+            excluded: currentUser?.recommendedGames?.map(g => g.gameId) || []
+        });
+
+        await userModel.userData.updateOne(
+            { _id: req.session.user.id },
+            {
+                $set: {
+                    recommendedGames,
+                    recommendationsUpdatedAt: new Date(),
+                    recommendationsDirty: false
+                }
+            }
+        );
+    }
+    const backlog = items.filter(i => 
+        i.status === 'wishlist' || i.status === 'playing'
+    )
+    let nextPlay = null;
+    if(backlog.length > 0) {
+        nextPlay = backlog[Math.floor(Math.random() * backlog.length)];
+    }
     res.render('pages/dashboard', {
         title: 'Dashboard',
         user: req.session.user,
@@ -547,8 +675,65 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         items,
         statsInfo,
         habitStats,
-        activityStats
+        activityStats,
+        recommendedGames,
+        nextPlay
     })
+})
+app.post('/refresh-recommendations', checkLogin, async (req, res) => {
+    try {
+        const currentUser = await userModel.userData.findOne({ _id: req.session.user.id });
+
+        const highestRated = await libraryModel.find({
+            userId: req.session.user.id,
+            userRating: { $ne: null },
+        })
+        .sort({ userRating: -1 })
+        .limit(5)
+        .lean();
+
+        const items = await libraryModel.find({ userId: req.session.user.id })
+        .lean();
+
+        const genreCounts = {}
+        items.forEach(game => {
+            const genres = (game.cachedGenres || [])
+            .split(',')
+            .map(g => g.trim())
+            .filter(Boolean);
+
+            genres.forEach(genre => {
+                genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+            })  
+        })
+
+        const sortedGenres = Object.entries(genreCounts)
+        .sort((a, b) => b[1] - a[1] )
+        const topGenre = sortedGenres.length ? sortedGenres[0][0] : "None Yet";
+
+        const recommendedGames = await buildRecommendations({
+            items,
+            highestRated,
+            topGenre,
+            excluded: currentUser?.recommendedGames?.map(g => g.gameId) || []
+        });
+
+        await userModel.userData.updateOne(
+            { _id: req.session.user.id },
+            {
+                $set: {
+                    recommendedGames,
+                    recommendationsUpdatedAt: new Date(),
+                    recommendationsDirty: false
+                }
+            }
+        );
+        res.redirect("/dashboard");
+    } catch (e) {
+        console.error(e);
+        req.session.errorMessage = "An error occurred while refreshing recommendations.";
+        res.redirect("/dashboard");
+    }
 })
 app.get("/search", checkLogin, (req, res) => {
     const q = (req.query.query || "").trim();
@@ -1118,6 +1303,10 @@ app.post('/library/add', checkLogin, async (req, res) => {
         cachedRating: rating ? Number(rating) : null,
         cachedRelease: release || ""
         });
+        await userModel.userData.updateOne(
+            { _id: req.session.user.id },
+            { $set: { recommendationsDirty: true } }
+        );
         res.redirect('/library');
     } catch (error) {
         console.error(error);
@@ -1137,6 +1326,10 @@ app.post("/library/status", checkLogin, async (req, res) => {
     await libraryModel.updateOne(
         { userId: req.session.user.id, gameId: Number(gameId) },
         { $set: update }
+    );
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $set: { recommendationsDirty: true } }
     );
 
     res.redirect("/library");
@@ -1159,6 +1352,10 @@ app.post("/library/rate", checkLogin, async (req, res) => {
             $currentDate: { updatedAt: true }
         }
     );
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $set: { recommendationsDirty: true } }
+    );
 
     res.sendStatus(204);
 })
@@ -1170,7 +1367,10 @@ app.post("/library/remove", checkLogin, async (req, res) => {
         userId: req.session.user.id,
         gameId: Number(gameId),
     });
-
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $set: { recommendationsDirty: true } }
+    );
     res.redirect("/library");
 });
 app.post("/reviews/create", checkLogin, async (req, res) => {
