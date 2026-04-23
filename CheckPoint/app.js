@@ -657,7 +657,7 @@ app.get("/dashboard", checkLogin, async (req, res) => {
         );
     }
     const backlog = items.filter(i => 
-        i.status === 'wishlist' || i.status === 'playing'
+        i.status === 'wishlist'
     )
     let nextPlay = null;
     if(backlog.length > 0) {

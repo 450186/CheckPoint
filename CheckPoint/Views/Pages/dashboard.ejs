@@ -242,31 +242,36 @@
             <% } %>
             <div class="card-spacer"></div> <button
                 onclick="window.location.href='/library'"
-                class="view-library">View Library</button>
+                class="view-library">View Your Vault</button>
         </div>
     </div>
     <div class="card-rows">
         <div class="dash-card next-game-card">
-            <h3>What's next?</h3>
-            <p>Don't know what to play next? Try this:</p>
-            <% if (nextPlay === 0) { %>
+            <h3>What to Play?</h3>
+            <p>Don't know what to play? Try this:</p>
+            <% if (!nextPlay) { %>
                 <p class="no-items">There's nothing in your wishlist and you're not currently playing anything.</p>
                 <button
-                onclick="window.location.href='/discover'"
+                onclick="showPageLoader('Loading the discovery page...'); window.location.href='/discover'"
                 class="view-library">Discover Games</button>
-            <% } %>
-            <% if (nextPlay > 0) { %>
-                <div class="next-game">
+            <% } else { %>
+                <div class="next-game clickable" data-game-id="<%= nextPlay.gameId %>">
                     <div class="next-game-header">
-                        <img class="next-game-cover" src="<%= nextPlay.cover.url %>" alt="<%= nextPlay.name %>">
-                        <p class="next-game-title"><%= nextPlay.name %></p>
+                        <img class="next-game-cover" src="<%= nextPlay.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= nextPlay.cachedName %>">
+                        <p class="next-game-title"><%= nextPlay.cachedName %></p>
                     </div>
                 </div>
             <% } %>
-            <div class="card-spacer"></div>
         </div>
         <div class="dash-card recommended-card">
-           <h3>Recommended For You</h3>
+            <div class="dash-card-header">
+                <h3>Recommended For You</h3>
+                <form action="/refresh-recommendations" class="refresh-form" method="POST">
+                    <button type="submit" class="refresh-rec-btn" title="Refresh Recommendations">
+                        <i class="fa-solid fa-rotate-right"></i> Refresh
+                    </button>
+                </form>
+            </div>
            <p style="margin-bottom: 0;">Based on your vault, we think you'd love these games.</p>
             <% if (recommendedGames.length === 0) { %>
                 <p class="no-items">No games recommended for you.</p>
@@ -299,11 +304,6 @@
                  </div>
                 <% }) %>
             </div>
-            <form action="/refresh-recommendations" class="refresh-form" method="POST">
-                <button type="submit" class="refresh-rec-btn" title="Refresh Recommendations">
-                    <i class="fa-solid fa-rotate-right"></i> Refresh
-                </button>
-            </form>
            </div>
             <div class="dash-card new-releases-card">
             <h3>New Releases</h3>
@@ -386,6 +386,17 @@
 
             tab.classList.add('active');
             document.getElementById(tab.dataset.tab).classList.add('active');
+        })
+    })
+</script>
+<script>
+    const nextGame = document.querySelectorAll('.next-game');
+
+    nextGame.forEach(card => {
+        card.addEventListener('click', () => {
+            const gameId = card.getAttribute('data-game-id');
+            showPageLoader('Loading game...');
+            window.location.href = `/game/${gameId}?from=${encodeURIComponent('/dashboard')}`;
         })
     })
 </script>
