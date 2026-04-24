@@ -5,10 +5,9 @@
 <div class="main-content">
     <h2 class="title"><%= title %></h2>
     <p>Discover new games and expand your library with our curated selection of titles.</p>
-    <% if (errorMessage) { %>
-        <p class="error-message"><%= errorMessage %></p> 
+    <% if (searchNotice) { %>
+        <p class="error-message"><%= searchNotice %></p> 
     <% } %>
-    
     <div class="filter-container" id="filters">
         <div class="filter-item">
             <button data-filter="genres">Genres</button>
@@ -44,6 +43,50 @@
     <div class="filter-select-div" hidden id="filter-dropdown"></div>
 
     <div class="card-rows">
+      <% if (suggestedQueries && suggestedQueries.length > 0) { %>
+        <% suggestedQueries.forEach(suggestion => { %>
+          <div class="dash-card game-card clickable"
+          data-game-id="<%= suggestion.id %>"
+          data-name="<%= suggestion.name %>"
+          data-cover="<%= suggestion.coverUrl %>"
+          data-genres="<%= suggestion.genres ? suggestion.genres : 'Unknown' %>"
+          data-rating="<%= suggestion.rating %>"
+          data-release="<%= suggestion.release %>"
+          >
+            <div class="game-card-header">
+                <img 
+                src="<%= suggestion.coverUrl %>"
+                alt="<%= suggestion.name %>"
+                class="game-cover"
+                >
+                <h3><%= suggestion.name %></h3>
+            </div>
+            <p><strong>Genre<%= suggestion.genres && suggestion.genres.includes(",") ? "s" : "" %> :</strong> <%= suggestion.genres ? suggestion.genres : "Unknown" %></p>
+            <p><strong>Release Date:</strong> <%= suggestion.release || "Unknown" %></p>
+            <p class="mutedText"><strong>Rating:</strong> <%= suggestion.rating || "N/A" %></p>
+            <div class="card-spacer"></div>
+            <form action="/library/add" class="library-form" method="POST" onclick="event.stopPropagation()">
+            <input type="hidden" name="gameId" value="<%= suggestion.id %>" />
+            <input type="hidden" name="name" value="<%= suggestion.name %>" />
+            <input type="hidden" name="gameCoverUrl" value="<%= suggestion.coverUrl %>" />
+            <input type="hidden" name="genres" value="<%= suggestion.genres ? suggestion.genres : 'Unknown' %>" />
+            <input type="hidden" name="rating" value="<%= suggestion.rating %>" />
+            <input type="hidden" name="release" value="<%= suggestion.release %>" />
+            <% if (ownedGames.has(suggestion.id)) { %>
+              <button class="add-btn disabled" type="submit" disabled>Added</button>
+            <% } else { %>
+              <select name="status" class="status-select-card">
+                <option value="wishlist">Wishlist</option>
+                <option value="playing">Playing</option>
+                <option value="completed">Completed</option>
+                <option value="dropped">Dropped</option>
+              </select>
+              <button class="add-btn card-add-btn" type="submit">+ Add to Wishlist</button>
+            <% } %>
+            </form>
+          </div>
+        <% }) %>
+      <% } %>
         <% games.forEach(game => { %>
             <div
                 class="dash-card game-card clickable"
@@ -62,7 +105,7 @@
                 >
                 <h3><%= game.name %></h3>
             </div>
-            <p><strong>Genre:</strong> <%= game.genres ? game.genres.map(g => g.name).join(', ') : 'Unknown' %></p>
+            <p><strong>Genre<%=game.genres && game.genres.length > 1 ? 's' : '' %> :</strong> <%= game.genres ? game.genres.map(g => g.name).join(', ') : 'Unknown' %></p>
             <% const releaseDate = game.first_release_date
             ? new Date(game.first_release_date * 1000).toLocaleDateString("en-GB", {
                 day: "2-digit",

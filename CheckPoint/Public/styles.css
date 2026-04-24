@@ -53,7 +53,19 @@ header {
     left: 0;
     right: 0;
 }
-
+.logo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+.logo {
+    width: 64px;
+    height: 64px;
+}
+.logo-container a {
+    margin: 0;
+}
 .centered {
     display: flex;
     text-align: center;
@@ -193,7 +205,10 @@ hr {
     margin-top: 20px;
     color: red;
 }
-
+button.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
 /* ======== Form styles ======== */
 #login-form,
 #register-form {
@@ -416,6 +431,9 @@ button:hover {
     overflow-y: auto;
     padding-top: var(--header-height);
     transition: margin-left 0.3s ease, width 0.3s ease;
+}
+.game-main-page {
+    padding-top: calc(var(--header-height) - 20px);
 }
 /* ~ is used to select the next element */
 .sidebar.collapsed ~ .main-content { 
@@ -774,7 +792,7 @@ button:hover {
     justify-content: center;
 }
 .library-row::-webkit-scrollbar {
-    height: 10px;
+    height: 8px;
 }
 
 .library-row::-webkit-scrollbar-thumb {
@@ -794,6 +812,7 @@ button:hover {
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 20px;
+    margin-bottom: 45px;
     display: flex;
     flex-direction: column;
     min-height: 200px;
@@ -1087,12 +1106,16 @@ textarea {
 }
 
 /* ======== Game Page ======== */
+
 .game-info-container {
     display: grid;
-    grid-template-columns: 0.2fr 1fr;
+    grid-template-columns: 0.4fr 1fr 0.5fr;
     gap: 20px;
     overflow-y: hidden;
     height: 100%;
+}
+.game-info strong {
+    font-size: 1.25rem;
 }
 .game-cover-container {
     margin: auto;
@@ -1108,54 +1131,84 @@ textarea {
 .game-details h2 {
     margin-bottom: 50px;
 }
-.game-header, .profile-header {
+.profile-header {
     position: relative;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-bottom: 40px;
+    min-height: 60px;
+    margin-bottom: 20px;
 }
-.game-header .title {
-    margin: 0;
+.profile-header h2 {
+    margin: 0
+}
+.profile-header .back-button {
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    transform: translateY(-50%)
 }
 .back-button {
-    position: absolute;
-    left: 0;
     background: none;
     border: none;
     font-size: 24px;
     
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
+    margin-bottom: 20px;
 
     font-size: 24px;
     color: var(--text);
     cursor: pointer;
     transition: color 0.3s ease;
 }
-
 .back-button:hover {
     color: var(--secondText);
+}
+.game-rating-div {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--shadow);
+    width: 100%;
+    margin: auto;
+    margin-bottom: 20px;
+}
+.game-rating {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+.game-rating h2 {
+    font-size: 1.75rem;
+    margin: 0;
+}
+.out-of-rating {
+    font-size: 0.75rem;
+    color: var(--secondText);
+    margin-top: auto;
+    transform: translateY(-3px);
 }
 .completion-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    width: 25%;
-    margin: auto;
+    width: 100%;
     padding: 20px;
     border-radius: 16px;
     background: var(--cards);
     box-shadow: var(--shadow);
     text-align: center;
-    grid-column: span 2;
     border: 1px solid var(--border);
-
-    position: absolute;
-    top: calc(var(--header-height) + 375px);
-    right: 40px;
+    margin-top: 20px;
 }
 .time-cell {
     font-size: 20px;
@@ -1170,15 +1223,11 @@ textarea {
     margin-bottom: 0;
 }
 .community-status-container {
-    position: absolute;
-    right: 20px;
-    margin-top: calc(var(--header-height) + 100px);
     background-color: var(--cards);
     border-radius: 16px;
     padding: 20px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
-    margin-bottom: 40px;
 }
 .community-bar {
     width: 100%;
@@ -1233,14 +1282,32 @@ textarea {
     display: flex;
     flex-direction: row;
     gap: 20px;
-    padding: 20px;
+    padding: 20px 0;
     margin-top: 0;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
 }
-.review-row-wrap.scrollable .game-review-card {
-    flex: 0 0 calc((100% - 40px) / 2.75);
+/* Sidebar expanded → always left aligned */
+.sidebar:not(.collapsed) ~ .main-content .review-row {
+    justify-content: flex-start;
+}
+
+/* Sidebar collapsed → center if few */
+.sidebar.collapsed ~ .main-content .review-row.few-reviews {
+    justify-content: center;
+}
+.game-review-card {
+    flex: 0 0 425px;
+    min-width: 425px;
+    background-color: var(--cards);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
 }
 .review-row-wrap.scrollable::after {
     content: '';
@@ -1251,16 +1318,6 @@ textarea {
     height: 100%;
     background: linear-gradient(to right, transparent, var(--background));
     pointer-events: none;
-}
-.game-review-card {
-    flex: 0 0 calc((100% - 40px) / 3);
-    background-color: var(--cards);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
 }
 .review-byline {
     display: flex;
@@ -1366,10 +1423,10 @@ textarea {
     width: 100%;
     margin-top: auto;
 }
-.tab-content::-webkit-scrollbar {
+.recommended-list::-webkit-scrollbar, .rating-list::-webkit-scrollbar, .tab-content::-webkit-scrollbar {
     width: 8px;
 }
-.tab-content::-webkit-scrollbar-thumb {
+.recommended-list::-webkit-scrollbar-thumb, .rating-list::-webkit-scrollbar-thumb, .tab-content::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 999px;
 }
@@ -1483,6 +1540,10 @@ textarea {
     gap: 10px;
     margin-top: 20px;
 }
+.refresh-rec-btn:hover  i {
+    transition: transform 0.2s ease-in-out;
+    transform: rotate(180deg);
+}
 .recommended-card-title {
     font-size: 1.5rem;
     font-weight: bold;
@@ -1529,6 +1590,7 @@ textarea {
 .refresh-form {
     margin-top: 0;
 }
+
 /* ======== Filter Styles ======== */
 .filter-container {
     display: flex;
@@ -1706,16 +1768,23 @@ textarea {
 
 .library-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
+    transition: gap 0.3s ease;
 }
-.sidebar.collapsed ~ .main-content .library-grid.library-center4 {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
-    justify-content: center;
+
+.library-img-card {
+    width: 100%;
+    max-width: 220px;
+    justify-self: center;
+    transition: transform 0.3s ease, max-width 0.3s ease;
 }
-.sidebar:not(.collapsed) .main-content .library-grid.library-center4 {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
-    justify-content: center;
+.library-accordion {
+    transition: margin-right 0.3s ease;
+}
+
+.library-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .library-card, .next-game {
     background: var(--background);
@@ -2566,7 +2635,7 @@ progress::-moz-progress-bar {
     color: var(--text);
 }
 /* ======== Loader ======== */
-/* Asked ChatGPT to create help me create a loader that looks like a vault door opening */
+/* Asked ChatGPT to help me create a loader that looks like a vault door opening */
 .page-loader {
     position: fixed;
     inset: 0;

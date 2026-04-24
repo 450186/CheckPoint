@@ -12,17 +12,24 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     referrerpolicy="no-referrer" 
 />
+<link rel="icon" type="image/png" sizes="64x64" href="/assets/logos/PlayVault-logo64.png">
 <script src="Modalfunction.js" defer></script>
 </head>
 <body>
     
 <header class=" <%= (title == "Home" || title == "Login" || title == "Register") ? "centered" : "" %>">
     <% if (title == "Home" || title == "Login" || title == "Register") { %>
-     <h1>PlayVault</h1>
-    <% } else { %>
-    <a href="/dashboard">
+      <div class="logo-container">
+        <img src="/assets/logos/PlayVault-logo64.png" class="logo" alt="PlayVault">
         <h1>PlayVault</h1>
-    </a>
+      </div>
+    <% } else { %>
+      <div class="logo-container">
+        <img src="/assets/logos/PlayVault-logo64.png" class="logo" alt="PlayVault">
+        <a href="/dashboard">
+            <h1>PlayVault</h1>
+        </a>
+      </div>
     <% } %>
     <% if (title !== "Home" && title !== "Login" && title !== "Register") { %>
     <form action="/search" method="GET">

@@ -2,13 +2,59 @@
 
 <%- include('../Partials/navi', {activePage: 'game'}) %>
 
-<div class="main-content">
-    <div class="game-header"> 
+<div class="main-content game-main-page">
         <button onclick="showPageLoader('<%= from.startsWith('/discover') ? 'Loading discover...' : 'Loading...' %>'); window.location.href='<%= from %>'" 
             class="back-button">
             <i class="fa-solid fa-circle-chevron-left"></i> <span>Back</span>
         </button>
-        <% if (totalTracked > 0) { %>
+    <div class="game-info-container">
+        <div class="game-cover-container"> 
+            <img src="<%= game.coverUrl %>"
+                alt="<%= game.name %>" class="game-cover">
+        </div>
+        <div class="game-details">
+            <h2><%= game.name %></h2>
+            <p class="game-info"><strong>Developer:</strong>
+                <%= game.developer %>
+            </p>
+            <p class="game-info"><strong>Description:</strong>
+                <%= game.description %>
+            </p>
+            <% if (game.gameModes) { %>
+                <p class="game-info"><strong>Game Modes:</strong>
+                    <%= game.gameModes ? game.gameModes.join(', ') : 'Unknown' %>
+                </p>             
+            <% } %>
+            <p class="game-info"><strong>Genre:</strong>
+                <%= (game.genres && game.genres.length) ? game.genres.join(', '): 'Unknown' %>
+            </p>
+            <p class="game-info"><strong>Platform:</strong>
+                <%= (game.platforms && game.platforms.length) ? game.platforms.join(', '): 'Unknown' %>
+            </p>
+            <p class="game-info"><strong>Release Date:</strong>
+                <%= game.releaseDate ? new Date(game.releaseDate * 1000).toLocaleDateString("en-GB", {day: "2-digit",month: "short",year: "numeric"}) : "Unknown" %>
+            </p>
+            <% if (isInLibrary) { %>
+                <button type="button" 
+                id="open-review-modal-btn" 
+                data-game-id="<%= game.id %>"
+                data-name="<%= game.name %>"
+                data-cover="<%= game.coverUrl %>"
+                data-rating="<%= userLibraryItem?.userRating || '' %>"
+                class="add-btn">
+                    Add Review
+                </button>
+            <% } %>
+        </div>
+        <div class="game-right-side">
+            <div class="game-rating-div">
+                <div class="game-rating">
+                    <h2><%= game.rating ? Math.round(game.rating) : "N/A" %></h2>
+                    <span class="out-of-rating"> / 100</span>
+                </div>
+                <p style="margin-top: 20px; margin-bottom: 0;">Critics' Rating</p>
+            </div>
+                    <% if (totalTracked > 0) { %>
         <div class="community-status-container">
             <h3 style="margin-top: 0;">Community Status:</h3>
                 <div class="community-bar">
@@ -37,66 +83,25 @@
                 </div>
         </div>
                 <% } %>
-    </div>
-    <div class="game-info-container">
-        <div class="game-cover-container"> 
-            <img src="<%= game.coverUrl %>"
-                alt="<%= game.name %>" class="game-cover">
-        </div>
-        <div class="game-details">
-            <h2><%= game.name %></h2>
-            <p class="game-info"><strong>Developer:</strong>
-                <%= game.developer %>
-            </p>
-            <p class="game-info"><strong>Description:</strong>
-                <%= game.description %>
-            </p>
-            <% if (game.gameModes) { %>
-                <p class="game-info"><strong>Game Modes:</strong>
-                    <%= game.gameModes ? game.gameModes.join(', ') : 'Unknown' %>
-                </p>             
-            <% } %>
-            <p class="game-info"><strong>Genre:</strong>
-                <%= (game.genres && game.genres.length) ? game.genres.join(', '): 'Unknown' %>
-            </p>
-            <p class="game-info"><strong>Platform:</strong>
-                <%= (game.platforms && game.platforms.length) ? game.platforms.join(', '): 'Unknown' %>
-            </p>
-            <p class="game-info"><strong>Release Date:</strong>
-                <%= game.releaseDate ? new Date(game.releaseDate * 1000).toLocaleDateString("en-GB", {day: "2-digit",month: "short",year: "numeric"}) : "Unknown" %>
-            </p>
-            <p class="game-info"><strong>Rating:</strong>
-                <%= game.rating ? Math.round(game.rating) : "N/A" %>
-            </p>
-            <% if (isInLibrary) { %>
-                <button type="button" 
-                id="open-review-modal-btn" 
-                data-game-id="<%= game.id %>"
-                data-name="<%= game.name %>"
-                data-cover="<%= game.coverUrl %>"
-                data-rating="<%= userLibraryItem?.userRating || '' %>"
-                class="add-btn">
-                    Add Review
-                </button>
-            <% } %>
-        </div>
-        <!-- <% if (game.completion) { %>
+        <% if (game.completion.rushed !== null && game.completion.main !== null && game.completion.completionist !== null) { %>
             <div class="completion-grid">
                 <p class="grid-header"><strong>Time to Complete</strong></p>
                 <p class="header-cell">Hastily</p>
                 <p class="header-cell">Main Story</p>
-                <p class="header-cell">Completionist</p>
+                <p class="header-cell">Complete</p>
 
                 <p class="time-cell"><%= game.completion.rushed != null ? `${game.completion.rushed} hours` : "No Record" %></p>
                 <p class="time-cell"><%= game.completion.main != null ? `${game.completion.main} hours` : "No Record" %></p>
                 <p class="time-cell"><%= game.completion.completionist != null ? `${game.completion.completionist} hours` : "No Record" %></p>
             </div>
-        <% } %> -->
+        <% } %>
+        </div>
+
     </div>
     <% if (reviews.length > 0) { %>
         <h3>User's Reviews</h3>
         <div class="review-row-wrap <%= reviews.length > 3 ? 'scrollable' : '' %>">
-            <div class="review-row">
+            <div class="review-row <%= reviews.length <= 3 ? 'few-reviews' : '' %>">
                 <% reviews.forEach(r => { %>
                     <div class="game-review-card">
                         <div class="review-card-content">

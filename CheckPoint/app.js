@@ -11,6 +11,7 @@ const genreComments = require('./data/genreComments.json')
 
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const Fuse = require('fuse.js')
 
 const dotenv = require('dotenv').config();
 
@@ -272,6 +273,83 @@ function staleRecs(document) {
     const oneDay = 24 * 60 * 60 * 1000;
 
     return age > oneDay
+}
+async function searchRecs(query) {
+    if (!query) return [];
+
+    let suggestions = [];
+
+    const cachedGames = await libraryModel.aggregate([
+        {
+            $group: {
+                _id: "$gameId",
+                id: { $first: "$gameId" },
+                name: { $first: "$cachedName" },
+                coverUrl: { $first: "$cachedCoverUrl" },
+                genres: { $first: "$cachedGenres" },
+                rating: { $first: "$cachedRating" },
+                release: { $first: "$cachedRelease" },
+            }
+        }
+    ]);
+
+    if (cachedGames.length) {
+        const fuse = new Fuse(cachedGames, {
+            keys: ["name"],
+            ignoreLocation: true,
+            threshold: 0.4,
+            minMatchCharLength: 2,
+        });
+
+        suggestions.push(...fuse.search(query).map(result => result.item));
+    }
+
+    let igdbSearchTerm = query;
+
+    if (suggestions.length > 0) {
+        igdbSearchTerm = suggestions[0].name
+            .replace(/\d+.*/g, "")
+            .replace(/:.*/g, "")
+            .trim();
+    }
+
+    const safeQuery = igdbSearchTerm.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+    const IGDBrecs = await IGDBrequest("games", `
+        search "${safeQuery}";
+        fields id, name, cover.url, first_release_date, aggregated_rating, genres.name;
+        where cover != null
+        & aggregated_rating != null
+        & version_parent = null
+        & parent_game = null;
+        limit 10;
+    `);
+
+    suggestions.push(...IGDBrecs.map(game => ({
+        id: game.id,
+        name: game.name,
+        coverUrl: game.cover?.url
+            ? `https:${game.cover.url.replace("t_thumb", "t_cover_big")}`
+            : "",
+        rating: game.aggregated_rating ? Math.round(game.aggregated_rating) : null,
+        release: game.first_release_date
+            ? new Date(game.first_release_date * 1000).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            })
+            : "",
+        genres: game.genres?.map(g => g.name).join(", ") || "",
+    })));
+
+    const seen = new Set();
+
+    return suggestions
+        .filter(game => {
+            if (seen.has(game.id)) return false;
+            seen.add(game.id);
+            return true;
+        })
 }
 app.get('/', (req, res) => {
     res.render('pages/home', {
@@ -837,7 +915,19 @@ app.get("/discover", checkLogin, async (req, res) => {
         offset ${offset};
         `;
 
-        const games = await IGDBrequest("games", igdbBody);
+        let games = await IGDBrequest("games", igdbBody);
+        let searchNotice = null;
+        let suggestedQueries = [];
+
+        if(q && games.length === 0) {
+            suggestedQueries = await searchRecs(q);
+
+            if(suggestedQueries) {
+                searchNotice = `No results for "${q}". Did you mean:`;
+            } else {
+                searchNotice = `No results for "${q}".`;
+            }
+        }
 
         const availableGenres = await IGDBrequest("genres", `
             fields id, name;
@@ -870,6 +960,8 @@ app.get("/discover", checkLogin, async (req, res) => {
             },
             requestPath: req.originalUrl,
             friendRequests,
+            searchNotice,
+            suggestedQueries
         });
     } catch (error) {
         console.error(error);
@@ -894,7 +986,9 @@ app.get("/discover", checkLogin, async (req, res) => {
                 sort: "newest"
             },
             requestPath: req.originalUrl,
-            friendRequests
+            friendRequests,
+            searchNotice: null,
+            suggestedQueries: []
         });
     }
 });
