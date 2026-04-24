@@ -223,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dropdown = document.getElementById("filter-dropdown");
   const filtersBar = document.getElementById("filters");
   const releaseDiv = document.getElementById("release-div")
+  let openFilter = null
 
   if (!dropdown || !filtersBar) {
     console.log("Missing dropdown or filtersBar", { dropdown, filtersBar });
@@ -246,10 +247,16 @@ const otherPlatforms = <%- JSON.stringify(otherPlatforms || []) %>;
     if (!btn) return;
 
     const type = btn.dataset.filter;
+    if(!dropdown.hidden && openFilter === type) {
+      dropdown.hidden = true;
+      openFilter = null;
+      return;
+    }
     console.log("Clicked filter:", type);
 
     if (type !== "sort" && type !== "minRating" && type !== "yearFrom" && type !== "yearTo" && type !== "genres" && type !== "platforms" && type !== "release" && type !== "reset") {
       dropdown.hidden = true;
+      openFilter = null;
       return;
     }
     if(type === 'sort') {
@@ -402,6 +409,7 @@ if(type === 'platforms') {
   `;
 }
 
+    openFilter = type;
 
     const rect = btn.getBoundingClientRect();
     dropdown.style.left = `${rect.left + rect.width / 2}px`;
@@ -413,6 +421,7 @@ if(type === 'platforms') {
   dropdown.addEventListener("click", (e) => {
     if (e.target.id === "close-dropdown") {
       dropdown.hidden = true;
+      openFilter = null;
     }
 
     if (e.target.id === "apply-sort") {
@@ -503,11 +512,12 @@ if(type === 'platforms') {
     if (e.target.closest("#filters")) return;
     if (e.target.closest("#filter-dropdown")) return;
     dropdown.hidden = true;
+    openFilter = null;
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !dropdown.hidden) {
       dropdown.hidden = true;
-
+      openFilter = null;
     }
   });
 });
