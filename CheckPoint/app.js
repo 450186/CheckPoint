@@ -313,17 +313,61 @@ async function searchRecs(query) {
             .trim();
     }
 
-    const safeQuery = igdbSearchTerm.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    async function searchIGDB(term) {
+        const safeQuery = term.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
-    const IGDBrecs = await IGDBrequest("games", `
-        search "${safeQuery}";
-        fields id, name, cover.url, first_release_date, aggregated_rating, genres.name;
-        where cover != null
-        & aggregated_rating != null
-        & version_parent = null
-        & parent_game = null;
-        limit 10;
-    `);
+        return IGDBrequest("games", `
+            search "${safeQuery}";
+            fields id, name, cover.url, first_release_date, aggregated_rating, genres.name, genres.id;
+            where cover != null
+              & aggregated_rating != null
+              & version_parent = null
+              & parent_game = null;
+            limit 20;
+            `)
+    }
+
+    let IGDBrecs = await searchIGDB(igdbSearchTerm);
+
+    if(!IGDBrecs.length) {
+        const words = query
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, "")
+        .split(/\s+/)
+        .filter(word => word.length >=2)
+        .sort((a, b) => b.length - a.length);
+
+        for (const word of words) {
+            IGDBrecs = await searchIGDB(word);
+            if (IGDBrecs.length) break;
+        }
+    }
+    if(IGDBrecs.length) {
+        const igdbFuse = new Fuse(IGDBrecs, {
+            keys: ["name"],
+            ignoreLocation: true,
+            threshold: 0.35,
+            includeScore: true,
+        })
+        const ranked = igdbFuse.search(query);
+
+        if(ranked.length) {
+            IGDBrecs = ranked.map(result => result.item);
+        }
+    }
+
+    IGDBrecs.sort((a, b) => {
+        const queryLower = query.toLowerCase();
+        const searchLower = igdbSearchTerm.toLowerCase();
+
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+
+        const aMatch = aName.includes(queryLower) || aName.includes(searchLower);
+        const bMatch = bName.includes(queryLower) || bName.includes(searchLower);
+
+        return Number(bMatch) - Number(aMatch);
+    });
 
     suggestions.push(...IGDBrecs.map(game => ({
         id: game.id,
@@ -1101,7 +1145,7 @@ similarGenres = similarGenres.slice(0, 6);
         where game_id = ${g.id};
         limit 1;
         `)
-
+    const alreadyReviewed = await reviewModel.findOne({ gameId: id, userId: req.session.user.id }).lean();
     const ttb = TimeToBeat[0] || null
     const completion = {
         main: ttb?.normally ? Math.round(ttb.normally / 3600) : null,
@@ -1128,6 +1172,7 @@ similarGenres = similarGenres.slice(0, 6);
         rating: g.aggregated_rating || null,
         gameModes: g.game_modes?.map(mode => mode.name) || [],
         completion,
+        userRating: userLibraryItem?.userRating || null,
 
         artworks: g.artworks?.map(a => ({
             url: a.url ? `http:${a.url.replace("t_thumb", "t_1080p")}` : ""
@@ -1216,7 +1261,8 @@ similarGenres = similarGenres.slice(0, 6);
         statusPercents,
         totalTracked,
         isInLibrary,
-        reviews
+        reviews,
+        alreadyReviewed
     })
 })
 app.get("/profile", checkLogin, async (req, res) => {

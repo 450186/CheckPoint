@@ -35,15 +35,69 @@
                 <%= game.releaseDate ? new Date(game.releaseDate * 1000).toLocaleDateString("en-GB", {day: "2-digit",month: "short",year: "numeric"}) : "Unknown" %>
             </p>
             <% if (isInLibrary) { %>
-                <button type="button" 
-                id="open-review-modal-btn" 
-                data-game-id="<%= game.id %>"
-                data-name="<%= game.name %>"
-                data-cover="<%= game.coverUrl %>"
-                data-rating="<%= userLibraryItem?.userRating || '' %>"
-                class="add-btn">
-                    Add Review
-                </button>
+            <div class="review-form-group">
+                <form action="/library/rate" class="rating-form" method="POST">
+                    <input type="hidden" name="gameId" value="<%= game.id %>">
+                    <label><strong>Your Rating</strong></label>
+                    <input type="hidden" name="rating" id="review-rate-input" value="<%= game.userRating ?? '' %>">
+
+                    <div class="star-rating" id="review-star-rating">
+                    <button type="button" class="star-btn" data-value="1" aria-label="1 star">
+                        <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="2" aria-label="2 stars">
+                        <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="3" aria-label="3 stars">
+                        <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="4" aria-label="4 stars">
+                        <i class="fa-regular fa-star"></i>
+                    </button>
+                    <button type="button" class="star-btn" data-value="5" aria-label="5 stars">
+                        <i class="fa-regular fa-star"></i>
+                    </button>
+                    </div>
+
+                    <button
+                    type="button"
+                    id="review-clear-rating-btn"
+                    class="clear-rating-btn"
+                    style="margin-bottom: 10px;"
+                    >
+                    Clear Rating
+                    </button>
+                </form>
+            </div>
+                <% if (!alreadyReviewed) { %>
+                    <button type="button" 
+                    id="open-review-modal-btn" 
+                    data-game-id="<%= game.id %>"
+                    data-name="<%= game.name %>"
+                    data-cover="<%= game.coverUrl %>"
+                    data-rating="<%= game.userRating || '' %>"
+                    class="add-btn">
+                        Add Review
+                    </button>
+                <% } %>
+            <% } else {  %>
+                <form action="/library/add" class="library-form" method="POST" onclick="event.stopPropagation()">
+                    <input type="hidden" name="gameId" value="<%= game.id %>">
+                    <input type="hidden" name="name" value="<%= game.name %>">
+                    <input type="hidden" name="coverUrl" value="<%= game.coverUrl %>">
+                    <input type="hidden" name="genres" value="<%= game.genres ? game.genres.join(', ') : '' %>">
+                    <input type="hidden" name="rating" value="<%= game.rating ? Math.round(game.rating) : '' %>">
+                    <input type="hidden" name="release" value="<%= game.releaseDate ? new Date(game.releaseDate * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '' %>">
+
+                    <select name="status" class="status-select-card">
+                        <option value="wishlist">Wishlist</option>
+                        <option value="playing">Playing</option>
+                        <option value="completed">Completed</option>
+                        <option value="dropped">Dropped</option>
+                    </select>
+
+                    <button type="submit" class="add-btn card-add-btn">+ Add to Wishlist</button>
+                </form>
             <% } %>
         </div>
         <div class="game-right-side">
@@ -169,7 +223,7 @@
         <h3>More From <strong>
                 <%= game.developer %>
             </strong></h3>
-        <div class="library-row">
+        <div class="library-row dev-row">
             <% moreFromDev.forEach(g => { %>
             <div class="library-card"
             data-game-id="<%= g.id %>"
@@ -196,7 +250,7 @@
     <% } %>
     <% if (similarGenres && similarGenres.length) { %>
         <h3>Similar Games</h3>
-        <div class="library-row">
+        <div class="library-row similar-row">
             <% similarGenres.forEach(g => { %>
                 <div class="library-card"
                 data-game-id="<%= g.id %>"
@@ -466,4 +520,80 @@
             overlay.hidden = true;
         }
     });
+</script>
+<script>
+  function setStatusLabel(value) {
+    switch (value) {
+      case "playing":
+        return "Playing";
+      case "completed":
+        return "Completed";
+      case "dropped":
+        return "Dropped";
+      case "wishlist":
+      default:
+        return "Wishlist";
+    }
+  }
+
+  document.querySelectorAll(".library-form").forEach((form) => {
+    const select = form.querySelector(".status-select-card");
+    const button = form.querySelector(".card-add-btn");
+
+    if (!select || !button) return;
+
+    function updateBtnLabel() {
+      button.textContent = `+ Add to ${setStatusLabel(select.value)}`;
+    }
+
+    select.addEventListener("change", updateBtnLabel);
+    updateBtnLabel();
+  });
+</script>
+<script>
+    const starRating = document.getElementById("review-star-rating");
+    const reviewRateInput = document.getElementById("review-rate-input");
+    const ratingForm = document.querySelector(".rating-form");
+
+    function drawStars(value) {
+        if (!starRating) return;
+
+        const numericValue = Number(value) || 0;
+        const btns = starRating.querySelectorAll(".star-btn");
+
+        btns.forEach((btn, index) => {
+        const starNumber = index + 1;
+        const icon = btn.querySelector("i");
+        if (!icon) return;
+
+        if (numericValue >= starNumber) {
+            icon.className = "fa-solid fa-star";
+        } else if (numericValue >= starNumber - 0.5) {
+            icon.className = "fa-solid fa-star-half-stroke";
+        } else {
+            icon.className = "fa-regular fa-star";
+        }
+        });
+    }
+    if(reviewRateInput) drawStars(reviewRateInput.value);
+
+    if(starRating && reviewRateInput && ratingForm) {
+        starRating.querySelectorAll(".star-btn").forEach((btn, index) => {
+        btn.addEventListener("click", async (e) => {
+            const rect = btn.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const isLeftHalf = clickX < rect.width / 2;
+
+            const starNumber = index + 1;
+            const value = isLeftHalf ? starNumber - 0.5 : starNumber;
+
+            reviewRateInput.value = value;
+            drawStars(value);
+
+            ratingForm.submit();
+        });
+        });
+    }
+
+
 </script>

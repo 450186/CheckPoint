@@ -819,6 +819,10 @@ button:hover {
     box-shadow: var(--shadow);
     cursor: pointer
 }
+.dev-row .library-card, .similar-row .library-card {
+    background-color: var(--cards);
+    margin-bottom: 0;
+}
 .clickable {
     cursor: pointer;
 }
@@ -1191,6 +1195,24 @@ textarea {
     font-size: 1.75rem;
     margin: 0;
 }
+.game-user-rating-div {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    line-height: 1.1;
+}
+.game-info:last-of-type {
+    margin-top: 0;
+}
+.game-details .library-form {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+.game-details .library-form select {
+    width: 30%;
+    background-color: var(--cards);
+}
 .out-of-rating {
     font-size: 0.75rem;
     color: var(--secondText);
@@ -1308,6 +1330,9 @@ textarea {
     border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
+}
+.review-row-wrap.scrollable .game-review-card:last-of-type {
+    margin-right: 30px;
 }
 .review-row-wrap.scrollable::after {
     content: '';
