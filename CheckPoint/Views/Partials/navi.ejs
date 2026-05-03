@@ -1,4 +1,21 @@
 <div class="sidebar collapsed">
+    <form action="/search" method="GET" class="sidebar-search">
+        <div id="sidebar-search-container">
+        <input
+        name="query"
+        type="search"
+        id="search"
+        placeholder="Search games..."
+        autocomplete="off"
+        value="<%= typeof query !== 'undefined' ? query : '' %>"
+        onfocus="this.value=''"
+        >
+            <button id="search-btn" type="submit" >
+                <i class="fa-solid fa-magnifying-glass fa-rotate-90 search-btn"></i>
+            </button>
+        </div>
+    </form>
+
     <ul class="nav-list">
         
         <li class="nav-item <%= activePage === "dashboard" ? "active-link" : ""  %>">
@@ -26,15 +43,102 @@
             </a>
         </li>
     </ul>
-    <button id="sidebar-toggle" type="button" class="sidebar-toggle">
-        <i class="fa-solid fa-chevron-right"></i>
-    </button>
-</div>
-<script>
-    const sidebar = document.querySelector('.sidebar');
-    const toggle = document.getElementById('sidebar-toggle');
+    <div class="sidebar-bottom">
+        <button class="open-friend-modal-btn sidebar-add-friends-btn" aria-label="Add Friends" type="button">
+            <i class="fa-solid fa-user-plus add-friends-icon"></i>
+        </button>
 
-    toggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-    })
+        <div class="sidebar-account-wrap">
+            <div class="sidebar-account-container">
+                <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= user?.avatarSeed || user?.username %>" alt="Account Logo" class="account-logo"> 
+            </div>
+
+            <div class="sidebar-account-dropdown">
+                <ul>
+                    <li><a href="/profile?from=<%= encodeURIComponent(requestPath || '/dashboard') %>"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
+                    <li><a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+        <button id="sidebar-toggle" type="button" class="sidebar-toggle">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+</div>
+
+<!-- ADD FRIEND MODAL -->
+<div id="friend-modal" class="modal-overlay" aria-hidden="true">
+  <div
+    class="modal friend-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="friend-modal-title"
+  >
+    <div class="modal-info">
+      <div class="modal-header">
+        <h2 id="friend-modal-title">Add a Friend</h2>
+        <button
+          class="modal-close friend-modal-close"
+          type="button"
+          aria-label="Close add friend dialog"
+        >
+          &CircleTimes;
+        </button>
+      </div>
+
+      <form action="/friends/search" method="GET" class="friend-search-form">
+        <label for="friend-search-input"><strong>Search by username</strong></label>
+        <input
+          type="search"
+          name="query"
+          id="friend-search-input"
+          placeholder="Enter a username..."
+          autocomplete="off"
+          required
+        >
+
+        <div class="modal-actions">
+          <button type="submit" class="add-btn">Search</button>
+          <button
+            type="button"
+            class="go-to-game"
+            id="friend-cancel-btn"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="/addFriendFunction.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.querySelector(".sidebar");
+  const toggle = document.getElementById("sidebar-toggle");
+
+  toggle?.addEventListener("click", () => {
+    sidebar?.classList.toggle("collapsed");
+  });
+
+  document.addEventListener("click", (event) => {
+    const accountClick = event.target.closest(".sidebar-account-container");
+    const dropdown = document.querySelector(".sidebar-account-dropdown");
+
+    if (accountClick && dropdown) {
+      event.stopPropagation();
+      console.log("sidebar account clicked");
+
+      dropdown.style.display =
+        dropdown.style.display === "block" ? "none" : "block";
+
+      return;
+    }
+
+    if (dropdown && !event.target.closest(".sidebar-account-dropdown")) {
+      dropdown.style.display = "none";
+    }
+  });
+});
 </script>

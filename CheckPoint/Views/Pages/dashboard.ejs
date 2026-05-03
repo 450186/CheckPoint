@@ -150,15 +150,17 @@
                             <div class="review-slide"
                                 style="<%= index === 0 ? 'display:block;' : 'display:none;' %>"
                             >
-                                <div class="review-header">
-                                    <div class="review-header-text">
-                                        <p style="font-weight: bold; font-size: 1.2rem" class="review-game"><%= review.cachedName %></p>
-                                        <p style="font-weight: bold;" class="review-title"><%= review.title %></p>
+                                <div class="review-grid">
+                                    <div class="review-header">
+                                        <div class="review-header-text">
+                                            <p style="font-weight: bold; font-size: 1.2rem" class="review-game"><%= review.cachedName %></p>
+                                            <p style="font-weight: bold;" class="review-title"><%= review.title %></p>
+                                        </div>
+                                        <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= review.cachedName %>">
                                     </div>
-                                    <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= review.cachedName %>">
-                                </div>
-                                <p class="review-body"><%= review.body %></p>
-                            </div> 
+                                    <p class="review-body"><%= review.body %></p>
+                                </div> 
+                            </div>
                         <% }) %>
                     </div>
                     <div class="review-controls">

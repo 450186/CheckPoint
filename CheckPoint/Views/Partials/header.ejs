@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Share+Tech&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+
 <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     referrerpolicy="no-referrer" 
@@ -20,12 +21,15 @@
 <header class=" <%= (title == "Home" || title == "Login" || title == "Register") ? "centered" : "" %>">
     <% if (title == "Home" || title == "Login" || title == "Register") { %>
       <div class="logo-container">
-        <img src="/assets/logos/PlayVault-logo64.png" class="logo" alt="PlayVault">
+        <!-- <img src="/assets/logos/PlayVault-logo64.png" class="logo" alt="PlayVault"> -->
         <h1>PlayVault</h1>
       </div>
     <% } else { %>
+      <button class="mobile-menu-btn" type="button" id="mobile-menu-btn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
       <div class="logo-container">
-        <img src="/assets/logos/PlayVault-logo64.png" class="logo" alt="PlayVault">
+        <!-- <img src="/assets/logos/PlayVault-logo64.png" class="logo" alt="PlayVault"> -->
         <a href="/dashboard">
             <h1>PlayVault</h1>
         </a>
@@ -57,7 +61,7 @@
         <% } %>
       </button>
       </div>
-        <button id="open-friend-modal-btn" class="add-friends-btn" aria-label="Add Friends" type="button">
+        <button class="open-friend-modal-btn add-friends-btn" aria-label="Add Friends" type="button">
             <i class="fa-solid fa-user-plus add-friends-icon"></i>
         </button>
         <div class="account-container">
@@ -93,7 +97,6 @@
      <div class="account-dropdown">
         <ul>
             <li><a href="/profile?from=<%= encodeURIComponent(requestPath || '/dashboard') %>" role="menuitem"><i class="fa-solid fa-circle-user"></i> Profile</a></li>
-            <li><a href="/settings" role="menuitem"><i class="fa-solid fa-user-gear"></i> Settings</a></li>
             <li><a href="/logout" role="menuitem"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
         </ul>
     </div>
@@ -114,17 +117,17 @@
     // Dropdown menu functionality
     const accountContainer = document.querySelector('.account-container');
     const dropdown = document.querySelector('.account-dropdown');
-    accountContainer.addEventListener('click', function() {
+    accountContainer?.addEventListener('click', function() {
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     });
         // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
-        if (!accountContainer.contains(event.target) && !dropdown.contains(event.target)) {
+      if (accountContainer && dropdown && !accountContainer.contains(event.target) && !dropdown.contains(event.target)) {
             dropdown.style.display = 'none';
         }
     });
     document.addEventListener('keydown', function(event) {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && dropdown) {
             dropdown.style.display = 'none';
         }
     });
@@ -133,20 +136,30 @@
     const notiOpen = document.querySelector('.open-noti-btn');
     const notifications = document.querySelectorAll(".noti-container")
 
-    notiOpen.addEventListener('click', function() {
-        notiDropdown.style.display = notiDropdown.style.display === 'block' ? 'none' : 'block';
+    notiOpen?.addEventListener('click', function() {
+        notiDropdown.style.display = 
+        notiDropdown.style.display === 'block' ? 'none' : 'block';
+
+        if(window.innerWidth <= 767) {
+            notiDropdown.style.position = "fixed";
+            notiDropdown.style.top = "80px";
+            notiDropdown.style.right = "16px";
+            notiDropdown.style.width = "300px";
+            notiDropdown.style.transform = "none";
+            return;
+        }
         const rect = notiOpen.getBoundingClientRect();
         notiDropdown.style.left = `${rect.left + rect.width / 2}px`;
         notiDropdown.style.top = `${rect.top + 60 + window.scrollY}px`;
         notiDropdown.style.transform = "translateX(-50%)";
     });
     document.addEventListener('click', function(event) {
-        if (!notiOpen.contains(event.target) && !notiDropdown.contains(event.target)) {
+      if (notiOpen && notiDropdown && !notiOpen.contains(event.target) && !notiDropdown.contains(event.target)) {
             notiDropdown.style.display = 'none';
         }
     });
     document.addEventListener('keydown', function(event) {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && notiDropdown) {
             notiDropdown.style.display = 'none';
         }
     });
@@ -267,4 +280,15 @@
 </script>
 
 <script src="/addFriendFunction.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+    const sidebar = document.querySelector(".sidebar");
+
+    mobileMenuBtn?.addEventListener("click", () => {
+      sidebar?.classList.toggle("mobile-open");
+      sidebar?.classList.remove("collapsed")
+    });
+  });
+</script>
 </header>

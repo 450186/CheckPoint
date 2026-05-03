@@ -3,7 +3,7 @@
     if(!overlay) return;
 
     const dialog = overlay.querySelector(".modal");
-    const openBtn = document.getElementById("open-friend-modal-btn");
+    const openBtns = document.querySelectorAll(".open-friend-modal-btn");
     const closeBtn = overlay.querySelector(".modal-close");
     const cancelBtn = document.getElementById("friend-cancel-btn")
     const searchInput = document.getElementById("friend-search-input");
@@ -28,7 +28,9 @@
         }
     }
 
-    if(openBtn) openBtn.addEventListener("click", openModal);
+    openBtns.forEach(btn => {
+        btn.addEventListener("click", openModal);
+    });
     if(closeBtn) closeBtn.addEventListener("click", closeModal);
     if(cancelBtn) cancelBtn.addEventListener("click", closeModal);
 

@@ -124,6 +124,7 @@
             <% if (playing.length > 0) { %>
                 <div class="profile-games
                 <%= playing.length <= 3 ? "profile-center" : ""%>
+                <%= playing.length <= 5 ? "profile-center-mobile" : ""%>
                 ">
                     <% playing.forEach(game => { %>
                         <div class="profile-game-card"

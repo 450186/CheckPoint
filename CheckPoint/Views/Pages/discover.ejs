@@ -414,10 +414,21 @@ if(type === 'platforms') {
     openFilter = type;
 
     const rect = btn.getBoundingClientRect();
-    dropdown.style.left = `${rect.left + rect.width / 2}px`;
-    dropdown.style.top = `${rect.bottom + 10 + window.scrollY}px`;
+    const dropdownWidth = Math.min(320, window.innerWidth - 24);
+
+    dropdown.style.width = `${dropdownWidth}px`;
+
+    let left = rect.left + rect.width / 2;
+    const minLeft = 12 + dropdownWidth / 2;
+    const maxLeft = window.innerWidth - 12 - dropdownWidth / 2;
+    left = Math.max(minLeft, Math.min(maxLeft, left));
+
+    dropdown.style.position = "fixed";
+    dropdown.style.left = `${left}px`;
+    dropdown.style.top = `${rect.bottom + 10}px`;
     dropdown.style.transform = "translateX(-50%)";
     dropdown.hidden = false;
+
   });
 
   dropdown.addEventListener("click", (e) => {
