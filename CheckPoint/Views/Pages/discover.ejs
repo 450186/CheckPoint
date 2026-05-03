@@ -2,7 +2,7 @@
 
 <%- include('../Partials/navi', {activePage: 'discover'}) %>
 
-<div class="main-content">
+<div class="main-content discover-main-page">
     <h2 class="title"><%= title %></h2>
     <p>Discover new games and expand your library with our curated selection of titles.</p>
     <% if (searchNotice) { %>
@@ -89,7 +89,7 @@
       <% } %>
         <% games.forEach(game => { %>
             <div
-                class="dash-card game-card clickable"
+                class="discover-cards dash-card game-card clickable"
                 data-game-id="<%= game.id %>"
                 data-name="<%= game.name %>"
                 data-cover="http:<%= game.cover.url.replace('t_thumb','t_cover_big') %>"
