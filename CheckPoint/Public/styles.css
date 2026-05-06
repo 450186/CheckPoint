@@ -100,7 +100,8 @@ a:hover {
 
 .sidebar-add-friends-btn,
 .sidebar-account-container,
-.sidebar-search {
+.sidebar-search,
+.sidebar-account-dropdown {
     display: none;
 }
 
@@ -474,7 +475,7 @@ button:hover {
     flex-direction: column;
     justify-content: flex-start;
     min-height: 180px;
-    height: 100%;
+    height: auto;
     box-shadow: var(--shadow);
     min-width: 0;
 }
@@ -523,6 +524,10 @@ button:hover {
     gap: 20px;
 }
 
+.first-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 #continue-card .library-row {
     padding-bottom: 5px;
 }
@@ -548,6 +553,7 @@ button:hover {
     z-index: 999;
     overflow: hidden;
 }
+
 .sidebar.collapsed {
     width: var(--collapsed-width);
     padding-left: 0;
@@ -1518,7 +1524,7 @@ textarea {
 
 .recommended-card,
 .next-game-card,
-.new-releases-card {
+.review-card {
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -2228,6 +2234,15 @@ progress::-moz-progress-bar {
     display: flex;
     flex-direction: column;
 }
+.review-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+#reviews-slideshow {
+    flex: 0 0 auto;
+}
 .review-header {
     display: flex;
     justify-content: space-between;
@@ -2238,6 +2253,7 @@ progress::-moz-progress-bar {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    min-width: 0;
 }
 .review-img-small {
     width: 120px;
@@ -2246,21 +2262,28 @@ progress::-moz-progress-bar {
     border-radius: 8px;
     flex-shrink: 0;
 }
-.review-title {
-    color: var(--secondText)
+.review-title,
+.review-game {
+    color: var(--secondText);
+    overflow-wrap: anywhere;
 }
 .review-body {
     color: var(--secondText);
-    width: 33ch;
-    text-overflow: ellipsis;
-    white-space: wrap;
+    max-width: 100%;
+    width: auto;
+    margin: 0;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+.review-grid {
+    min-width: 0;
 }
 .review-controls {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    margin-top: 10px
+    margin-top: auto;
 }
 .reviewPrev,
 .reviewNext {
@@ -2276,7 +2299,7 @@ progress::-moz-progress-bar {
     color: var(--accent);
 }
 .review-controls .dot-div {
-    margin: auto
+    margin: auto;
 }
 .go-to-reviews {
     display: flex;
@@ -2289,14 +2312,19 @@ progress::-moz-progress-bar {
     overflow: hidden;
 }
 .ranking-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 16px;
-    padding: 5px;
-    gap: 12px;
-    margin: 10px 0;
-    cursor: pointer;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.ranking-card .activity-star-rating {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 16px;
 }
 .ranking-card:hover {
     transform: translateY(-4px);
@@ -2304,8 +2332,9 @@ progress::-moz-progress-bar {
     background-color: var(--accentHover);
 }
 .ranking-card-header {
-    display: flex;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 100px minmax(120px, 1fr);
+    gap: 12px;
     align-items: center;
     min-width: 0;
 }
@@ -2313,6 +2342,12 @@ progress::-moz-progress-bar {
 .ranking-card-title {
     margin: 0;
     font-weight: bold;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .ranking-card-rating {
@@ -2331,12 +2366,13 @@ progress::-moz-progress-bar {
     flex: 1;
     overflow-y: auto;
     padding-right: 6px;
-    margin-top: 10px
+    margin-top: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px
 }
 .card-rows > .dash-card {
     min-height: 0;
 }
-.review-card,
 .high-rated-card,
 .stats-card {
     max-height: 65vh;
@@ -2595,9 +2631,13 @@ progress::-moz-progress-bar {
     flex-shrink: 0;
     cursor: pointer;
 }
-.activity-avatar:hover + .activity-username {
+.activity-avatar:hover + .activity-username{
     color: var(--accent);
     text-decoration: underline;
+}
+.review-byline:has(.activity-username:hover) .activity-avatar {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .7);
 }
 .activity-content {
     display: flex;
@@ -3140,7 +3180,7 @@ progress::-moz-progress-bar {
     }
 
     .modal {
-        width: 75%;
+        width: 95%;
     }
 
     .review-modal {

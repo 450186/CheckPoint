@@ -154,8 +154,8 @@
     </div>
     <% if (reviews.length > 0) { %>
         <h3>User's Reviews</h3>
-        <div class="review-row-wrap <%= reviews.length > 3 ? 'scrollable' : '' %>">
-            <div class="review-row <%= reviews.length <= 3 ? 'few-reviews' : '' %>">
+        <div class="review-row-wrap <%= reviews.length > 2 ? 'scrollable' : '' %>">
+            <div class="review-row <%= reviews.length <= 2 ? 'few-reviews' : '' %>">
                 <% reviews.forEach(r => { %>
                     <div class="game-review-card">
                         <div class="review-card-content">

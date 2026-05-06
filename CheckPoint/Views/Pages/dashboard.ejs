@@ -11,7 +11,7 @@
         </h3>
     </div>
     <p class="error-msg"><%= errorMessage %></p>
-    <div class="card-rows">
+    <div class="card-rows first-row">
         <div class="dash-card stats-card">
             <h3>Your Stats</h3>
             <div class="stats-tabs">
@@ -137,50 +137,6 @@
                 </div>
             </div>
         </div>
-        <div class="dash-card review-card">
-            <h3>Your Reviews</h3>
-            <p>See your most recent reviews here</p>
-            <% if (YourReviews.length === 0) { %>
-                <p class="no-items">Review games you've played for them to appear here</p>
-            <% } %>
-            <% if(YourReviews.length) { %>
-                <div class="review-container">
-                    <div class="slideshow-container" id="reviews-slideshow">
-                        <% YourReviews.forEach((review, index) => { %>
-                            <div class="review-slide"
-                                style="<%= index === 0 ? 'display:grid;' : 'display:none;' %>"
-                            >
-                                <div class="review-grid">
-                                    <div class="review-header">
-                                        <div class="review-header-text">
-                                            <p style="font-weight: bold; font-size: 1.2rem" class="review-game"><%= review.cachedName %></p>
-                                            <p style="font-weight: bold;" class="review-title"><%= review.title %></p>
-                                        </div>
-                                        <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= review.cachedName %>">
-                                    </div>
-                                    <p class="review-body"><%= review.body %></p>
-                                </div> 
-                            </div>
-                        <% }) %>
-                    </div>
-                    <div class="review-controls">
-                        <% if (YourReviews.length > 1) { %>
-                            <a class="reviewPrev" onclick="plusReviewSlides(-1)">&#10094;</a>
-                        <% } %>
-                    <div class="dot-div">
-                        <% YourReviews.forEach((_, index) => { %>
-                            <span class="reviewDot <%= index === 0 ? 'active' : '' %>" onclick="currentReviewSlide(<%= index + 1 %>)"></span>
-                        <% }) %>
-                    </div>
-                    <% if (YourReviews.length > 1) { %>
-                        <a class="reviewNext" onclick="plusReviewSlides(1)">&#10095;</a>
-                    <% } %>
-                    </div>
-                </div>
-            <% } %>
-            <div class="card-spacer"></div>
-
-        </div>
         <div class="dash-card high-rated-card">
             <h3>Highest Rated</h3>
             <p>Your highest rated games: </p>
@@ -192,7 +148,7 @@
                         <div class="ranking-card" data-game-id="<%= HR.gameId %>">
                             <div class="ranking-card-header">
                                 <img class="ranking-card-img" src="<%= HR.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= HR.cachedName %>">
-                                <p class="ranking-card-title"><%= HR.cachedName %></p>
+                                <p class="ranking-card-title" title="<%= HR.cachedName %>"><%= HR.cachedName %></p>
                             </div>
                             <div class="activity-star-rating">
                                 <% for( let i = 1; i <= 5; i++) { %>
@@ -216,7 +172,6 @@
             <p>Pick up where you left off in your current games.</p>
             <% if (playing && playing.length > 0) { %>
                 <div class="library-row 
-                    <%= playing.length <= 4 ? "center4" : "" %>
                     <%= playing.length <= 3 ? "center3" : "" %>
                 ">
                     <% playing.forEach(game => { %>
@@ -270,7 +225,7 @@
                 <h3>Recommended For You</h3>
                 <form action="/refresh-recommendations" class="refresh-form" method="POST">
                     <button type="submit" class="refresh-rec-btn" title="Refresh Recommendations">
-                        <i class="fa-solid fa-rotate-right"></i> Refresh
+                        <i class="fa-solid fa-rotate-right"></i>
                     </button>
                 </form>
             </div>
@@ -307,15 +262,50 @@
                 <% }) %>
             </div>
            </div>
-            <div class="dash-card new-releases-card">
-            <h3>New Releases</h3>
-            <p>Check out the latest games added to our library.</p>
-            <p class="releases"> <i class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> <i
-                    class="fa-solid fa-gamepad"></i> </p>
-            <div class="card-spacer"></div>
+        <div class="dash-card review-card">
+            <h3>Your Reviews</h3>
+            <p>See your most recent reviews here</p>
+            <% if (YourReviews.length === 0) { %>
+                <p class="no-items">Review games you've played for them to appear here</p>
+            <% } %>
+            <% if(YourReviews.length) { %>
+                <div class="review-container">
+                    <div class="slideshow-container" id="reviews-slideshow">
+                        <% YourReviews.forEach((review, index) => { %>
+                            <div class="review-slide"
+                                style="<%= index === 0 ? 'display:grid;' : 'display:none;' %>"
+                            >
+                                <div class="review-grid">
+                                    <div class="review-header">
+                                        <div class="review-header-text">
+                                            <p style="font-weight: bold; font-size: 1.2rem" class="review-game"><%= review.cachedName %></p>
+                                            <p style="font-weight: bold;" class="review-title"><%= review.title %></p>
+                                        </div>
+                                        <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= review.cachedName %>">
+                                    </div>
+                                    <p class="review-body"><%= review.body %></p>
+                                </div> 
+                            </div>
+                        <% }) %>
+                    </div>
+                    <div class="card-spacer"></div>
+                    <div class="review-controls">
+                        <% if (YourReviews.length > 1) { %>
+                            <a class="reviewPrev" onclick="plusReviewSlides(-1)">&#10094;</a>
+                        <% } %>
+                    <div class="dot-div">
+                        <% YourReviews.forEach((_, index) => { %>
+                            <span class="reviewDot <%= index === 0 ? 'active' : '' %>" onclick="currentReviewSlide(<%= index + 1 %>)"></span>
+                        <% }) %>
+                    </div>
+                    <% if (YourReviews.length > 1) { %>
+                        <a class="reviewNext" onclick="plusReviewSlides(1)">&#10095;</a>
+                    <% } %>
+                    </div>
+                </div>
+            <% } %>
+
         </div>
-            <div class="card-spacer"></div>
         </div>
 
     </div>

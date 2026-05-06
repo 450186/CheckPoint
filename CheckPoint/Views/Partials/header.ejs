@@ -147,11 +147,13 @@
             notiDropdown.style.width = "300px";
             notiDropdown.style.transform = "none";
             return;
+        } else if(window.innerWidth > 767) {
+          const rect = notiOpen.getBoundingClientRect();
+          notiDropdown.style.left = `${rect.left + rect.width / 2}px`;
+          notiDropdown.style.top = `${rect.top + 60 + window.scrollY}px`;
+          notiDropdown.style.transform = "translateX(-50%)";
         }
-        const rect = notiOpen.getBoundingClientRect();
-        notiDropdown.style.left = `${rect.left + rect.width / 2}px`;
-        notiDropdown.style.top = `${rect.top + 60 + window.scrollY}px`;
-        notiDropdown.style.transform = "translateX(-50%)";
+
     });
     document.addEventListener('click', function(event) {
       if (notiOpen && notiDropdown && !notiOpen.contains(event.target) && !notiDropdown.contains(event.target)) {
