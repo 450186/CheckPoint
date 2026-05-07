@@ -91,13 +91,98 @@ a {
 a:hover {
     color: var(--secondText);
 }
-
 .home-links {
     right: 20px;
     position: absolute;
-    font-weight: bold;
 }
-
+.welcome-content {
+    text-align: center;
+    margin-top: var(--header-height)
+}
+.welcome-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+    padding: 20px;
+}
+.welcome-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+}
+.preview-section {
+    margin-top: 40px;
+}
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+.preview-game {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.preview-game img {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+.preview-rating {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.preview-rating-stars {
+    margin-left: auto;
+    color: #FBBF24;
+}
+.preview-card {
+    position: relative;
+}
+.preview-badge {
+    position: absolute;
+    top: 35px;
+    right: 20px;
+    background-color: var(--accent);
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--accentHover);
+    opacity: 0.8;
+    cursor: pointer;
+}
+.preview-dropdown {
+    background-color: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    top: 70px;
+    right: 20px;
+    width: 240px;
+    position: absolute;
+    z-index: 100;
+    box-shadow: var(--shadow);
+}
+.welcome-card,
+.preview-card {
+    background-color: var(--cards);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 180px;
+    height: auto;
+    box-shadow: var(--shadow);
+    min-width: 0;
+}
 .sidebar-add-friends-btn,
 .sidebar-account-container,
 .sidebar-search,
@@ -1533,6 +1618,7 @@ textarea {
 .recommended-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 6px;
     margin-top: 10px
 }
@@ -1767,7 +1853,7 @@ textarea {
     flex-direction: column;
     gap: 16px;
     margin-top: 20px;
-    margin-right: calc(60px + var(--sidebar-width));
+    margin-right: calc(80px + var(--sidebar-width));
 }
 .accordion-item {
     background: var(--cards);
@@ -2437,6 +2523,7 @@ progress::-moz-progress-bar {
 }
 .profile-right-column > .review-card {
     grid-column: 1 / -1;
+    height: 60vh;
 }
 .friendsList-card,
 .playing-card {
@@ -2802,12 +2889,8 @@ progress::-moz-progress-bar {
     }
 }
 
-/* ======== Tablet Styles ======== */
-@media (max-width: 1023px) {
-
-}
 /* ======== Mobile Styles ======== */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
     header {
         display: grid;
         grid-template-columns: 48px 1fr 48px;
@@ -3054,11 +3137,20 @@ progress::-moz-progress-bar {
     }
 
     .card-rows {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .review-card {
+        grid-column: 1 / -1
+    }
+
+    .library-row.center4 {
+        justify-content: center;
+        overflow: hidden;
     }
 
     .game-info-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
 
     .game-cover-container img {
@@ -3075,7 +3167,7 @@ progress::-moz-progress-bar {
     }
 
     .filter-container {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 8px;
     }
 
@@ -3108,6 +3200,23 @@ progress::-moz-progress-bar {
         width: 90%;
     }
 
+    .total-games {
+        width: 48%;
+        margin: 0 auto;
+    }
+
+    .completion-rate {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        margin: 0 auto;
+    }
+    .progress-wrap {
+        width: 65%;
+    }
+
     .genre-chart-cont {
         width: 100%;
         display: flex;
@@ -3122,6 +3231,32 @@ progress::-moz-progress-bar {
         width: 250px !important;
         max-width: 250px !important;
         max-height: 250px !important;
+    }
+
+    .profile-page {
+        grid-template-areas:
+            "profile friends"
+            "profile playing"
+            "review review";
+    }
+
+    .profile-card {
+        grid-area: profile;
+    }
+    .profile-right-column {
+        display: contents;
+    }
+
+    .profile-page .friendsList-card {
+        grid-area: friends;
+    }
+
+    .profile-page .playing-card {
+        grid-area: playing;
+    }
+
+    .profile-page .review-card {
+        grid-area: review
     }
 
     .stats-sidebar {
@@ -3255,6 +3390,360 @@ progress::-moz-progress-bar {
   .activity-rating {
     margin: 0;
   }
+  
+  .welcome-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .welcome-content h4 {
+    margin: 20px;
+  }
+  .preview-card.high-rated-card {
+    grid-column: 1 / -1;
+    width: 60%;
+    margin: auto;
+  }
+    .game-info-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+    .game-right-side {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+    }
+    .game-right-side .community-status-legend {
+        width: 100%;
+        margin: auto
+    }
+    .game-main-page .library-form {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 60%;
+        margin: auto
+    }
+    .game-rating-div {
+        width: 60%;
+        margin: auto
+    }
+
+}
+@media (max-width: 950px) {
+    .dashboard-rows.card-rows {
+        grid-template-columns: 1fr;
+    }
+    .review-card {
+        height: 65vh
+    }
+    .dash-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+    }
+    .community-status-legend {
+        width: 50%;
+        margin: auto
+    }
+    .last-stat {
+        grid-column: 2
+    }
+}
+@media (max-width: 650px) {
+    .dash-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .community-status-legend {
+        width: 100%;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+    .modal {
+        width: 97%;
+        height: fit-content;
+        margin: 0;
+    }
+    .modal-body {
+        display: grid;
+        grid-template-columns: 175px 1fr;
+        gap: 12px;
+    }
+    .modal-cover {
+        width: 100%;
+        height: auto;
+        max-width: 175px;
+        object-fit: cover;
+        aspect-ratio: 3 / 4;
+        grid-column: 1;
+        grid-row: 1 / 5;
+        align-self: center;
+        justify-self: center;
+    }
+    .modal-info {
+        display: contents;
+        grid-row: 1 / 5;
+        grid-column: 2;
+    }
+    .modal-header {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    .modal-info .muted-text {
+        grid-column: 2;
+        grid-row: 2;
+    }
+    #modal-genres {
+        grid-column: 2;
+        grid-row: 3;
+    }
+    #modal-release {
+        grid-column: 2;
+        grid-row: 4;
+    }
+    .modal-info .card-spacer {
+        display: none;
+    }
+    .modal-info .modal-actions {
+        grid-column: 1 / -1;
+        grid-row: 5;
+        width: 70%;
+        margin: auto;
+    }
+}
+@media (max-width: 480px) {
+    .home-links {
+        right: 10px;
+        position: absolute;
+        gap: 5px;
+    }
+    .home-links a {
+        margin: 0;
+    }
+    .home-links a[href="register"] {
+        margin-left: 15px;
+    }
+    .review-img-small {
+        grid-column: 2;
+        grid-row: 1 / 3;
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        justify-self: end;
+        margin: auto;
+    }
+    .discover-main-page .card-rows {
+        grid-template-columns: 1fr;
+    }
+    .dash-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .dash-card .community-status-legend {
+        width: 100%;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+    .dashboard-main-page .review-card {
+        height: 70vh;
+    }
+    .discover-cards,
+    .suggestion-card {
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+        padding: 12px;
+    }
+
+    .discover-cards .game-card-header,
+    .suggestion-card .game-card-header {
+        display: contents;
+    }
+
+    .discover-cards .game-cover,
+    .suggestion-card .game-cover {
+        grid-column: 1;
+        grid-row: 1 / span 5;
+        width: 120px;
+        height: auto;
+        object-fit: cover;
+        margin: 0;
+    }
+
+    .discover-cards h3,
+    .discover-cards p,
+    .discover-cards .library-form,
+    .suggestion-card h3,
+    .suggestion-card p,
+    .suggestion-card .library-form {
+        grid-column: 2;
+        margin: 0;
+    }
+
+    .discover-cards h3,
+    .suggestion-card h3 {
+        grid-row: 1;
+        font-size: 1rem;
+    }
+
+    .discover-cards p,
+    .suggestion-card p {
+        font-size: 0.85rem;
+    }
+
+    .discover-cards .library-form,
+    .suggestion-card .library-form {
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .discover-cards .card-spacer,
+    .suggestion-card .card-spacer {
+        display: none;
+    }
+    .activity-card {
+        display: grid;
+        grid-template-columns: 48px 1fr 100px;
+        grid-template-areas:
+            "avatar message image"
+            "reviewTitle reviewTitle reviewTitle"
+            "rating rating rating"
+            "body body body"
+            "timestamp timestamp timestamp";
+        gap: 10px;
+        align-items: start;
+    }
+
+    .activity-content {
+        display: contents;
+    }
+
+    .activity-avatar {
+        grid-area: avatar;
+        width: 48px;
+        height: 48px;
+        margin: auto;
+    }
+
+    .activity-msg-line {
+        grid-area: message;
+        margin: 0;
+    }
+
+    .activity-game-img {
+        grid-area: image;
+        width: 100px;
+        height: 120px;
+        object-fit: cover;
+        justify-self: end;
+    }
+
+    .activity-review-title {
+        grid-area: reviewTitle;
+        margin: 0;
+    }
+
+    .activity-rating {
+        grid-area: rating;
+        margin: 0;
+    }
+
+    .activity-review-body {
+        grid-area: body;
+        margin: 0;
+    }
+
+    .activity-timestamp {
+        grid-area: timestamp;
+        margin: 0;
+    }
+
+    .card-spacer {
+        display: none;
+    }
+
+    .welcome-content .card-spacer {
+        flex: 1;
+    }
+
+    .card-rows {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .completion-rate{
+        width: 100%;
+    }
+    .total-games {
+        width: 100%;
+    }
+    .progress-wrap {
+        width: 100%;
+    }
+    .preview-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .preview-card.high-rated-card {
+        width: 100%;
+        margin: auto;
+    }
+    #login-card, #register-card {
+        width: 100%;
+    }
+    .library-grid.last-centered > .library-img-card:last-of-type {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: 50%;
+    }
+    .game-info-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+    .game-right-side {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+    }
+    .game-right-side .community-status-legend {
+        width: 100%;
+        margin: auto
+    }
+    .review-row-wrap.scrollable::after {
+        display: none;
+    }
+    .game-main-page .library-form {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        margin: auto
+    }
+    .game-rating-div {
+        width: 100%;
+        margin: auto
+    }
 }
 /* ======== ======== */
 /* ======== ======== */

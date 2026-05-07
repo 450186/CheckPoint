@@ -26,6 +26,7 @@
                     <% } else { %>
                         <div class="library-grid
                         <%= grouped[section.key].length <= 4 ? "library-center4" : "" %>
+                        <%= grouped[section.key].length % 2 == 1 ? "last-centered" : "" %>
                         ">
                             <% grouped[section.key].forEach(item => { %>
                                 <div class="library-card library-img-card"

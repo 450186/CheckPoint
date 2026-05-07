@@ -1,7 +1,7 @@
 <%- include('../Partials/header') %>
 <%- include('../Partials/navi', {activePage: 'dashboard'}) %>
 
-<div class="main-content">
+<div class="main-content dashboard-main-page">
     <h2 class="title">
         <%= title %>
     </h2>
@@ -11,7 +11,7 @@
         </h3>
     </div>
     <p class="error-msg"><%= errorMessage %></p>
-    <div class="card-rows first-row">
+    <div class="dashboard-rows card-rows first-row">
         <div class="dash-card stats-card">
             <h3>Your Stats</h3>
             <div class="stats-tabs">
@@ -67,7 +67,7 @@
                         <p class="stat-comment"><%= statsInfo.diversityComment %></p>
                     </div>
                 </div>
-                <h3>Vault Breakdown:</h3>
+                <h3 style="text-align: center;">Vault Breakdown:</h3>
                 <div class="community-status-legend">
                     <p><i class="fa-solid fa-circle-dot wishlist-dot"></i><strong>Wishlisted: </strong><%= statsInfo.wishlistCount %></p>
                     <p><i class="fa-solid fa-circle-dot completed-dot"></i><strong>Completed: </strong><%= statsInfo.completedCount %></p>
@@ -95,7 +95,7 @@
                         <p class="stat-label">Your Backlog</p>
                         <p class="stat-comment"><%= habitStats.backlogComment %></p>
                     </div>
-                    <div class="stat-grid-item">
+                    <div class="stat-grid-item last-stat">
                         <i class="fa-solid fa-pen-nib icon-blue"></i>
                         <h4><%= habitStats.reviewRate %>%</h4>
                         <p class="stat-label"><%= habitStats.reviewCount %> / <%= habitStats.playedGamesTotal %> reviewed</p>
@@ -127,7 +127,7 @@
                         <div class="card-spacer"></div>
                         <p class="stat-comment"><%= activityStats.recentUpdatesComment %></p>
                     </div>
-                    <div class="stat-grid-item">
+                    <div class="stat-grid-item last-stat">
                         <i class="fa-solid fa-star icon-yellow"></i>
                         <h4><%= activityStats.recentRatings %></h4>
                         <p class="stat-label">Ratings this month</p>
@@ -166,13 +166,14 @@
                 </div>
         </div>
     </div>
-    <div class="card-rows">
+    <div class="dashboard-rows card-rows">
         <div class="dash-card" id="continue-card">
             <h3>Continue Playing</h3>
             <p>Pick up where you left off in your current games.</p>
             <% if (playing && playing.length > 0) { %>
                 <div class="library-row 
                     <%= playing.length <= 3 ? "center3" : "" %>
+                    <%= playing.length <= 4 ? "center4" : "" %>
                 ">
                     <% playing.forEach(game => { %>
                     <div class="library-card game-card"
@@ -202,7 +203,7 @@
                 class="view-library">View Your Vault</button>
         </div>
     </div>
-    <div class="card-rows">
+    <div class="dashboard-rows card-rows">
         <div class="dash-card next-game-card">
             <h3>What to Play?</h3>
             <p>Don't know what to play? Try this:</p>

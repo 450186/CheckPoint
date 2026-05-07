@@ -45,7 +45,7 @@
     <div class="card-rows">
       <% if (suggestedQueries && suggestedQueries.length > 0) { %>
         <% suggestedQueries.forEach(suggestion => { %>
-          <div class="dash-card game-card clickable"
+          <div class="dash-card game-card clickable suggestion-card"
           data-game-id="<%= suggestion.id %>"
           data-name="<%= suggestion.name %>"
           data-cover="<%= suggestion.coverUrl %>"

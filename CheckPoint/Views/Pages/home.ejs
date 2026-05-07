@@ -1,3 +1,124 @@
 <%- include('../partials/header') %>
+<div class="welcome-content">
+    <h1>Welcome to PlayVault</h1>
+    <h2>Track your games. Rate them. Build your vault.</h2>
+    <h4>GameVault helps you manage your backlog, reviews, ratings, and recommendations in one place.</h4>
 
+    <div class="welcome-cards-grid">
+        <div class="welcome-card">
+            <i class="fa-solid fa-vault"></i>
+            <h2>Your Vault</h2>
+            <div class="card-spacer"></div>
+            <p>Keep track of games you like, dislike and want to play</p>
+        </div>
+        <div class="welcome-card">
+            <i class="fa-solid fa-chart-pie"></i>
+            <h2>Your Stats</h2>
+            <div class="card-spacer"></div>
+            <p>See your completion rate, favourite genres, average rating and more</p>
+        </div>
+        <div class="welcome-card">
+            <i class="fa-solid fa-pen-nib"></i>
+            <h2>Reviews and Ratings</h2>
+            <div class="card-spacer"></div>
+            <p>Write reviews and rate games you've played so your favourites stand out</p>
+        </div>
+        <div class="welcome-card">
+            <i class="fa-solid fa-compass"></i>
+            <h2>Discover New Games</h2>
+            <div class="card-spacer"></div>
+            <p>Find new games and get recommendations based on your vault</p>
+        </div>
+    </div>
+    <section class="preview-section">
+        <h2>Inside the Vault</h2>
+        <div class="preview-grid">
+            <div class="preview-card">
+                <span class="preview-badge">Preview</span>
+                <h3>Continue Playing</h3>
+                <div class="preview-game">
+                    <img src="/assets/Images/Uncharted_4_Preview.jpg" alt="Uncharted 4">
+                    <p>Uncharted 4: A Thief's End</p>
+                </div>
+                <div class="preview-game">
+                    <img src="/assets/Images/Doom_Preview.jpg" alt="Doom">
+                    <p>Doom Eternal</p>
+                </div>
+                <div class="preview-game">
+                    <img src="/assets/Images/God_of_War_Preview.webp" alt="God Of War Ragnarok">
+                    <p>God of War Ragnarok</p>
+                </div>
+                <div class="preview-dropdown hidden">
+                    <h3>This is a preview</h3>
+                    <p>This is a basic preview of what a portion of your vault would look like</p>
+                </div>
+            </div>
+            <div class="preview-card">
+                <span class="preview-badge">Preview</span>
+                <h3>Your Stats</h3>
+                <p>Games Completed: 24</p>
+                <p>Completion Rate: 65%</p>
+                <p>Average Rating: 4.4 / 5 <i class="fa-solid fa-star"></i></p>
+                <div class="preview-dropdown hidden">
+                    <h3>This is a preview</h3>
+                    <p>This is a basic preview of what kind of stats you can see</p>
+                </div>
+            </div>
+            <div class="preview-card high-rated-card">
+                <span class="preview-badge">Preview</span>
+                <h3>Top Rated</h3>
+                <div class="preview-rating">
+                    <p>Detroit: Become Human</p>
+                    <div class="preview-rating-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                </div>
+                <div class="preview-rating">
+                    <p>Dark Souls 3</p>
+                    <div class="preview-rating-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star-half-stroke"></i>
+                    </div>
+                </div>
+                <div class="preview-rating">
+                    <p>Red Dead Redemption 2</p>
+                    <div class="preview-rating-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                    </div>
+                </div>
+                <div class="preview-dropdown hidden">
+                    <h3>This is a preview</h3>
+                    <p>This is a basic preview of what rated games would look like</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    const previewCards = document.querySelectorAll('.preview-card');
+
+    previewCards.forEach(card => {
+        const badge = card.querySelector('.preview-badge');
+        const dropdown = card.querySelector('.preview-dropdown');
+
+        badge.addEventListener("mouseenter", () => {
+            dropdown.classList.remove('hidden');
+        })
+
+        badge.addEventListener("mouseleave", () => {
+            dropdown.classList.add('hidden');
+        })
+    })
+</script>
 <%- include('../partials/footer') %>
