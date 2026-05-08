@@ -3537,7 +3537,7 @@ progress::-moz-progress-bar {
         margin: 0;
     }
     .home-links a[href="register"] {
-        margin-left: 15px;
+        margin-left: 10px;
     }
     .review-img-small {
         grid-column: 2;
@@ -3700,10 +3700,17 @@ progress::-moz-progress-bar {
     .progress-wrap {
         width: 100%;
     }
+    .welcome-cards-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
     .preview-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 12px;
+    }
+    .preview-card h3 {
+        text-align: left;
     }
     .preview-card.high-rated-card {
         width: 100%;
