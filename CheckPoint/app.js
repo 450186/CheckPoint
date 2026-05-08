@@ -153,6 +153,7 @@ async function IGDBrequest(endpoint, body) {
         throw err;
     }
 }
+// https://www.tutorialspoint.com/article/php-program-to-convert-a-given-timestamp-into-time-ago
 function toTimeAgo(date) {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
     if (seconds < 60) {

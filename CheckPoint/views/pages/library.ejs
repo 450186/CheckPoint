@@ -3,10 +3,10 @@
 <%- include('../partials/navi', {activePage: 'library'}) %>
 
     <% const sections = [
-        {key: "playing", label: "🟠 Playing "},
-        {key: "completed", label: "🟢 Completed "},
-        {key: "wishlist", label: "🟡 Wishlist "},
-        {key: "dropped", label: "🔴 Dropped "}
+        {key: "playing", label: " Playing", icon: "fa-solid fa-gamepad icon-orange"},
+        {key: "completed", label: " Completed", icon: "fa-solid fa-circle-check icon-green"},
+        {key: "wishlist", label: " Wishlist", icon: "fa-solid fa-bookmark icon-yellow"},
+        {key: "dropped", label: " Dropped", icon: "fa-solid fa-circle-xmark icon-red"}
     ]; %>
 <div class="main-content">
     <h2 class="title">My Vault</h2>
@@ -14,7 +14,10 @@
         <% sections.forEach(section => { %>
             <section class="accordion-item <%= grouped[section.key].length ? '' : 'empty' %>">
                 <button class="accordion-trigger" type="button" aria-expanded="<%= section.key === 'playing' ? 'true' : 'false' %>">
-                    <span><%= section.label %></span>
+                    <span class="accordion-label">
+                        <span class="accordion-icon"><i class="<%= section.icon %>"></i></span>
+                        <span class="accordion-text"><%= section.label %></span>
+                    </span>
                     <span class="accordion-right">
                         <span class="accordion-count"><%= grouped[section.key].length %></span>
                         <span class="accordion-arrow"><i class="fa-solid fa-chevron-down"></i></span>

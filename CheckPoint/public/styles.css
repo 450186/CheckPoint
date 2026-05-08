@@ -1386,21 +1386,34 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
 }
+.game-right-side .community-status-legend span,
+.game-right-side .community-status-legend i,
+.game-right-side .community-status-legend strong {
+    font-size: 0.8rem;
+}
 .community-status-legend .fa-circle-dot {
     width: 20px;
     height: 20px;
 }
 .playing-dot {
     color: var(--playing);
+
+    width: 20px;
 }
 .completed-dot {
     color: var(--completed);
+    margin-right: 5px;
+    width: 20px;
 }
 .wishlist-dot {
     color: var(--wishlist);
+    margin-right: 5px;
+    width: 20px;
 }
 .dropped-dot {
     color: var(--dropped);
+    margin-right: 5px;
+    width: 20px;
 }
 .review-row-wrap {
     position: relative;
@@ -1847,6 +1860,15 @@ textarea {
 /* ======== Accordion styles ======== */
 .accordion-panel {
     display: none;
+}
+.accordion-label {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+.accordion-icon {
+    width: 24px;
+    text-align: center;
 }
 .accordion-panel.open {
     display: block;
@@ -3428,7 +3450,7 @@ progress::-moz-progress-bar {
     }
     .game-right-side .community-status-legend {
         width: 100%;
-        margin: auto
+        margin: auto;
     }
     .game-main-page .library-form {
         display: flex;
