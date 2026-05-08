@@ -2,9 +2,9 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 4000;
 
-const userModel = require('./Models/users.js');
-const libraryModel = require('./Models/Library.js');
-const reviewModel = require('./Models/Review.js');
+const userModel = require('./models/users.js');
+const libraryModel = require('./models/Library.js');
+const reviewModel = require('./models/Review.js');
 
 const platformsData = require('./data/platforms.json')
 const genreComments = require('./data/genreComments.json')
@@ -66,7 +66,7 @@ const { log, error } = require('console');
 const { platform } = require('os');
 const { get } = require('http');
 const { doesNotThrow } = require('assert');
-app.use(express.static(path.join(__dirname, 'Public')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

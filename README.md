@@ -4,11 +4,17 @@ CheckPoint
 ├─ .DS_Store
 ├─ CheckPoint
 │  ├─ .DS_Store
-│  ├─ Models
+│  ├─ app.js
+│  ├─ data
+│  │  ├─ genreComments.json
+│  │  └─ platforms.json
+│  ├─ models
 │  │  ├─ Library.js
 │  │  ├─ Review.js
 │  │  └─ users.js
-│  ├─ Public
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
 │  │  ├─ .DS_Store
 │  │  ├─ Modalfunction.js
 │  │  ├─ Reviewfunction.js
@@ -26,32 +32,26 @@ CheckPoint
 │  │  │     ├─ PlayVault-logo512.png
 │  │  │     └─ PlayVault-logo64.png
 │  │  └─ styles.css
-│  ├─ Views
-│  │  ├─ .DS_Store
-│  │  ├─ Pages
-│  │  │  ├─ LibraryOld.ejs
-│  │  │  ├─ activity.ejs
-│  │  │  ├─ dashboard.ejs
-│  │  │  ├─ discover.ejs
-│  │  │  ├─ favourites.ejs
-│  │  │  ├─ game.ejs
-│  │  │  ├─ home.ejs
-│  │  │  ├─ library.ejs
-│  │  │  ├─ login.ejs
-│  │  │  ├─ profile.ejs
-│  │  │  └─ register.ejs
-│  │  └─ Partials
-│  │     ├─ Modal.ejs
-│  │     ├─ ReviewModal.ejs
-│  │     ├─ footer.ejs
-│  │     ├─ header.ejs
-│  │     └─ navi.ejs
-│  ├─ app.js
-│  ├─ data
-│  │  ├─ genreComments.json
-│  │  └─ platforms.json
-│  ├─ package-lock.json
-│  └─ package.json
+│  └─ views
+│     ├─ .DS_Store
+│     ├─ pages
+│     │  ├─ LibraryOld.ejs
+│     │  ├─ activity.ejs
+│     │  ├─ dashboard.ejs
+│     │  ├─ discover.ejs
+│     │  ├─ favourites.ejs
+│     │  ├─ game.ejs
+│     │  ├─ home.ejs
+│     │  ├─ library.ejs
+│     │  ├─ login.ejs
+│     │  ├─ profile.ejs
+│     │  └─ register.ejs
+│     └─ partials
+│        ├─ Modal.ejs
+│        ├─ ReviewModal.ejs
+│        ├─ footer.ejs
+│        ├─ header.ejs
+│        └─ navi.ejs
 ├─ Notion header.png
 └─ README.md
 

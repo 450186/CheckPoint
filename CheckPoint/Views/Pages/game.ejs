@@ -1,6 +1,6 @@
-<%- include('../Partials/header') %>
+<%- include('../partials/header') %>
 
-<%- include('../Partials/navi', {activePage: 'game'}) %>
+<%- include('../partials/navi', {activePage: 'game'}) %>
 
 <div class="main-content game-main-page">
         <button onclick="showPageLoader('<%= from.startsWith('/discover') ? 'Loading discover...' : 'Loading...' %>'); window.location.href='<%= from %>'" 
@@ -474,7 +474,7 @@
     showVideoSlides(videoSlideIndex);
     </script>
 </div>
-<%- include('../Partials/footer') %>
+<%- include('../partials/footer') %>
 <script src="/Reviewfunction.js"></script>
 <script>
     const usernames = document.querySelectorAll('.activity-username');
