@@ -29,12 +29,14 @@ const twitchClientSecret = process.env.TWITCH_CLIENT_SECRET
 
 app.set('trust proxy', 1);
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 app.use(session({
     secret: sessionSecret,
     saveUninitialized: false,
     cookie: {
         maxAge: fiveMins,
-        secure: true,
+        secure: isProduction,
         httpOnly: true
     },
     resave: false,

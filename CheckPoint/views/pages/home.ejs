@@ -1,5 +1,13 @@
 <%- include('../partials/header') %>
 <div class="welcome-content">
+    <div class="mobile-home-links">
+        <form action="/login" method="GET">
+            <button type="submit" class="mobile-home-link">Login</button>
+        </form>
+        <form action="/register" method="GET">
+            <button type="submit" class="mobile-home-link">Register</button>
+        </form>
+    </div>
     <h1>Welcome to PlayVault</h1>
     <h2>Track your games. Rate them. Build your vault.</h2>
     <h4>GameVault helps you manage your backlog, reviews, ratings, and recommendations in one place.</h4>
