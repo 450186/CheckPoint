@@ -888,7 +888,7 @@ button:hover {
     -webkit-overflow-scrolling: touch;
 }
 .sidebar.collapsed ~ .main-content .library-row.center4 {
-    justify-content: center;
+    justify-content: flex-start;
 }
 .sidebar:not(.collapsed) ~ .main-content .library-row.center3 {
     justify-content: center;
@@ -2707,7 +2707,6 @@ progress::-moz-progress-bar {
     align-items: stretch;
     width: 75%;
     margin: 0 auto;
-    cursor: pointer;
 }
 .activity-avatar {
     width: 60px;
@@ -2798,6 +2797,10 @@ progress::-moz-progress-bar {
     margin: 0;
     font-weight: 600;
     color: var(--text);
+}
+.activity-game-name {
+    text-decoration: underline;
+    cursor: pointer;
 }
 /* ======== Loader ======== */
 /* Asked ChatGPT to help me create a loader that looks like a vault door opening */
@@ -3437,7 +3440,9 @@ progress::-moz-progress-bar {
         width: 60%;
         margin: auto
     }
-
+    .dashboard-main-page .review-card {
+        height: 65vh
+    }
 }
 @media (max-width: 950px) {
     .dashboard-rows.card-rows {
@@ -3498,7 +3503,7 @@ progress::-moz-progress-bar {
     }
     .modal-header {
         grid-column: 2;
-        grid-row: 1;
+        grid-row: 1 / 2;
     }
     .modal-info .muted-text {
         grid-column: 2;

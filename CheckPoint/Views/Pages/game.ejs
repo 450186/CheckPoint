@@ -367,9 +367,25 @@
     let artSlideIndex = 1;
     let videoSlideIndex = 1;
 
+    //this function stops the videos from playing when they are hidden
+    function pauseVideos() {
+        document.querySelectorAll('.video-frame').forEach(frame => {
+            frame.contentWindow.postMessage(
+                JSON.stringify({
+                    event: 'command',
+                    func: 'pauseVideo',
+                    args: []
+                }),
+                '*'
+            )
+        })
+    }
+
     function showVideoSlides(n) {
         const slides = document.getElementsByClassName("video-slide");
         const dots = document.getElementsByClassName("Videodot");
+
+        pauseVideos();
 
         if (!slides.length) return;
 

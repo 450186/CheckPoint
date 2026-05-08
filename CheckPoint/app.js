@@ -1183,7 +1183,7 @@ similarGenres = similarGenres.slice(0, 6);
         })).filter(s => s.url) || [],//filter out empty urls
 
         videos: g.videos?.map(v => ({
-            url: v.video_id ? `https://www.youtube.com/embed/${v.video_id}` : ""
+            url: v.video_id ? `https://www.youtube.com/embed/${v.video_id}?enablejsapi=1` : ""
         })).filter(v => v.url) || [],
     }
 
