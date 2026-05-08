@@ -35,6 +35,7 @@
                 <%= game.releaseDate ? new Date(game.releaseDate * 1000).toLocaleDateString("en-GB", {day: "2-digit",month: "short",year: "numeric"}) : "Unknown" %>
             </p>
             <% if (isInLibrary) { %>
+                <% if(!isInWishlist) { %> 
             <div class="review-form-group">
                 <form action="/library/rate" class="rating-form" method="POST">
                     <input type="hidden" name="gameId" value="<%= game.id %>">
@@ -69,7 +70,8 @@
                     </button>
                 </form>
             </div>
-                <% if (!alreadyReviewed) { %>
+            <% } %>
+                <% if (!alreadyReviewed && !isInWishlist) { %>
                     <button type="button" 
                     id="open-review-modal-btn" 
                     data-game-id="<%= game.id %>"

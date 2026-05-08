@@ -1233,6 +1233,8 @@ similarGenres = similarGenres.slice(0, 6);
     }
     const isInLibrary = userLibraryItem !== null;
 
+    const isInWishlist = userLibraryItem?.status === "wishlist";
+
     const gameReviews = await reviewModel.find({ gameId: id })
         .populate("userId", "username avatarSeed")
         .sort({ createdAt: -1 })
@@ -1249,6 +1251,7 @@ similarGenres = similarGenres.slice(0, 6);
         title: r.title,
         ownReview: String(r.userId._id) === String(req.session.user.id)
     }))
+
     res.render('pages/game', {
         title: game.name,
         user: req.session.user,
@@ -1266,6 +1269,7 @@ similarGenres = similarGenres.slice(0, 6);
         statusPercents,
         totalTracked,
         isInLibrary,
+        isInWishlist,
         reviews,
         alreadyReviewed
     })
