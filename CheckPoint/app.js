@@ -27,12 +27,15 @@ const mongoAppName = process.env.MongoAppName
 const twitchClientId = process.env.TWITCH_CLIENT_ID
 const twitchClientSecret = process.env.TWITCH_CLIENT_SECRET
 
+app.set('trust proxy', 1);
+
 app.use(session({
     secret: sessionSecret,
     saveUninitialized: false,
     cookie: {
         maxAge: fiveMins,
-        secure: false, // Set to true if using HTTPS
+        secure: true,
+        httpOnly: true
     },
     resave: false,
 }))
