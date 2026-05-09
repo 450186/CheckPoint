@@ -485,7 +485,7 @@ button:hover {
     box-shadow: var(--shadow);
     color: var(--text);
     text-align: left;
-    border-radius: 25px;
+    border-radius: 16px;
     z-index: 1500;
     padding: 20px;
     display: none;
@@ -1624,12 +1624,17 @@ textarea {
 .icon-playstyle { color: #7C3AED; }
 
 .recommended-card,
-.next-game-card,
-.review-card {
+.next-game-card {
     display: flex;
     flex-direction: column;
     overflow: hidden;
     height: 75vh;
+}
+.review-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 55vh;
 }
 .recommended-list {
     flex: 1;
@@ -1641,33 +1646,57 @@ textarea {
 .recommended-byline {
     display: flex;
     justify-content: center;
+    grid-column: 1 / -1;
     color: var(--secondText);
+}
+.recommended-card-header {
+    display: contents;
 }
 .recommended-card-img {
     width: 150px;
-    height: 200px;
+    max-width: 150px;
+    height: auto;
+    aspect-ratio: 3 / 4;
     object-fit: cover;
     border-radius: 8px;
     flex-shrink: 0;
-    margin-top: 20px;
-}
-.recommended-card-header {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin: 20px;
-    margin-bottom: 0;
+    margin: auto;
+    grid-column: 2;
+    grid-row: 1;
 }
 .recommended-card-info {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+    grid-column: 1;
+}
+.recommended-card-title {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+}
+.dashboard-rows:last-of-type {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.recommended-card-content {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+}
+.review-card {
+    grid-column: 1 / -1;
+    width: 100%;
 }
 .recommended-content-card {
     border-radius: 16px;
-    background-color: #122650;
+    background-color: var(--background);
     border: 1px solid var(--borer);
     box-shadow: var(--shadow);
+    align-items: start;
+    gap: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 .recommended-content-card:last-of-type {
     margin-bottom: 20px;
@@ -3490,6 +3519,7 @@ progress::-moz-progress-bar {
     }
 }
 @media (max-width: 650px) {
+
     .dash-stats-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -3555,6 +3585,9 @@ progress::-moz-progress-bar {
 @media (max-width: 480px) {
     body {
         padding-top: 20px;
+    }
+    #password-rules-div {
+        width: 95%;
     }
     .home-links {
         display: none;
