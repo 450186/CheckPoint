@@ -3519,6 +3519,35 @@ progress::-moz-progress-bar {
     }
 }
 @media (max-width: 650px) {
+    .high-rated-card .ranking-card {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        grid-template-rows: auto auto;
+    }
+    .high-rated-card .ranking-card-header {
+        display: contents;
+    }
+    .high-rated-card .ranking-card-title {
+        grid-column: 2;
+        grid-row: 1;
+        margin: 0;
+    }
+    .high-rated-card .ranking-card-img {
+        grid-column: 1;
+        grid-row: 1 / 2;
+        width: 100%;
+        max-width: 150px;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        justify-self: end;
+        margin: auto;
+    }
+    .high-rated-card .activity-star-rating {
+        grid-column: 2;
+        grid-row: 2;
+        margin: 0;
+    }
     .home-links {
         display: none;
     }
