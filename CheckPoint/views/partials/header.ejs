@@ -140,14 +140,23 @@
         notiDropdown.style.display = 
         notiDropdown.style.display === 'block' ? 'none' : 'block';
 
-        if(window.innerWidth <= 767) {
+        if(window.innerWidth <= 480) {
+          notiDropdown.style.position = "fixed";
+          notiDropdown.style.top = "80px";
+          notiDropdown.style.right = "16px";
+          notiDropdown.style.width = "350px";
+          notiDropdown.style.minWidth = "0"
+          notiDropdown.style.transform = "none";
+
+        } else if(window.innerWidth <= 767) {
             notiDropdown.style.position = "fixed";
             notiDropdown.style.top = "80px";
             notiDropdown.style.right = "16px";
-            notiDropdown.style.width = "300px";
+            notiDropdown.style.width = "400px";
+            notiDropdown.style.minWidth = "0"
             notiDropdown.style.transform = "none";
             return;
-        } else if(window.innerWidth > 767) {
+        }  else {
           const rect = notiOpen.getBoundingClientRect();
           notiDropdown.style.left = `${rect.left + rect.width / 2}px`;
           notiDropdown.style.top = `${rect.top + 60 + window.scrollY}px`;
