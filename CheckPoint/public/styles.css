@@ -3519,7 +3519,16 @@ progress::-moz-progress-bar {
     }
 }
 @media (max-width: 650px) {
-
+    .home-links {
+        display: none;
+    }
+    .mobile-home-links {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+    }
     .dash-stats-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -3588,16 +3597,6 @@ progress::-moz-progress-bar {
     }
     #password-rules-div {
         width: 95%;
-    }
-    .home-links {
-        display: none;
-    }
-    .mobile-home-links {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 12px;
-        margin-top: 20px;
     }
     .review-img-small {
         grid-column: 2;
