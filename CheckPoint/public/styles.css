@@ -99,6 +99,7 @@ a:hover {
     display: none;
 }
 .welcome-content {
+    padding-top: var(--header-height);
     text-align: center;
 }
 .welcome-cards-grid {
