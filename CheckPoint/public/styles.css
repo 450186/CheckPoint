@@ -3975,7 +3975,7 @@ progress::-moz-progress-bar {
         grid-column: 1 / -1;
         grid-row: 4;
     }
-    .profile-review-card {
+    .profile-reviews {
         height: auto;
     }
 }
