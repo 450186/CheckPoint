@@ -3505,6 +3505,9 @@ progress::-moz-progress-bar {
     .dashboard-main-page .review-card {
         height: 65vh
     }
+    #login-card, #register-card {
+        margin-top: calc(var(--header-height) + 16px);
+    }
 }
 @media (max-width: 950px) {
     .dashboard-rows.card-rows {
@@ -3977,6 +3980,11 @@ progress::-moz-progress-bar {
     }
     .profile-reviews {
         height: auto;
+    }
+    .friend-search-form {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin: auto;
     }
 }
 /* ======== ======== */
