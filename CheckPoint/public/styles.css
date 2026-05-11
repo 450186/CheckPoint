@@ -747,6 +747,9 @@ button:hover {
     height: 300px;
     overflow-y: scroll;
 }
+.noti-dropdown::-webkit-scrollbar {
+    display: none;
+}
 .noti-container {
     display: flex;
     flex-direction: row;
