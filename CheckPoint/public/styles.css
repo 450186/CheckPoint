@@ -3975,6 +3975,9 @@ progress::-moz-progress-bar {
         grid-column: 1 / -1;
         grid-row: 4;
     }
+    .profile-review-card {
+        height: auto;
+    }
 }
 /* ======== ======== */
 /* ======== ======== */
