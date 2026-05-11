@@ -35,7 +35,7 @@ app.use(session({
     secret: sessionSecret,
     saveUninitialized: false,
     cookie: {
-        maxAge: fiveMins,
+        maxAge: oneHour,
         secure: isProduction,
         httpOnly: true
     },
