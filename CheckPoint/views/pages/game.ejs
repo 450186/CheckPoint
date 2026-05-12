@@ -40,9 +40,9 @@
                 <form action="/library/rate" class="rating-form" method="POST">
                     <input type="hidden" name="gameId" value="<%= game.id %>">
                     <label><strong>Your Rating</strong></label>
-                    <input type="hidden" name="rating" id="review-rate-input" value="<%= game.userRating ?? '' %>">
+                    <input type="hidden" name="rating" id="game-rate-input" value="<%= game.userRating ?? '' %>">
 
-                    <div class="star-rating" id="review-star-rating">
+                    <div class="star-rating" id="game-star-rating">
                     <button type="button" class="star-btn" data-value="1" aria-label="1 star">
                         <i class="fa-regular fa-star"></i>
                     </button>
@@ -169,14 +169,19 @@
                                             <input type="hidden" name="reviewId" value="<%= r.reviewId %>">
                                             <input type="hidden" name="gameId" value="<%= r.gameId %>">
                                             <button type="submit" class="delete-btn" onclick="event.stopPropagation()">
-                                                <i class="fa-solid fa-trash"></i> Delete</button>
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
                                         </form>
-                                        <form action="/reviews/edit" onclick="event.stopPropagation()" method="POST">
-                                            <input type="hidden" name="gameId" value="<%= r.gameId %>">
-                                            <input type="hidden" name="reviewId" value="<%= r.reviewId %>">
-                                            <button type="submit" class="edit-btn">
-                                                <i class="fa-solid fa-pen"></i> Edit</button>
-                                        </form>
+                                            <button
+                                            data-review-id="<%= r.reviewId %>"
+                                            data-name="<%= game.name %>"
+                                            data-title="<%= r.title %>"
+                                            data-body="<%= r.body %>"
+                                            data-rating="<%= r.rating || ''%>"
+                                            data-cover="<%= game.coverUrl %>"
+                                            type="button" class="edit-review-btn">
+                                                <i class="fa-regular fa-pen-to-square"></i>
+                                            </button>
                                     </div>
                                 <% } %>
                             </div>
@@ -194,7 +199,6 @@
                                     <% } %>
                                 <% } %>
                             </div>
-
                         <div class="review-byline">
                             <img
                                 src="https://api.dicebear.com/7.x/thumbs/svg?seed=<%= r.user.avatarSeed || r.user.username %>"
@@ -477,7 +481,30 @@
     </script>
 </div>
 <%- include('../partials/footer') %>
-<script src="/Reviewfunction.js"></script>
+<script>
+    document.querySelectorAll(".edit-review-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const rating = Number(btn.dataset.rating);
+            document.getElementById('review-title-input').value = btn.dataset.title;
+            document.getElementById('review-body-input').value = btn.dataset.body;
+            document.getElementById('review-rate-input').value = rating;
+            document.getElementById('review-modal-game-name').textContent = btn.dataset.name;
+            const coverImg = document.getElementById("review-modal-cover");
+            coverImg.src = btn.dataset.cover;
+            coverImg.alt = `${btn.dataset.name} cover`;
+            window.drawReviewStars(rating);
+
+            const form = document.querySelector(".review-form");
+            form.action = `/reviews/edit/${btn.dataset.reviewId}`;
+
+            document.getElementById("review-modal-title").textContent =
+            "Edit Review";
+            document.querySelector(".review-form .add-btn").textContent = "Save Changes";
+
+            window.openReviewModal();
+        })
+    })
+</script>
 <script>
     const usernames = document.querySelectorAll('.activity-username');
     const userAvatars = document.querySelectorAll('.activity-avatar');
@@ -569,8 +596,8 @@
   });
 </script>
 <script>
-    const starRating = document.getElementById("review-star-rating");
-    const reviewRateInput = document.getElementById("review-rate-input");
+    const starRating = document.getElementById("game-star-rating");
+    const reviewRateInput = document.getElementById("game-rate-input");
     const ratingForm = document.querySelector(".rating-form");
 
     function drawStars(value) {

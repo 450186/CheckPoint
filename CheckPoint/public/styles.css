@@ -1444,6 +1444,7 @@ textarea {
 .game-review-card {
     flex: 0 0 425px;
     min-width: 425px;
+    min-height: 300px;
     background-color: var(--cards);
     border-radius: 16px;
     padding: 20px;
@@ -1451,6 +1452,9 @@ textarea {
     border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
+}
+.game-review-card .review-byline {
+    margin-top: auto;
 }
 .review-row-wrap.scrollable .game-review-card:last-of-type {
     margin-right: 30px;
@@ -1501,6 +1505,16 @@ textarea {
     gap: 10px;
     flex-shrink: 0;
     white-space: nowrap;
+}
+.review-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    grid-column: 2;
+    grid-row: 3;
+    margin: auto;
 }
 .stats-card {
     overflow: hidden;
@@ -3484,13 +3498,22 @@ progress::-moz-progress-bar {
     }
     .game-right-side {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
         width: 100%;
     }
     .game-right-side .community-status-legend {
         width: 100%;
         margin: auto;
+    }
+    .game-rating-div {
+        grid-row: 1;
+        grid-column: 1 / -1;
+    }
+    .completion-grid {
+        grid-row: 2;
+        margin: auto;
+        margin-top: 0;
     }
     .game-main-page .library-form {
         display: flex;
@@ -3885,8 +3908,27 @@ progress::-moz-progress-bar {
         grid-row: 1;
     }
     .review-body {
-        grid-column: 1 / -1;
+        grid-column: 1;
         grid-row: 3;
+        margin: 0;
+    }
+    .review-actions {
+        grid-column: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+    }
+    .game-review-card .review-byline {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+        margin-top: auto;
+    }
+    .review-byline .activity-avatar {
+        margin-top: auto;
         margin: 0;
     }
     .dash-card.review-card {

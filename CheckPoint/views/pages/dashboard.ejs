@@ -285,8 +285,40 @@
                                         <img class="review-img-small" src="<%= review.cachedCoverUrl.replace('t_cover_big', 't_720p') %>" alt="<%= review.cachedName %>">
                                     </div>
                                     <p class="review-body"><%= review.body %></p>
+                                    <div class="review-actions">
+                                    <button 
+                                    type="button"
+                                    class="edit-review-btn"
+                                    data-review-id="<%= review._id %>"
+                                    data-name="<%= review.cachedName %>"
+                                    data-title="<%= review.title %>"
+                                    data-body="<%= review.body %>"
+                                    data-rating="<%= review.rating || ''%>"
+                                    data-cover="<%= review.cachedCoverUrl %>"
+                                    >
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </button>
+                                    <form action="/reviews/delete" class="review-remove-form" onclick="event.stopPropagation()" method="POST">
+                                        <input type="hidden" name="reviewId" value="<%= review._id %>">
+                                        <input type="hidden" name="gameId" value="<%= review.gameId %>">
+                                        <button type="submit" class="delete-btn" onclick="event.stopPropagation()">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    </div>
                                 </div> 
                             </div>
+                            <div id="confirm-overlay" class="confirm-overlay" hidden>
+                            <div class="confirm-box">
+                                <h3>Are you sure you want to delete your review of <em>"<%= review.cachedName %>"</em> called
+                                    <span class="confirm-game-name"></span>
+                                    ?</h3>
+                                <div class="confirm-buttons">
+                                    <button id="cancel-remove" type="button">Cancel</button>
+                                    <button id="confirm-remove" type="button">Remove</button>
+                                </div>
+                            </div>
+                        </div>
                         <% }) %>
                     </div>
                     <div class="card-spacer"></div>
@@ -311,7 +343,66 @@
 
     </div>
 </div>
+<script>
+    const overlay = document.getElementById('confirm-overlay')
+    const confirmBtn = document.getElementById('confirm-remove')
+    const cancelBtn = document.getElementById('cancel-remove')
+    const nameSpace = document.querySelector('.confirm-game-name')
 
+    let pendingForm = null;
+
+    document.querySelectorAll('.review-remove-form').forEach(form => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const card = form.closest('.review-slide')
+            const reviewTitle = card.querySelector('.review-title')?.textContent?.trim() || 'this review';
+
+            nameSpace.textContent = `"${reviewTitle}"`;
+            pendingForm = form;
+            overlay.hidden = false;
+        })
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        if(pendingForm) {
+            pendingForm.submit();
+            pendingForm = null;
+        }
+        overlay.hidden = true;
+    });
+    cancelBtn.addEventListener('click', () => {
+        pendingForm = null;
+        overlay.hidden = true;
+    });
+    overlay.addEventListener('click', (e) => {
+        if(e.target === overlay) {
+            pendingForm = null;
+            overlay.hidden = true;
+        }
+    });
+    document.querySelectorAll(".edit-review-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const rating = Number(btn.dataset.rating);
+            document.getElementById('review-title-input').value = btn.dataset.title;
+            document.getElementById('review-body-input').value = btn.dataset.body;
+            document.getElementById('review-rate-input').value = rating;
+            document.getElementById('review-modal-game-name').textContent = btn.dataset.name;
+            const coverImg = document.getElementById("review-modal-cover");
+            coverImg.src = btn.dataset.cover;
+            coverImg.alt = `${btn.dataset.name} cover`;
+            window.drawReviewStars(rating);
+
+            const form = document.querySelector(".review-form");
+            form.action = `/reviews/edit/${btn.dataset.reviewId}`;
+
+            document.getElementById("review-modal-title").textContent =
+            "Edit Review";
+            document.querySelector(".review-form .add-btn").textContent = "Save Changes";
+
+            window.openReviewModal();
+        })
+    })
+</script>
 <script>
     let reviewSlideIndex = 1;
 

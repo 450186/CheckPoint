@@ -69,6 +69,14 @@
   function openModal() {
     if (!openBtn) return;
 
+    if(reviewForm) reviewForm.action = "/reviews/create";
+    document.getElementById("review-modal-title").textContent = "Write a Review";
+    const submitBtn = reviewForm?.querySelector(".add-btn")
+    if(submitBtn) submitBtn.textContent = "Add Review";
+
+    if(reviewTitleInput) reviewTitleInput.value = "";
+    if(reviewTextInput) reviewTextInput.value = "";
+
     lastFocused = document.activeElement;
 
     const gameId = openBtn.dataset.gameId || "";
@@ -183,4 +191,11 @@
       first.focus();
     }
   });
+  window.openReviewModal = () => {
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  };
+
+  window.drawReviewStars = drawStars;
 })();

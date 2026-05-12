@@ -972,8 +972,8 @@ app.get("/discover", checkLogin, async (req, res) => {
         if(q && games.length === 0) {
             suggestedQueries = await searchRecs(q);
 
-            if(suggestedQueries) {
-                searchNotice = `No results for "${q}". Did you mean:`;
+            if(suggestedQueries.length > 0) {
+                searchNotice = `No results for "${q}". Try these:`;
             } else {
                 searchNotice = `No results for "${q}".`;
             }
@@ -1371,6 +1371,23 @@ app.post('/friends/remove', checkLogin, async (req, res) => {
     );
 
     res.redirect(req.get("referer") || "/profile");
+})
+app.post("/reviews/edit/:reviewId", checkLogin, async (req, res) => {
+    const { title, review, rating} = req.body;
+
+    await reviewModel.findOneAndUpdate(
+        { 
+            _id: req.params.reviewId,
+            userId: req.session.user.id
+        },
+        {
+            title,
+            body: review,
+            rating,
+            updatedAt: new Date()
+        }
+    )
+    res.redirect(req.get("Referrer") || "/dashboard");
 })
 app.get("/library", checkLogin, async (req, res) => {
 
