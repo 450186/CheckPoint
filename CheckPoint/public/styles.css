@@ -3982,7 +3982,7 @@ progress::-moz-progress-bar {
         grid-row: 4;
     }
     .profile-reviews {
-        height: auto;
+        height: fit-content;
     }
     .friend-search-form {
         grid-column: 1 / -1;
