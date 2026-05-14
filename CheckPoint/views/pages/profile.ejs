@@ -25,7 +25,77 @@
                     <button class="avatar-change" type="submit"><i class="fa-solid fa-shuffle"></i> Randomise</button>
                 </form>
             <% } %>
-        <h2><%= profileUser.username %></h2>
+            <div class="username-container">
+            <h2 class="profile-username"><%= profileUser.username %></h2>
+
+            <% if (isOwnProfile) { %>
+                <form method="POST" class="edit-username-form" action="/profile/update-username">
+                <input
+                    type="text"
+                    name="username"
+                    class="profile-username-input hidden"
+                    value="<%= profileUser.username %>"
+                    required
+                >
+
+                <button class="edit-username-btn" type="button">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+                <div class="username-btns">
+                    <button class="save-username-btn hidden" type="submit">
+                        Save
+                    </button>
+
+                    <button class="cancel-username-btn hidden" type="button">
+                        Cancel
+                    </button>
+                </div>
+                </form>
+            <% } %>
+            </div>
+            <% if (isOwnProfile) { %>
+                <div class="password-section">
+
+                <button class="edit-profile-btn change-password-btn" type="button">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                    Change Password
+                </button>
+
+                <form method="POST"
+                    action="/profile/update-password"
+                    class="edit-password-form hidden">
+
+                    <input
+                        type="password"
+                        name="currentPassword"
+                        placeholder="Current Password"
+                        required>
+
+                    <input
+                        type="password"
+                        name="newPassword"
+                        placeholder="New Password"
+                        required>
+
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm New Password"
+                        required>
+
+                    <div class="password-actions">
+                        <button type="submit" class="save-password-btn">
+                            Save
+                        </button>
+
+                        <button type="button" class="cancel-password-btn">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+            <% } %>
         <h3><%= profileUser.firstName %> <%= profileUser.lastName %></h3>
 
 
@@ -35,7 +105,6 @@
 
         <% if (isOwnProfile) { %>
             <div class="card-spacer"></div>
-            <button type="button" class="edit-profile">Edit Profile</button>
             <div class="delete-acc-container">
                 <button type="button" class="delete-profile-btn" id="show-del-confirmation">
                     <i class="fa-solid fa-user-xmark"></i> Delete Account
@@ -221,5 +290,58 @@
             finalBtn.disabled = false
         }
     })
+</script>
+<script>
+  const editUsernameBtn = document.querySelector(".edit-username-btn");
+  const saveUsernameBtn = document.querySelector(".save-username-btn");
+  const cancelUsernameBtn = document.querySelector(".cancel-username-btn");
+  const usernameText = document.querySelector(".profile-username");
+  const usernameInput = document.querySelector(".profile-username-input");
+
+  if (editUsernameBtn) {
+    editUsernameBtn.addEventListener("click", () => {
+      usernameText.classList.add("hidden");
+      usernameInput.classList.remove("hidden");
+
+      editUsernameBtn.classList.add("hidden");
+      saveUsernameBtn.classList.remove("hidden");
+      cancelUsernameBtn.classList.remove("hidden");
+
+      usernameInput.focus();
+      usernameInput.select();
+    });
+
+    cancelUsernameBtn.addEventListener("click", () => {
+      usernameInput.value = usernameText.textContent.trim();
+
+      usernameText.classList.remove("hidden");
+      usernameInput.classList.add("hidden");
+
+      editUsernameBtn.classList.remove("hidden");
+      saveUsernameBtn.classList.add("hidden");
+      cancelUsernameBtn.classList.add("hidden");
+    });
+  }
+</script>
+<script>
+    const passwordBtn = document.querySelector(".change-password-btn");
+    const passwordForm = document.querySelector(".edit-password-form");
+    const cancelPasswordBtn = document.querySelector(".cancel-password-btn");
+
+    if(passwordBtn) {
+        passwordBtn.addEventListener("click", () => {
+            passwordBtn.classList.add("hidden");
+            passwordForm.classList.remove("hidden");
+        });
+    }
+
+    if(cancelPasswordBtn) {
+        cancelPasswordBtn.addEventListener("click", () => {
+            passwordBtn.classList.remove("hidden");
+            passwordForm.classList.add("hidden");
+
+            passwordForm.reset();
+        });
+    }
 </script>
 <%- include('../partials/footer') %>

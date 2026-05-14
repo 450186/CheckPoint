@@ -1358,6 +1358,65 @@ app.post('/profile/delete', checkLogin, async (req, res) => {
         res.redirect("/profile")
     }
 })
+app.post('/profile/update-username', checkLogin, async (req, res) => {
+    const username = req.body.username?.trim()
+
+    if(!username) {
+        req.session.errorMessage = "Username cannot be empty"
+        return res.redirect("/profile")
+    }
+    const existingUser = await userModel.userData.findOne({
+        username,
+        _id: { $ne: req.session.user.id }
+    })
+
+    if(existingUser) {
+        req.session.errorMessage = "Username already taken"
+        return res.redirect("/profile")
+    }
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $set: { username } }
+    )
+    req.session.user.username = username // update session with new username
+
+    res.redirect("/profile")
+})
+app.post('/profile/update-password', checkLogin, async (req, res) => {
+    const { currentPassword, newPassword, confirmPassword} = req.body;
+
+    const user = await userModel.userData.findById(req.session.user.id)
+    if(!user) {
+        req.session.errorMessage = "User not found"
+        return res.redirect("/profile")
+    }
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password)
+    if(!passwordMatch) {
+        req.session.errorMessage = "Incorrect password"
+        return res.redirect("/profile")
+    }
+
+    if(newPassword !== confirmPassword) {
+        req.session.errorMessage = "Passwords do not match"
+        return res.redirect("/profile")
+    }
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    if(!passwordRegex.test(newPassword)) {
+        req.session.errorMessage = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+        return res.redirect("/profile")
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await userModel.userData.updateOne(
+        { _id: req.session.user.id },
+        { $set: { password: hashed } }
+    )
+    
+    req.session.errorMessage = "Password updated successfully"
+    res.redirect("/profile")
+
+})
 app.post('/friends/remove', checkLogin, async (req, res) => {
     const { friendId } = req.body;
     
