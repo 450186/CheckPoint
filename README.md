@@ -42,19 +42,13 @@ PlayVault is a full-stack web application that allows users to discover, track, 
 ---
 ## 📸 Screenshots
 
-> Add screenshots of your application here.
+| Home | Discover |
+|------|----------|
+| ![Home](screenshots/Home.png) | ![Discover](screenshots/Discover.png) |
 
-### Home
-![Home](screenshots/Home.png)
-
-### Discover
-![Discover](screenshots/Discover.png)
-
-### Library
-![Vault](screenshots/Vault.png)
-
-### Dashboard
-![Dashboard](screenshots/Dashboard.png)
+| Vault | Dashboard |
+|---------|-----------|
+| ![Library](screenshots/Vault.png) | ![Dashboard](screenshots/Dashboard.png) |
 
 ---
 
