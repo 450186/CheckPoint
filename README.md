@@ -40,6 +40,23 @@ PlayVault is a full-stack web application that allows users to discover, track, 
 - Twitch OAuth Authentication
 
 ---
+## 📸 Screenshots
+
+> Add screenshots of your application here.
+
+### Home
+![Home](screenshots/Home.png)
+
+### Discover
+![Discover](screenshots/Discover.png)
+
+### Library
+![Vault](screenshots/Vault.png)
+
+### Dashboard
+![Dashboard](screenshots/Dashboard.png)
+
+---
 
 ## 🚀 Installation
 
